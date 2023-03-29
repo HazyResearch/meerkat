@@ -12,9 +12,9 @@ export { default as Progress } from './component/_internal/progress/Progress.sve
 /** Contrib Components */
 export { default as ChangeList } from './component/contrib/change_list/ChangeList.svelte';
 export { default as Discover } from './component/contrib/discover/Discover.svelte';
-export { default as Row } from './component/contrib/row/Row.svelte';
 export { default as FMFilter } from "./component/contrib/fm_filter/FMFilter.svelte";
 export { default as GlobalStats } from './component/contrib/global_stats/GlobalStats.svelte';
+export { default as Row } from './component/contrib/row/Row.svelte';
 /** Core Components */
 export { default as Audio } from './component/core/audio/Audio.svelte';
 export { default as Button } from './component/core/button/Button.svelte';
