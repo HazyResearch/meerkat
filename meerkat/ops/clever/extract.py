@@ -1,7 +1,16 @@
+from functools import partial
+from typing import Union
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.dataframe import DataFrame
 from meerkat.engines.abstract import TextCompletion
 from meerkat.row import Row
+from meerkat import env
+
+if env.package_available("guardrails"):
+    import guardrails as gd
+    Guard = gd.Guard
+else:
+    Guard = None
 
 
 def _prepare_row(row: Row, output_column: str, is_test: bool):
@@ -29,7 +38,6 @@ def extract(
     column: str,
     to: str,
     engine: TextCompletion = None,
-    schema: str = None
 ):
     """Extract information given some annotated examples.
 
@@ -48,8 +56,6 @@ def extract(
 
     """
     column_name = column
-    if not isinstance(df[to], ScalarColumn):
-        raise TypeError("Extraction is only supported for scalar columns.")
 
     # Annotated examples.
     annot_input = annotated_df[[column_name, to]]
@@ -66,7 +72,7 @@ def extract(
     test_df = df[[column]]
     return test_df.map(
         lambda row: engine.run(
-            prompt=in_ctx_examples + "\n" + _prepare_row(row, column=to, is_test=True)
+            prompt=in_ctx_examples + "\n" + _prepare_row(row, output_column=to, is_test=True)
         ),
         inputs="row",
     )
@@ -74,8 +80,9 @@ def extract(
 
 def extract_to_schema(
     column: ScalarColumn,
-    schema: str,
+    schema: Union[str, Guard] = None,
     engine: TextCompletion = None,
+    prompt: str = None,
 ) -> ScalarColumn:
     """Extract information from a column to a specified schema.
 
@@ -87,13 +94,15 @@ def extract_to_schema(
     Return:
         A column with the extracted information.
     """
-    prompt = """
-    Extract information from the TEXT to a SCHEMA.
+    if isinstance(schema, Guard):
+        return column.map(
+            lambda text: schema(engine.run, prompt_params=dict(text=text))[0]
+        )
 
-    TEXT: {text}
-    SCHEMA: {schema}
-    """
-
+    if prompt is None:
+        prompt = "Extract information from the TEXT to a SCHEMA.\n\nTEXT: {text}\nSCHEMA: {schema}\nAnswer:"
+    
+    formatter = partial(prompt.format, schema=schema)
     return column.map(
-        lambda text: engine.run(prompt=prompt.format(text=text, schema=schema))
+        lambda text: engine.run(prompt=formatter(text=text))
     )

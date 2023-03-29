@@ -87,6 +87,19 @@ class ChatCompletion(TextCompletion):
     def with_openai(cls, key: str):
         return OpenAIChatCompletion(key)
 
+    @classmethod
+    def with_mock(cls, **kwargs):
+        return MockChatCompletion(**kwargs)
+
+
+class MockChatCompletion(ChatCompletion):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.engine = lambda *args, **kwargs: "\n---Mock Response---"
+
+    def run(self, prompt: str) -> str:
+        return prompt + self.engine()
+
 
 class Message(BaseModel):
     role: str
