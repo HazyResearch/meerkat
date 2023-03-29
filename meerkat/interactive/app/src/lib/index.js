@@ -63,8 +63,6 @@ export { default as ScatterPlot } from './component/plotly/scatter/ScatterPlot.s
 export { API_URL } from './constants.js';
 export { default as Page } from './shared/Page.svelte';
 /** Shared Components */
-export { default as DynamicComponent } from './shared/DynamicComponent.svelte';
-export { default as Cell } from './shared/cell/Cell.svelte';
 export { default as Website } from './shared/cell/website/Website.svelte';
 export { default } from './utils/api';
 export { meerkatWritable } from './utils/stores.js';
