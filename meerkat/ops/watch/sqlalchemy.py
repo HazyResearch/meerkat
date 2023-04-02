@@ -1,20 +1,19 @@
 """Postgres cache."""
 import hashlib
 import logging
-from typing import Any, Dict, Union
 import uuid
+from typing import Any, Dict, Union
 
 logger = logging.getLogger("postgresql")
 logger.setLevel(logging.WARNING)
 
-from .abstract import WatchLogger
-
 import sqlalchemy  # type: ignore
+from sqlalchemy import Column, Identity, Integer, String, create_engine  # type: ignore
 from sqlalchemy.engine import Engine
-# from google.cloud.sql.connector import Connector  # type: ignore
-from sqlalchemy import Column, String, Integer, Identity  # type: ignore
 from sqlalchemy.ext.declarative import declarative_base  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
+
+from .abstract import WatchLogger
 
 Base = declarative_base()
 
@@ -31,7 +30,6 @@ class Query(Base):  # type: ignore
 
 class SQLAlchemyWatchLogger(WatchLogger):
     """A PostgreSQL cache for request/response pairs."""
-
 
     def __init__(self, engine: Engine):
         """
@@ -68,12 +66,24 @@ class SQLAlchemyWatchLogger(WatchLogger):
             value: new value for key.
             table: table to set key in.
         """
-        self.session.add(Query(
-            id=str(uuid.uuid4()),
-            input=input, response=response, engine=engine
-        ))
+        self.session.add(
+            Query(id=str(uuid.uuid4()), input=input, response=response, engine=engine)
+        )
         self.commit()
 
     def commit(self) -> None:
         """Commit any results."""
         self.session.commit()
+
+    @classmethod
+    def from_snowflake(cls, user: str, password: str, account_identifier: str):
+
+        engine = create_engine(
+            f"snowflake://{user}:{password}@{account_identifier}/meerkatlogs/public"
+        )
+        return cls(engine=engine)
+    
+    @classmethod
+    def from_bigquery(cls, project: str, dataset: str):
+        engine = create_engine(f'bigquery://{project}/{dataset}')
+        return cls(engine=engine)

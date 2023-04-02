@@ -25,7 +25,7 @@ def summarize(
     df: DataFrame,
     *,
     column: str,
-    engine: TextCompletion = TextCompletion.with_openai(),
+    engine: TextCompletion,
 ):
     """Summarize every row in a column."""
 
