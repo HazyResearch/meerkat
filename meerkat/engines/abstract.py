@@ -68,6 +68,10 @@ class TextCompletion(BaseEngine):
     def stop(self, stop: Union[str, List[str]]):
         """The stop sequences."""
         raise NotImplementedError("Engine must implement the stop method.")
+    
+    def run(self, prompt: str) -> str:
+        """Run the engine on a prompt."""
+        raise NotImplementedError("Engine must implement the run method.")
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}()"
@@ -324,11 +328,43 @@ class AnthropicTextCompletion(TextCompletion):
         return await self.run(prompt=prompt)
 
 
-"""
-from meerkat.engines import TextCompletion
+class PersonalityChatbot(ChatCompletion):
 
-engine = TextCompletion.openai("davinci-003", temperature=0.1)
-TextCompletion.openai().temperature(0.1).max_tokens(100).run("This is a test of the emergency broadcast system.")
-completion = engine("This is a test of the emergency broadcast system.")
-engine.response
-"""
+    def __init__(
+        self,
+        name: str,
+        personality: str,
+        bio: str,
+    ):
+        self.name = "Chatty the Chatbot"
+        self.personality = "You are a helpful assistant."
+        self.bio = "I am a chatbot."
+
+    def personality(self, personality: str):
+        self.personality = personality
+        return self
+
+    def description(self, description: str):
+        self.description = description
+        return self
+
+    def run(
+        self,
+        prompt: str,
+        history: List[Message] = [],
+    ):
+        """Run the engine on a prompt."""
+        messages = (
+            [
+                {
+                    "role": "system",
+                    "content": self.description,
+                }
+            ]
+            + [message.dict() for message in history]
+            + [{"role": "user", "content": prompt}]
+        )
+        response = personality_chatbot(messages=messages)
+        self.response = response
+        return response["choices"][0]["message"]["content"]
+    

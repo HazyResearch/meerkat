@@ -8,6 +8,7 @@ from meerkat import env
 
 if env.package_available("guardrails"):
     import guardrails as gd
+
     Guard = gd.Guard
 else:
     Guard = None
@@ -72,7 +73,9 @@ def extract(
     test_df = df[[column]]
     return test_df.map(
         lambda row: engine.run(
-            prompt=in_ctx_examples + "\n" + _prepare_row(row, output_column=to, is_test=True)
+            prompt=in_ctx_examples
+            + "\n"
+            + _prepare_row(row, output_column=to, is_test=True)
         ),
         inputs="row",
     )
@@ -101,8 +104,35 @@ def extract_to_schema(
 
     if prompt is None:
         prompt = "Extract information from the TEXT to a SCHEMA.\n\nTEXT: {text}\nSCHEMA: {schema}\nAnswer:"
-    
+
     formatter = partial(prompt.format, schema=schema)
-    return column.map(
-        lambda text: engine.run(prompt=formatter(text=text))
+    return column.map(lambda text: engine.run(prompt=formatter(text=text)))
+
+
+def extraction_guard(schema: str) -> Guard:
+    output = """
+<output>
+{schema}
+</output>
+""".format(
+        schema=schema
     )
+
+    prompt = """
+<prompt>
+Extract data from the given text into the schema below.
+Text: {{text}}
+@complete_json_suffix_v2\
+</prompt>
+"""
+
+    rail = """\
+<rail version="0.1">
+{output}
+{prompt}
+</rail>
+""".format(
+        output=output, prompt=prompt
+    )
+
+    return gd.Guard.from_rail_string(rail)

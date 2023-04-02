@@ -1,1 +1,1 @@
-from meerkat.ops.clever.extract import extract, extract_to_schema
+from meerkat.ops.clever.extract import extract, extract_to_schema, extraction_guard
