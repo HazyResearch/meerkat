@@ -17,6 +17,18 @@ class BaseEngine:
     def __call__(self, *args, **kwargs):
         raise NotImplementedError("Engine must implement the __call__ method.")
 
+    def name(self) -> str:
+        """The name of the engine."""
+        return self.__class__.__name__
+
+    # def log(
+    #     self, 
+    #     logger: WatchLogger,
+    # ):
+    #     """Log the engine."""
+    #     logger.log_engine_run(
+    #         errand_run_id,
+    #     )
 
 class EngineResponse:
     pass
@@ -159,7 +171,7 @@ class OpenAIChatCompletion(ChatCompletion):
         return self
 
     def help(self):
-        print(self.engine.__doc__)
+        print(self.engine.__doc__)    
 
     def run(
         self,
@@ -168,6 +180,15 @@ class OpenAIChatCompletion(ChatCompletion):
         system_prompt: str = "You are a helpful assistant.",
     ):
         """Run the engine on a prompt."""
+        self.log_engine_run(
+            input={
+                "prompt": prompt,
+                "history": history,
+                "system_prompt": system_prompt,
+            },
+            outputs
+
+        )
         messages = (
             [
                 {
