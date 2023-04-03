@@ -27,7 +27,6 @@ class EngineRun(Base):
     input = Column(String)
     output = Column(String)
     engine = Column(String)
-    response = Column(String)
     cost = Column(Float)
     input_tokens = Column(Integer)
     output_tokens = Column(Integer)
@@ -170,7 +169,6 @@ class SQLAlchemyWatchLogger(WatchLogger):
         input: str,
         output: str,
         engine: str,
-        response: str,
         cost: float,
         input_tokens: int,
         output_tokens: int,
@@ -181,9 +179,8 @@ class SQLAlchemyWatchLogger(WatchLogger):
                 id=str(uuid.uuid4()),
                 errand_run_id=errand_run_id,
                 input=input,
-
+                output=output,
                 engine=engine,
-                response=response,
                 cost=cost,
                 input_tokens=input_tokens,
                 output_tokens=output_tokens,
@@ -228,4 +225,9 @@ class SQLAlchemyWatchLogger(WatchLogger):
     @classmethod
     def from_bigquery(cls, project: str, dataset: str):
         engine = create_engine(f"bigquery://{project}/{dataset}")
+        return cls(engine=engine)
+
+    @classmethod
+    def from_sqlite(cls, path: str):
+        engine = create_engine(f"sqlite:///{path}")
         return cls(engine=engine)

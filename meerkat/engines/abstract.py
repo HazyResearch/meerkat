@@ -4,6 +4,7 @@ from typing import Callable, List, Optional, Union
 from pydantic import BaseModel, validator
 
 from meerkat.tools.lazy_loader import LazyLoader
+from meerkat.ops.watch.abstract import WatchLogger
 
 manifest = LazyLoader("manifest")
 openai = LazyLoader("openai")
@@ -129,6 +130,11 @@ class Message(BaseModel):
 
 
 class OpenAIChatCompletion(ChatCompletion):
+
+    COST_PER_TOKEN = {
+        "gpt-3.5-turbo": 0.002/1000,
+    }
+
     def __init__(
         self,
         key: str = None,
@@ -173,6 +179,30 @@ class OpenAIChatCompletion(ChatCompletion):
     def help(self):
         print(self.engine.__doc__)    
 
+    def set_logger(self, logger: WatchLogger):
+        self.logger = logger
+
+    def log_engine_run(
+        self,
+        errand_run_id: str,
+        input: str,
+        output: str,
+        engine: str,
+        cost: float,
+        input_tokens: int,
+        output_tokens: int,
+    ) -> None:
+        """Log the engine run."""
+        self.logger.log_engine_run(
+            errand_run_id,
+            input=input,
+            output=output,
+            engine=engine,
+            cost=cost,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+        )
+
     def run(
         self,
         prompt: str,
@@ -180,15 +210,6 @@ class OpenAIChatCompletion(ChatCompletion):
         system_prompt: str = "You are a helpful assistant.",
     ):
         """Run the engine on a prompt."""
-        self.log_engine_run(
-            input={
-                "prompt": prompt,
-                "history": history,
-                "system_prompt": system_prompt,
-            },
-            outputs
-
-        )
         messages = (
             [
                 {
@@ -201,6 +222,20 @@ class OpenAIChatCompletion(ChatCompletion):
         )
         response = self.engine(messages=messages)
         self.response = response
+
+        self.log_engine_run(
+            input={
+                "prompt": prompt,
+                "history": history,
+                "system_prompt": system_prompt,
+            },
+            output=response,
+            engine=self.name,
+            cost=self.COST_PER_TOKEN[self.name],
+            input_tokens=response["usage"]["prompt_tokens"],
+            output_tokens=response["usage"]["completion_tokens"],
+        )
+
         return response["choices"][0]["message"]["content"]
 
 
