@@ -8,7 +8,7 @@ Meerkat's documentation is still under construction to make it as comprehensive 
 
 Meerkat's goal is to help technical teams work with *unstructured data* like images, text, audio etc., especially when using foundation models. We want to make foundation models a reliable software abstraction that can underlie applications that require reasoning about unstructured data.
 
-Read more about our motivation for building Meerkat in our [blog post](https://hazyresearch.github.io/blog/meerkat). Long story short: we realized that to use foundation models reliably, we needed something that would make interactively working with unstructured data and models simple. We built Meerkat so users can focus on their problems and data and not on writing complicated, messy code.
+Read more about our motivation for building Meerkat in our [blog post](https://hazyresearch.stanford.edu/blog/2023-03-01-meerkat). Long story short: we realized that to use foundation models reliably, we needed something that would make interactively working with unstructured data and models simple. We built Meerkat so users can focus on their problems and data and not on writing complicated, messy code.
 
 Through our Python library and npm package, we offer tools to help you work with unstructured data and foundation models across many contexts:
 - a simple, full-stack framework to build interactive user interfaces purely in Python,
