@@ -57,8 +57,9 @@ export { default as Toggle } from './component/core/toggle/Toggle.svelte';
 export { default as Vega } from './component/core/vega/Vega.svelte';
 /** Plotly Components */
 export { default as BarPlot } from './component/plotly/bar/BarPlot.svelte';
-export { default as Plot } from './component/plotly/plot/Plot.svelte';
+export { default as Histogram } from './component/plotly/histogram/Histogram.svelte';
 export { default as ScatterPlot } from './component/plotly/scatter/ScatterPlot.svelte';
+export { default as ScatterMapbox } from './component/plotly/scattermapbox/ScatterMapbox.svelte';
 /** Utils */
 export { API_URL } from './constants.js';
 export { default as Page } from './shared/Page.svelte';

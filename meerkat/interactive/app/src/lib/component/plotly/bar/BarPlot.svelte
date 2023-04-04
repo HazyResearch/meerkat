@@ -9,8 +9,12 @@
 	export let y: string;
 	export let orientation: string = 'v';
 	export let config: Record<string, any> = { displayModeBar: false };
+	export let splits: Array<string>;
+	export let barmode: string;
 	export let title: string;
 	export let onClick: Endpoint;
+
+	console.log('splits', splits);
 
 	$: data_promise = fetchChunk({
 		df: df,
@@ -18,6 +22,17 @@
 		columns: [x, y],
 		variants: ['small']
 	}).then((chunk) => {
+		if (splits) {
+			return splits.map((split) => {
+				return {
+					x: chunk.getColumn(x).data,
+					y: chunk.getColumn(y).data,
+					name: split,
+					keyidx: chunk.getColumn(chunk.primaryKey).data,
+					type: 'bar'
+				};
+			});
+		}
 		return [
 			{
 				x: chunk.getColumn(x).data,
@@ -29,7 +44,7 @@
 		];
 	});
 
-	const layout = { xaxis: { title: x }, yaxis: { title: y }, title: title };
+	const layout = { xaxis: { title: x }, yaxis: { title: y }, title: title, barmode: barmode };
 
 	async function on_endpoint(endpoint: Endpoint, e) {
 		let data = await data_promise;
