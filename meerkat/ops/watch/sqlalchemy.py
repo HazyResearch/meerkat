@@ -3,6 +3,7 @@ import hashlib
 import logging
 import uuid
 from typing import Any, Dict, Union
+from meerkat import DataFrame
 
 logger = logging.getLogger("postgresql")
 logger.setLevel(logging.WARNING)
@@ -38,7 +39,7 @@ class ErrandRun(Base):
     __tablename__ = "errand_runs"
     id = Column(String, primary_key=True)
     errand_id = Column(String)
-    key = Column(String)
+    # key = Column(String)
     parent_id = Column(String)
     engine = Column(String)
 
@@ -159,7 +160,6 @@ class SQLAlchemyWatchLogger(WatchLogger):
                 key=key,
             )
             self.session.add(errand_run_input)
-        print("here")
         self.commit()
         return errand_run.id
 
@@ -214,6 +214,10 @@ class SQLAlchemyWatchLogger(WatchLogger):
         """Commit any results."""
         self.session.commit()
 
+    def rollback(self) -> None:
+        """Rollback any results."""
+        self.session.rollback()
+
     @classmethod
     def from_snowflake(cls, user: str, password: str, account_identifier: str):
 
@@ -231,3 +235,12 @@ class SQLAlchemyWatchLogger(WatchLogger):
     def from_sqlite(cls, path: str):
         engine = create_engine(f"sqlite:///{path}")
         return cls(engine=engine)
+
+    def get_table(self, model: type):
+        result = self.session.query(model).all()
+        return DataFrame(
+            [
+                {c.name: getattr(row, c.name) for c in model.__table__.columns}
+                for row in result
+            ]
+        )
