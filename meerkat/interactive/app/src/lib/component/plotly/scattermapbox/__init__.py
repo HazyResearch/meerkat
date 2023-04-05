@@ -41,10 +41,9 @@ class ScatterMapbox(Component):
             title=title,
             mapbox_style="open-street-map",
         )
-        self.json_desc = fig.to_json()
 
         super().__init__(
-            df=df, lat=lat, lon=lon, json_desc=self.json_desc, on_click=on_click
+            df=df, lat=lat, lon=lon, json_desc=fig.to_json(), on_click=on_click
             # df=df, lat=lat, lon=lon, json_desc=fig.to_json(), on_click=on_click
         )
 
