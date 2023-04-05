@@ -1,4 +1,4 @@
-from typing import Optional
+import plotly.express as px
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import EndpointProperty
@@ -9,26 +9,24 @@ from ...abstract import Component
 
 class Histogram(Component):
     df: DataFrame
-    x: str
-    color: Optional[str]
-    title: Optional[str]
-    nbins: Optional[int]
     on_click: EndpointProperty = None
+
+    json_desc: str = ""
 
     def __init__(
         self,
         df: DataFrame,
         *,
-        x: str,
-        color: Optional[str] = None,
-        title: Optional[str] = None,
-        nbins: Optional[int] = None,
         on_click: EndpointProperty = None,
+        **kwargs,
     ):
-        super().__init__(
-            df=df, x=x, on_click=on_click, color=color, title=title, nbins=nbins
-        )
+        fig = px.histogram(df.to_pandas(), **kwargs)
+
+        super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 
     @classproperty
     def namespace(cls):
         return "plotly"
+
+    def _get_ipython_height(self):
+        return "800px"
