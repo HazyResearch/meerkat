@@ -6,20 +6,18 @@
 	export let jsonDesc: string;
 	export let onClick: Endpoint;
 
-	console.log("jsonDesc yo:", jsonDesc);
-
-	async function on_endpoint(endpoint: Endpoint, e) {
-		let d = JSON.parse(jsonDesc).data;
+	async function onEndpoint(endpoint: Endpoint, e) {
+		let data = JSON.parse(jsonDesc).data;
 		e.detail.points;
 		console.log(e);
 		if (endpoint) {
 			dispatch(endpoint.endpointId, {
 				detail: {
-					keyidxs: e.detail.points.map((p) => d[0].keyidx[p.pointIndex])
+					keyidxs: e.detail.points.map((p) => data[0].keyidx[p.pointIndex])
 				}
 			});
 		}
 	}
 </script>
 
-<Plot data={JSON.parse(jsonDesc).data} on:click={(e) => on_endpoint(onClick, e)} />
+<Plot {...JSON.parse(jsonDesc)} on:click={(e) => onEndpoint(onClick, e)} />
