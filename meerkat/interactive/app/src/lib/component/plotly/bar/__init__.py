@@ -6,7 +6,7 @@ from meerkat.interactive.endpoint import EndpointProperty
 from meerkat.tools.utils import classproperty
 
 
-class BarPlot(Component):
+class Bar(Component):
     df: DataFrame
     x: str
     y: str

@@ -1,13 +1,12 @@
-
-from .bar import BarPlot
+from .bar import Bar
 from .histogram import Histogram
 from .plot import Plot
-from .scatter import ScatterPlot
-from .scattermapbox import ScatterMapbox
+from .scatter import Scatter
+from .scatter_mapbox import ScatterMapbox
 
 __all__ = [
-    "BarPlot",
+    "Bar",
     "Histogram",
-    "ScatterPlot",
+    "Scatter",
     "ScatterMapbox",
 ]

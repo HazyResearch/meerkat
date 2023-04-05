@@ -56,10 +56,10 @@ export { default as Textbox } from './component/core/textbox/Textbox.svelte';
 export { default as Toggle } from './component/core/toggle/Toggle.svelte';
 export { default as Vega } from './component/core/vega/Vega.svelte';
 /** Plotly Components */
-export { default as BarPlot } from './component/plotly/bar/BarPlot.svelte';
+export { default as Bar } from './component/plotly/bar/Bar.svelte';
 export { default as Histogram } from './component/plotly/histogram/Histogram.svelte';
-export { default as ScatterPlot } from './component/plotly/scatter/ScatterPlot.svelte';
-export { default as ScatterMapbox } from './component/plotly/scattermapbox/ScatterMapbox.svelte';
+export { default as Scatter } from './component/plotly/scatter/Scatter.svelte';
+export { default as ScatterMapbox } from './component/plotly/scatter_mapbox/ScatterMapbox.svelte';
 /** Utils */
 export { API_URL } from './constants.js';
 export { default as Page } from './shared/Page.svelte';

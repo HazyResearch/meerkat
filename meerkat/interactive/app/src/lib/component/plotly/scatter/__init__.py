@@ -6,7 +6,7 @@ from meerkat.interactive.endpoint import Endpoint, EndpointProperty
 from meerkat.tools.utils import classproperty
 
 
-class ScatterPlot(Component):
+class Scatter(Component):
     df: DataFrame
     x: str
     y: str
