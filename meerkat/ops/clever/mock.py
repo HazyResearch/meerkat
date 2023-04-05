@@ -1,14 +1,15 @@
-from functools import partial
 import inspect
+from functools import partial
 from typing import Callable
+
 from meerkat.engines import TextCompletion
 
 
-def pretender(fn: Callable = None, engine: TextCompletion = None):
+def mock(fn: Callable = None, engine: TextCompletion = None):
     """A decorator to implement a function using a language model."""
 
     if fn is None:
-        return partial(pretender, engine=engine)
+        return partial(mock, engine=engine)
 
     if engine is None:
         raise ValueError("You must provide an engine.")
@@ -35,7 +36,7 @@ Output:\
         bound_args = sig.bind(*args, **kwargs)
         # Fill in the template.
         prompt = template.format(
-            source=str(inspect.getsource(fn)).replace("@pretender", ""),
+            source=str(inspect.getsource(fn)).replace("@mock", ""),
             params=bound_args.arguments,
         )
 
@@ -46,6 +47,10 @@ Output:\
 
 if __name__ == "__main__":
     # Example usage.
-    @pretender
+    @mock
+    def fruits(n: int = 3) -> list[str]:
+        """A list of `n` fruits."""
+
+    @mock(engine=engine_mock.dummy("['apple', 'orange', 'banana']"))
     def fruits(n: int = 3) -> list[str]:
         """A list of `n` fruits."""

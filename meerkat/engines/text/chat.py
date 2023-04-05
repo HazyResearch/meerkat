@@ -30,18 +30,46 @@ class ChatCompletion(TextCompletion):
     def with_openai(cls, key: str):
         return OpenAIChatCompletion(key)
 
+    def set_logger(self, logger: WatchLogger):
+        self_.logger = logger
+
+    def set_errand_run_id(self, errand_run_id: str):
+        self._errand_run_id = errand_run_id
+
 
 class MockChatCompletion(ChatCompletion):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.engine = lambda *args, **kwargs: "\n---Mock Response---"
+    """
+    A text completion engine that takes in a prompt and returns a completion.
+    """
 
-    def response(self, response: str):
-        self.engine = lambda *args, **kwargs: response
-        return self
+    @property
+    def parameter_mapping(self):
+        """Map from Meerkat parameter names to the engine's parameter names."""
+        return {
+            "model": "model",
+            "temperature": "temperature",
+            "max_tokens": "max_tokens",
+            "top_k": "top_k",
+            "top_p": "top_p",
+            "n": "n",
+            "stop": "stop",
+            "dummy": "dummy",
+        }
 
-    def run(self, prompt: str) -> str:
-        return prompt + self.engine()
+    def setup_engine(self, **kwargs):
+        def mock(prompt, dummy="Mock response.") -> str:
+            return dummy
+
+        self._engine = mock
+
+    def _check_import(self):
+        pass
+
+    def dummy(self, dummy: str):
+        return self.configure(dummy=dummy)
+
+    def parse_response(self, response: str) -> str:
+        return response
 
 
 class Message(BaseModel):
@@ -63,18 +91,17 @@ class OpenAIChatCompletion(ChatCompletion):
 
     def __init__(
         self,
-        key: str = None,
-        model: Optional[str] = None,
+        key: Optional[str] = None,
+        model: Optional[str] = "gpt-3.5-turbo",
         temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
+        max_tokens: Optional[int] = 20,
         top_k: Optional[int] = None,
         top_p: Optional[float] = None,
         n: Optional[int] = None,
         stop: Optional[Union[str, List[str]]] = None,
     ):
-        self._check_import()
-        self.engine = partial(openai.ChatCompletion.create, api_key=key)
-        self.configure(
+        super().__init__(
+            key=key,
             model=model,
             temperature=temperature,
             max_tokens=max_tokens,
@@ -84,50 +111,20 @@ class OpenAIChatCompletion(ChatCompletion):
             stop=stop,
         )
 
+    def setup_engine(self, key: str = None):
+        import openai
+
+        openai.api_key = key
+        self._engine = openai.ChatCompletion.create
+
     def _check_import(self):
         try:
             import openai
         except ImportError:
             raise ImportError(
-                "OpenAI is not installed. Install with `pip install meerkat[openai]`."
+                f"{self.__class__.__name__} requires the openai package."
+                " Please install it with `pip install openai`."
             )
-
-    def model(self, model: str):
-        """The name of the model to use for completion."""
-        self.engine = partial(self.engine, model=model)
-        return self
-
-    def temperature(self, temperature: float):
-        """The temperature of the model. Higher values will result in more creative completions, but also more mistakes."""
-        self.engine = partial(self.engine, temperature=temperature)
-        return self
-
-    def help(self):
-        print(self.engine.__doc__)
-
-    def set_logger(self, logger: WatchLogger):
-        self.logger = logger
-
-    def log_engine_run(
-        self,
-        errand_run_id: str,
-        input: str,
-        output: str,
-        engine: str,
-        cost: float,
-        input_tokens: int,
-        output_tokens: int,
-    ) -> None:
-        """Log the engine run."""
-        self.logger.log_engine_run(
-            errand_run_id,
-            input=input,
-            output=output,
-            engine=engine,
-            cost=cost,
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
-        )
 
     def run(
         self,
@@ -136,6 +133,7 @@ class OpenAIChatCompletion(ChatCompletion):
         system_prompt: str = "You are a helpful assistant.",
     ):
         """Run the engine on a prompt."""
+        self.prompt = prompt
         messages = (
             [
                 {
@@ -146,23 +144,37 @@ class OpenAIChatCompletion(ChatCompletion):
             + [message.dict() for message in history]
             + [{"role": "user", "content": prompt}]
         )
-        response = self.engine(messages=messages)
-        self.response = response
+        self.messages = messages
+        self.response = self.engine(messages=messages)
 
-        self.log_engine_run(
-            input={
-                "prompt": prompt,
-                "history": history,
-                "system_prompt": system_prompt,
-            },
-            output=response,
-            engine=self.name,
-            cost=self.COST_PER_TOKEN[self.name],
-            input_tokens=response["usage"]["prompt_tokens"],
-            output_tokens=response["usage"]["completion_tokens"],
+        self.result = self.parse_response(self.response)
+        self.on_run_end()
+        return self.result
+
+    def parse_response(self, response: dict) -> str:
+        return response["choices"][0]["message"]["content"]
+
+    def on_run_end(self):
+        """Run after the engine has been run."""
+        if self._logger is None:
+            return
+
+        self._logger.log_engine_run(
+            errand_run_id=self._errand_run_id
+            if hasattr(self, "_errand_run_id")
+            else None,
+            input=self.prompt,
+            output=self.result,
+            engine=f"{self.name}/{self._model}",
+            cost=self.COST_PER_TOKEN[self._model]
+            * self.response["usage"]["total_tokens"],
+            input_tokens=self.response["usage"]["prompt_tokens"],
+            output_tokens=self.response["usage"]["completion_tokens"],
         )
 
-        return response["choices"][0]["message"]["content"]
+    def key(self, key: str):
+        self.setup_engine(key=key)
+        return self
 
 
 class PersonalityChatbot(ChatCompletion):

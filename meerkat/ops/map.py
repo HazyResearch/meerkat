@@ -620,3 +620,49 @@ def _materialize(
                 )
             )
         return concat(result)
+
+
+async def amap(
+    data: Union["DataFrame", "Column"],
+    function: Callable,
+    pbar: bool = True,
+    max_concurrent: int = 100,
+) -> Union["DataFrame", "Column"]:
+    """Apply a function to each element in the column.
+
+    Args:
+        data: The column or dataframe to apply the function to.
+        function: The function to apply to each element in the column.
+        pbar: Whether to show a progress bar or not.
+        max_concurrent: The maximum number of concurrent tasks to run.
+
+    Returns:
+        A column or dataframe with the function applied to each element.
+    """
+
+    # Iterate over the data, applying the function to each element.
+    async def apply_function(element):
+        return await function(element)
+
+    async def process_data():
+        if isinstance(data, DataFrame):
+            transformed_data = data.copy()
+            for column in data.columns:
+                results = await process_column(data[column])
+                transformed_data[column] = results
+        else:
+            transformed_data = await process_column(data)
+        return transformed_data
+
+    async def process_column(column):
+        results = []
+        async for element in column:
+            result = await apply_function(element)
+            results.append(result)
+        return column(results)
+
+    
+
+if __name__ == '__main__':
+    df = DataFrame({'a': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'b': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
+    df = df.amap(lambda x: x + 1, batch_size=2, pbar=False)

@@ -366,7 +366,7 @@ class OpenAITextCompletion(TextCompletion):
             output_tokens=self.response["usage"]["completion_tokens"],
         )
 
-    def parse_response(self, response):
+    def parse_response(self, response: dict) -> str:
         return response.choices[0].text
 
     def key(self, key: str):

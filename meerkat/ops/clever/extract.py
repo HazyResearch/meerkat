@@ -2,7 +2,7 @@ from functools import partial
 from typing import Union
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.dataframe import DataFrame
-from meerkat.engines.abstract import TextCompletion
+from meerkat.engines import TextCompletion
 from meerkat.row import Row
 from meerkat import env
 
