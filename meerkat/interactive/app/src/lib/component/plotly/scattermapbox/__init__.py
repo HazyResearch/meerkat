@@ -44,7 +44,6 @@ class ScatterMapbox(Component):
 
         super().__init__(
             df=df, lat=lat, lon=lon, json_desc=fig.to_json(), on_click=on_click
-            # df=df, lat=lat, lon=lon, json_desc=fig.to_json(), on_click=on_click
         )
 
     @classproperty
