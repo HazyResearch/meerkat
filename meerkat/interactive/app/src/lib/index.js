@@ -5,14 +5,14 @@
  * would not include it in the package/ build.
  * We manually compile the Tailwind CSS into package/app.css (
  * replacing the tailwind directives with the actual CSS), and then publish
-*/
-export { default as styles } from "./app.css";
+ */
+export { default as styles } from './app.css';
 /** Internal Components */
 export { default as Progress } from './component/_internal/progress/Progress.svelte';
 /** Contrib Components */
 export { default as ChangeList } from './component/contrib/change_list/ChangeList.svelte';
 export { default as Discover } from './component/contrib/discover/Discover.svelte';
-export { default as FMFilter } from "./component/contrib/fm_filter/FMFilter.svelte";
+export { default as FMFilter } from './component/contrib/fm_filter/FMFilter.svelte';
 export { default as GlobalStats } from './component/contrib/global_stats/GlobalStats.svelte';
 export { default as Row } from './component/contrib/row/Row.svelte';
 /** Core Components */
@@ -50,16 +50,47 @@ export { default as Sort } from './component/core/sort/Sort.svelte';
 export { default as Stats } from './component/core/stats/Stats.svelte';
 export { default as Table } from './component/core/table/Table.svelte';
 export { default as Tabs } from './component/core/tabs/Tabs.svelte';
-export { default as Tensor } from "./component/core/tensor/Tensor.svelte";
+export { default as Tensor } from './component/core/tensor/Tensor.svelte';
 export { default as Text } from './component/core/text/Text.svelte';
 export { default as Textbox } from './component/core/textbox/Textbox.svelte';
 export { default as Toggle } from './component/core/toggle/Toggle.svelte';
 export { default as Vega } from './component/core/vega/Vega.svelte';
 /** Plotly Components */
+export { default as Area } from './component/plotly/area/Area.svelte';
 export { default as Bar } from './component/plotly/bar/Bar.svelte';
+export { default as BarPolar } from './component/plotly/bar_polar/BarPolar.svelte';
+export { default as Box } from './component/plotly/box/Box.svelte';
+export { default as Choropleth } from './component/plotly/choropleth/Choropleth.svelte';
+export { default as ChoroplethMapbox } from './component/plotly/choropleth_mapbox/ChoroplethMapbox.svelte';
+export { default as DensityContour } from './component/plotly/density_contour/DensityContour.svelte';
+export { default as DensityHeatmap } from './component/plotly/density_heatmap/DensityHeatmap.svelte';
+export { default as DensityMapbox } from './component/plotly/density_mapbox/DensityMapbox.svelte';
+export { default as ECDF } from './component/plotly/ecdf/ECDF.svelte';
+export { default as Funnel } from './component/plotly/funnel/Funnel.svelte';
+export { default as FunnelArea } from './component/plotly/funnel_area/FunnelArea.svelte';
 export { default as Histogram } from './component/plotly/histogram/Histogram.svelte';
+export { default as Icicle } from './component/plotly/icicle/Icicle.svelte';
+export { default as Line } from './component/plotly/line/Line.svelte';
+export { default as Line3D } from './component/plotly/line_3d/Line3D.svelte';
+export { default as LineGeo } from './component/plotly/line_geo/LineGeo.svelte';
+export { default as LineMapbox } from './component/plotly/line_mapbox/LineMapbox.svelte';
+export { default as LinePolar } from './component/plotly/line_polar/LinePolar.svelte';
+export { default as LineTernary } from './component/plotly/line_ternary/LineTernary.svelte';
+export { default as ParallelCategories } from './component/plotly/parallel_categories/ParallelCategories.svelte';
+export { default as ParallelCoordinates } from './component/plotly/parallel_coordinates/ParallelCoordinates.svelte';
+export { default as Pie } from './component/plotly/pie/Pie.svelte';
 export { default as Scatter } from './component/plotly/scatter/Scatter.svelte';
+export { default as Scatter3D } from './component/plotly/scatter_3d/Scatter3D.svelte';
+export { default as ScatterGeo } from './component/plotly/scatter_geo/ScatterGeo.svelte';
 export { default as ScatterMapbox } from './component/plotly/scatter_mapbox/ScatterMapbox.svelte';
+export { default as ScatterMatrix } from './component/plotly/scatter_matrix/ScatterMatrix.svelte';
+export { default as ScatterPolar } from './component/plotly/scatter_polar/ScatterPolar.svelte';
+export { default as ScatterTernary } from './component/plotly/scatter_ternary/ScatterTernary.svelte';
+export { default as Strip } from './component/plotly/strip/Strip.svelte';
+export { default as Sunburst } from './component/plotly/sunburst/Sunburst.svelte';
+export { default as Timeline } from './component/plotly/timeline/Timeline.svelte';
+export { default as Treemap } from './component/plotly/treemap/Treemap.svelte';
+export { default as Violin } from './component/plotly/violin/Violin.svelte';
 /** Utils */
 export { API_URL } from './constants.js';
 export { default as Page } from './shared/Page.svelte';

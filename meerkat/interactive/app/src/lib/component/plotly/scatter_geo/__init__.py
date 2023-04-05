@@ -7,7 +7,7 @@ from meerkat.tools.utils import classproperty
 from ...abstract import Component
 
 
-class ScatterMapbox(Component):
+class ScatterGeo(Component):
     df: DataFrame
     on_click: EndpointProperty = None
 
@@ -20,7 +20,7 @@ class ScatterMapbox(Component):
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.scatter_mapbox(df.to_pandas(), **kwargs)
+        fig = px.scatter_geo(df.to_pandas(), **kwargs)
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 
