@@ -11,40 +11,20 @@ from ...abstract import Component
 
 class ScatterMapbox(Component):
     df: DataFrame
-    lat: str
-    lon: str
-    json_desc: str = ""
-    title: Optional[str] = None
     on_click: EndpointProperty = None
+
+    json_desc: str = ""
 
     def __init__(
         self,
         df: DataFrame,
         *,
-        lat: str,
-        lon: str,
-        title: Optional[str] = None,
         on_click: EndpointProperty = None,
+        **kwargs,
     ):
-        fig = px.scatter_mapbox(
-            df.to_pandas(),
-            lat=lat,
-            lon=lon,
-            # hover_name="Make",
-            # hover_data=["Model Year", "Make", "Model", "Electric Vehicle Type"],
-            # color="Electric Range",
-            # color_continuous_scale=[(0, "orange"), (1, "red")],
-            # size="Electric Range",
-            zoom=8,
-            height=800,
-            width=800,
-            title=title,
-            mapbox_style="open-street-map",
-        )
+        fig = px.scatter_mapbox(df.to_pandas(), **kwargs)
 
-        super().__init__(
-            df=df, lat=lat, lon=lon, json_desc=fig.to_json(), on_click=on_click
-        )
+        super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 
     @classproperty
     def namespace(cls):
