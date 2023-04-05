@@ -13,9 +13,9 @@ class ScatterMapbox(Component):
     df: DataFrame
     lat: str
     lon: str
+    json_desc: str = ""
     title: Optional[str] = None
     on_click: EndpointProperty = None
-    json_desc: str = ""
 
     def __init__(
         self,

@@ -3,13 +3,13 @@
 	import type { Endpoint } from '$lib/utils/types';
 	import Plot from '../plot/Plot.svelte';
 
-	export let json_desc: string;
-	export let on_click: Endpoint;
+	export let jsonDesc: string;
+	export let onClick: Endpoint;
 
-	console.log("json_desc yo:", json_desc);
+	console.log("jsonDesc yo:", jsonDesc);
 
 	async function on_endpoint(endpoint: Endpoint, e) {
-		let d = JSON.parse(json_desc).data;
+		let d = JSON.parse(jsonDesc).data;
 		e.detail.points;
 		console.log(e);
 		if (endpoint) {
@@ -22,4 +22,4 @@
 	}
 </script>
 
-<Plot data={JSON.parse(json_desc).data} on:click={(e) => on_endpoint(on_click, e)} />
+<Plot data={JSON.parse(jsonDesc).data} on:click={(e) => on_endpoint(onClick, e)} />
