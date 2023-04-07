@@ -1,5 +1,4 @@
-from functools import partial
-from typing import Callable, List, Optional, Union
+from typing import List, Optional, Union
 
 from pydantic import BaseModel, validator
 
@@ -31,7 +30,7 @@ class ChatCompletion(TextCompletion):
         return OpenAIChatCompletion(key)
 
     def set_logger(self, logger: WatchLogger):
-        self_.logger = logger
+        self._logger = logger
 
     def set_errand_run_id(self, errand_run_id: str):
         self._errand_run_id = errand_run_id
@@ -45,16 +44,7 @@ class MockChatCompletion(ChatCompletion):
     @property
     def parameter_mapping(self):
         """Map from Meerkat parameter names to the engine's parameter names."""
-        return {
-            "model": "model",
-            "temperature": "temperature",
-            "max_tokens": "max_tokens",
-            "top_k": "top_k",
-            "top_p": "top_p",
-            "n": "n",
-            "stop": "stop",
-            "dummy": "dummy",
-        }
+        return {**super().parameter_mapping, "dummy": "dummy"}
 
     def setup_engine(self, **kwargs):
         def mock(prompt, dummy="Mock response.") -> str:

@@ -1,10 +1,14 @@
+import asyncio
 from functools import partial
+import json
 from typing import Union
+
+from meerkat import env
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.dataframe import DataFrame
 from meerkat.engines import TextCompletion
+from meerkat.ops.amap import amap
 from meerkat.row import Row
-from meerkat import env
 
 if env.package_available("guardrails"):
     import guardrails as gd
@@ -86,6 +90,8 @@ def extract_to_schema(
     schema: Union[str, Guard] = None,
     engine: TextCompletion = None,
     prompt: str = None,
+    async_: bool = False,
+    max_concurrent: int = 10,
 ) -> ScalarColumn:
     """Extract information from a column to a specified schema.
 
@@ -93,13 +99,23 @@ def extract_to_schema(
         column: The column to extract information from.
         schema: The schema to tell the LLM to format the extraction into.
         engine: The engine to use for extracting information.
+        prompt: The prompt to use for the LLM. If not specified, a default
+            prompt will be used.
 
     Return:
         A column with the extracted information.
     """
     if isinstance(schema, Guard):
-        return column.map(
-            lambda text: schema(engine.run, prompt_params=dict(text=text))[0]
+        if not async_:
+            return column.map(
+                lambda text: schema(engine.run, prompt_params=dict(text=text))[0]
+            )
+        return asyncio.run(
+            amap(
+                column,
+                lambda text: schema(engine.run, prompt_params=dict(text=text))[0],
+                max_concurrent=max_concurrent,
+            )
         )
 
     if prompt is None:
@@ -123,6 +139,56 @@ def extraction_guard(schema: str) -> Guard:
 Extract data from the given text into the schema below.
 Text: {{text}}
 @complete_json_suffix_v2\
+</prompt>
+"""
+
+    rail = """\
+<rail version="0.1">
+{output}
+{prompt}
+</rail>
+""".format(
+        output=output, prompt=prompt
+    )
+
+    return gd.Guard.from_rail_string(rail)
+
+
+def span_citation_guard() -> gd.Guard:
+    schema = """
+<list name="spans" description="The most relevant spans that contain the extracted information." format="atmost-top-3-spans">
+    <string description="A very short span of text, containing atmost 5 words. The span must be verbatim, so that `assert (span in doc)`. If unsure, return an empty string."/>
+</list>
+"""
+
+    output = """
+<output>
+{schema}
+</output>
+""".format(
+        schema=schema
+    )
+
+    #     prompt = """
+    # <prompt>
+    # Output the most relevant spans in the text that are relevant to the information extracted.
+    # Abstract: {{abstract}}
+
+    # Extracted Information: {{description}} {{extracted}}
+    # @complete_json_suffix_v2\
+    # </prompt>
+    # """
+    prompt = """\
+<prompt>
+Abstract: {{abstract}}
+
+Description of Information: {{description}}
+Extracted Information: {{extracted}}
+
+Output the 3 most relevant substrings VERBATIM from the abstract with atmost 5 words that contains the extracted info. ONLY OUTPUT THE VERBATIM SUBSTRINGS SUCH THAT python
+assert extraction in substring WILL WORK. IF YOU ARE NOT CONFIDENT, RETURN AN EMPTY STRING.
+
+List of Substrings (as list of substrings):\
 </prompt>
 """
 

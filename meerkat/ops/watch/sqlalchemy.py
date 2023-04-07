@@ -1,15 +1,22 @@
 """Postgres cache."""
-import hashlib
 import logging
+import threading
 import uuid
-from typing import Any, Dict, Union
+from typing import Any, Dict
+
 from meerkat import DataFrame
 
 logger = logging.getLogger("postgresql")
 logger.setLevel(logging.WARNING)
 
 import sqlalchemy  # type: ignore
-from sqlalchemy import Column, Identity, Integer, Float, String, create_engine  # type: ignore
+from sqlalchemy import (  # type: ignore
+    Column,
+    Float,
+    Integer,
+    String,
+    create_engine,
+)
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
@@ -39,7 +46,6 @@ class ErrandRun(Base):
     __tablename__ = "errand_runs"
     id = Column(String, primary_key=True)
     errand_id = Column(String)
-    # key = Column(String)
     parent_id = Column(String)
     engine = Column(String)
 
@@ -81,6 +87,10 @@ class Object(Base):
     id = Column(String, primary_key=True)
     value = Column(String)
 
+    def __init__(self, *args: Any, value: Any, **kwargs: Any) -> None:
+        value = str(value)
+        super().__init__(*args, value=value, **kwargs)
+
 
 class SQLAlchemyWatchLogger(WatchLogger):
     """A PostgreSQL cache for request/response pairs."""
@@ -103,7 +113,19 @@ class SQLAlchemyWatchLogger(WatchLogger):
             logger.info("Creating database...")
         Base.metadata.create_all(engine)
 
-        self.session = sessionmaker(bind=engine)()
+        self.sessionmaker = sessionmaker(bind=engine)
+        self._session = self.sessionmaker()
+        self.thread_id = threading.get_ident()
+
+    @property
+    def session(self):
+        # Need to use a different session if we're in a different thread.
+        # This happens when running an engine asynchronously.
+        if self.thread_id != threading.get_ident():
+            # Do this ephemerally.
+            return self.sessionmaker()
+        else:
+            return self._session
 
     def close(self) -> None:
         """Close the client."""
@@ -117,7 +139,8 @@ class SQLAlchemyWatchLogger(WatchLogger):
     ):
         # Query the `errands` table to see if the errand is already there
         # If not, add it
-        response = self.session.query(Errand).filter_by(code=code).first()
+        session = self.session
+        response = session.query(Errand).filter_by(code=code).first()
         if response is not None:
             return response.id
 
@@ -127,8 +150,8 @@ class SQLAlchemyWatchLogger(WatchLogger):
             name=name,
             module=module,
         )
-        self.session.add(errand)
-        self.commit()
+        session.add(errand)
+        session.commit()
         return errand.id
 
     def log_errand_start(
@@ -147,20 +170,21 @@ class SQLAlchemyWatchLogger(WatchLogger):
             parent_id=None,
             engine=engine,
         )
-        self.session.add(errand_run)
+        session = self.session
+        session.add(errand_run)
 
         # Add the inputs
         for key, value in inputs.items():
             obj = Object(id=str(uuid.uuid4()), value=value)
-            self.session.add(obj)
+            session.add(obj)
             errand_run_input = ErrandRunInput(
                 id=str(uuid.uuid4()),
                 object_id=obj.id,
                 errand_run_id=errand_run.id,
                 key=key,
             )
-            self.session.add(errand_run_input)
-        self.commit()
+            session.add(errand_run_input)
+        session.commit()
         return errand_run.id
 
     def log_engine_run(
@@ -174,7 +198,8 @@ class SQLAlchemyWatchLogger(WatchLogger):
         output_tokens: int,
     ) -> None:
         # Log to Tables: engine_runs
-        self.session.add(
+        session = self.session
+        session.add(
             EngineRun(
                 id=str(uuid.uuid4()),
                 errand_run_id=errand_run_id,
@@ -186,7 +211,7 @@ class SQLAlchemyWatchLogger(WatchLogger):
                 output_tokens=output_tokens,
             )
         )
-        self.commit()
+        session.commit()
 
     def log_errand_end(
         self,
@@ -196,9 +221,10 @@ class SQLAlchemyWatchLogger(WatchLogger):
         # Log to Tables: errand_runs, errand_run_outputs, objects
 
         # Add the outputs
+        session = self.session
         for key, value in outputs.items():
             obj = Object(id=str(uuid.uuid4()), value=value)
-            self.session.add(obj)
+            session.add(obj)
 
             errand_run_output = ErrandRunOutput(
                 id=str(uuid.uuid4()),
@@ -206,9 +232,9 @@ class SQLAlchemyWatchLogger(WatchLogger):
                 errand_run_id=errand_run_id,
                 key=key,
             )
-            self.session.add(errand_run_output)
+            session.add(errand_run_output)
 
-        self.commit()
+        session.commit()
 
     def commit(self) -> None:
         """Commit any results."""
@@ -237,7 +263,8 @@ class SQLAlchemyWatchLogger(WatchLogger):
         return cls(engine=engine)
 
     def get_table(self, model: type):
-        result = self.session.query(model).all()
+        session = self.session
+        result = session.query(model).all()
         return DataFrame(
             [
                 {c.name: getattr(row, c.name) for c in model.__table__.columns}
