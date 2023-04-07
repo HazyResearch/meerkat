@@ -8,6 +8,7 @@ from .expw import expw
 from .fer import fer
 from .imagenet import imagenet
 from .imagenette import imagenette
+from .lra import pathfinder
 from .lvis import lvis
 from .mimic_iii import mimic_iii
 from .mirflickr import mirflickr
@@ -33,6 +34,7 @@ __all__ = [
     "coco",
     "yesno",
     "siim_cxr",
+    "pathfinder",
 ]
 
 DOWNLOAD_MODES = ["force", "extract", "reuse", "skip"]
