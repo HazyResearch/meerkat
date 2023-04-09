@@ -155,7 +155,7 @@ class WILDSInputColumn(Column):
             self.metadata_columns.update(
                 {
                     field: NumPyTensorColumn(data=series.values)
-                    for field, series in metadata_df.iteritems()
+                    for field, series in metadata_df.items()
                 }
             )
 
