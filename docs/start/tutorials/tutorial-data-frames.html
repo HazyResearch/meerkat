@@ -2145,7 +2145,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "7fa87fda680c43e99c5ba0ac53fcb3a2"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "1ee08253573c442bb36305fe8e1a3f23"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -2352,7 +2352,7 @@ Using the <a class="reference external" href="https://seaborn.pydata.org/install
   warnings.warn(
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7f0f25c2ec40&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7fdf98c19490&gt;
 </pre></div>
 </div>
 <img alt="../../_images/7e234957b14e939fce17327c18d898143278432b13bb3e39e1316f507cea4bbb.png" src="../../_images/7e234957b14e939fce17327c18d898143278432b13bb3e39e1316f507cea4bbb.png" />
@@ -2391,13 +2391,10 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/44.7M [00:00&lt;?, ?B/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 15%|█▌        | 6.91M/44.7M [00:00&lt;00:00, 72.5MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 57%|█████▋    | 25.3M/44.7M [00:00&lt;00:00, 266MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 74%|███████▍  | 33.0M/44.7M [00:00&lt;00:00, 191MB/s] 
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 44.7M/44.7M [00:00&lt;00:00, 191MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 44.7M/44.7M [00:00&lt;00:00, 300MB/s]
 </pre></div>
 </div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
@@ -2488,11 +2485,11 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/IPython/core/formatters.py:920,</span> in <span class="ni">IPythonDisplayFormatter.__call__</span><span class="nt">(self, obj)</span>
-<span class="g g-Whitespace">    </span><span class="mi">918</span> <span class="n">method</span> <span class="o">=</span> <span class="n">get_real_method</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_method</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">919</span> <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">920</span>     <span class="n">method</span><span class="p">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">921</span>     <span class="k">return</span> <span class="kc">True</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/IPython/core/formatters.py:922,</span> in <span class="ni">IPythonDisplayFormatter.__call__</span><span class="nt">(self, obj)</span>
+<span class="g g-Whitespace">    </span><span class="mi">920</span> <span class="n">method</span> <span class="o">=</span> <span class="n">get_real_method</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_method</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">921</span> <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">922</span>     <span class="n">method</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">923</span>     <span class="k">return</span> <span class="kc">True</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74,</span> in <span class="ni">unmarked.__call__.&lt;locals&gt;.decorate_context</span><span class="nt">(*args, **kwargs)</span>
 <span class="g g-Whitespace">     </span><span class="mi">71</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
@@ -2519,34 +2516,34 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <span class="g g-Whitespace">    </span><span class="mi">194</span>     <span class="p">)</span>
 <span class="g g-Whitespace">    </span><span class="mi">196</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">table</span><span class="p">()</span><span class="o">.</span><span class="n">_ipython_display_</span><span class="p">()</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/core/frame.py:3218,</span> in <span class="ni">DataFrame.to_html</span><span class="nt">(self, buf, columns, col_space, header, index, na_rep, formatters, float_format, sparsify, index_names, justify, max_rows, max_cols, show_dimensions, decimal, bold_rows, classes, escape, notebook, border, table_id, render_links, encoding)</span>
-<span class="g g-Whitespace">   </span><span class="mi">3198</span> <span class="n">formatter</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">DataFrameFormatter</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">3199</span>     <span class="bp">self</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3200</span>     <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/core/frame.py:3128,</span> in <span class="ni">DataFrame.to_html</span><span class="nt">(self, buf, columns, col_space, header, index, na_rep, formatters, float_format, sparsify, index_names, justify, max_rows, max_cols, show_dimensions, decimal, bold_rows, classes, escape, notebook, border, table_id, render_links, encoding)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3108</span> <span class="n">formatter</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">DataFrameFormatter</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">3109</span>     <span class="bp">self</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3110</span>     <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
    <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">3215</span>     <span class="n">show_dimensions</span><span class="o">=</span><span class="n">show_dimensions</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3216</span> <span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">3217</span> <span class="c1"># TODO: a generic formatter wld b in DataFrameFormatter</span>
-<span class="ne">-&gt; </span><span class="mi">3218</span> <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">DataFrameRenderer</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">3219</span>     <span class="n">buf</span><span class="o">=</span><span class="n">buf</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3220</span>     <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3221</span>     <span class="n">notebook</span><span class="o">=</span><span class="n">notebook</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3222</span>     <span class="n">border</span><span class="o">=</span><span class="n">border</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3223</span>     <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3224</span>     <span class="n">table_id</span><span class="o">=</span><span class="n">table_id</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3225</span>     <span class="n">render_links</span><span class="o">=</span><span class="n">render_links</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3226</span> <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3125</span>     <span class="n">show_dimensions</span><span class="o">=</span><span class="n">show_dimensions</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3126</span> <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3127</span> <span class="c1"># TODO: a generic formatter wld b in DataFrameFormatter</span>
+<span class="ne">-&gt; </span><span class="mi">3128</span> <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">DataFrameRenderer</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">3129</span>     <span class="n">buf</span><span class="o">=</span><span class="n">buf</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3130</span>     <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3131</span>     <span class="n">notebook</span><span class="o">=</span><span class="n">notebook</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3132</span>     <span class="n">border</span><span class="o">=</span><span class="n">border</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3133</span>     <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3134</span>     <span class="n">table_id</span><span class="o">=</span><span class="n">table_id</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3135</span>     <span class="n">render_links</span><span class="o">=</span><span class="n">render_links</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3136</span> <span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:1110,</span> in <span class="ni">DataFrameRenderer.to_html</span><span class="nt">(self, buf, encoding, classes, notebook, border, table_id, render_links)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1101</span> <span class="n">Klass</span> <span class="o">=</span> <span class="n">NotebookFormatter</span> <span class="k">if</span> <span class="n">notebook</span> <span class="k">else</span> <span class="n">HTMLFormatter</span>
-<span class="g g-Whitespace">   </span><span class="mi">1103</span> <span class="n">html_formatter</span> <span class="o">=</span> <span class="n">Klass</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1104</span>     <span class="bp">self</span><span class="o">.</span><span class="n">fmt</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1105</span>     <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:1108,</span> in <span class="ni">DataFrameRenderer.to_html</span><span class="nt">(self, buf, encoding, classes, notebook, border, table_id, render_links)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1099</span> <span class="n">Klass</span> <span class="o">=</span> <span class="n">NotebookFormatter</span> <span class="k">if</span> <span class="n">notebook</span> <span class="k">else</span> <span class="n">HTMLFormatter</span>
+<span class="g g-Whitespace">   </span><span class="mi">1101</span> <span class="n">html_formatter</span> <span class="o">=</span> <span class="n">Klass</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1102</span>     <span class="bp">self</span><span class="o">.</span><span class="n">fmt</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1103</span>     <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
    <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1108</span>     <span class="n">render_links</span><span class="o">=</span><span class="n">render_links</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1109</span> <span class="p">)</span>
-<span class="ne">-&gt; </span><span class="mi">1110</span> <span class="n">string</span> <span class="o">=</span> <span class="n">html_formatter</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span>
-<span class="g g-Whitespace">   </span><span class="mi">1111</span> <span class="k">return</span> <span class="n">save_to_buffer</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">buf</span><span class="o">=</span><span class="n">buf</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1106</span>     <span class="n">render_links</span><span class="o">=</span><span class="n">render_links</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1107</span> <span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1108</span> <span class="n">string</span> <span class="o">=</span> <span class="n">html_formatter</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">1109</span> <span class="k">return</span> <span class="n">save_to_buffer</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">buf</span><span class="o">=</span><span class="n">buf</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
 
 <span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/html.py:77,</span> in <span class="ni">HTMLFormatter.to_string</span><span class="nt">(self)</span>
 <span class="g g-Whitespace">     </span><span class="mi">76</span> <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -2585,46 +2582,46 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <span class="ne">--&gt; </span><span class="mi">401</span>         <span class="n">fmt_values</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt</span><span class="o">.</span><span class="n">format_col</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncols</span><span class="p">)}</span>
 <span class="g g-Whitespace">    </span><span class="mi">402</span>     <span class="k">return</span> <span class="n">fmt_values</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:897,</span> in <span class="ni">DataFrameFormatter.format_col</span><span class="nt">(self, i)</span>
-<span class="g g-Whitespace">    </span><span class="mi">895</span> <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_frame</span>
-<span class="g g-Whitespace">    </span><span class="mi">896</span> <span class="n">formatter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_formatter</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">897</span> <span class="k">return</span> <span class="n">format_array</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">898</span>     <span class="n">frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">_values</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">899</span>     <span class="n">formatter</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">900</span>     <span class="n">float_format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">float_format</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">901</span>     <span class="n">na_rep</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">na_rep</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">902</span>     <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">col_space</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
-<span class="g g-Whitespace">    </span><span class="mi">903</span>     <span class="n">decimal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">decimal</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">904</span>     <span class="n">leading_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">905</span> <span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:895,</span> in <span class="ni">DataFrameFormatter.format_col</span><span class="nt">(self, i)</span>
+<span class="g g-Whitespace">    </span><span class="mi">893</span> <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_frame</span>
+<span class="g g-Whitespace">    </span><span class="mi">894</span> <span class="n">formatter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_formatter</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">895</span> <span class="k">return</span> <span class="n">format_array</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">896</span>     <span class="n">frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">_values</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">897</span>     <span class="n">formatter</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">898</span>     <span class="n">float_format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">float_format</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">899</span>     <span class="n">na_rep</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">na_rep</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">900</span>     <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">col_space</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
+<span class="g g-Whitespace">    </span><span class="mi">901</span>     <span class="n">decimal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">decimal</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">902</span>     <span class="n">leading_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">903</span> <span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:1328,</span> in <span class="ni">format_array</span><span class="nt">(values, formatter, float_format, na_rep, digits, space, justify, decimal, leading_space, quoting)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1313</span>     <span class="n">digits</span> <span class="o">=</span> <span class="n">get_option</span><span class="p">(</span><span class="s2">&quot;display.precision&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1315</span> <span class="n">fmt_obj</span> <span class="o">=</span> <span class="n">fmt_klass</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1316</span>     <span class="n">values</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1317</span>     <span class="n">digits</span><span class="o">=</span><span class="n">digits</span><span class="p">,</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:1330,</span> in <span class="ni">format_array</span><span class="nt">(values, formatter, float_format, na_rep, digits, space, justify, decimal, leading_space, quoting, fallback_formatter)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1314</span>     <span class="n">digits</span> <span class="o">=</span> <span class="n">get_option</span><span class="p">(</span><span class="s2">&quot;display.precision&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1316</span> <span class="n">fmt_obj</span> <span class="o">=</span> <span class="n">fmt_klass</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1317</span>     <span class="n">values</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1318</span>     <span class="n">digits</span><span class="o">=</span><span class="n">digits</span><span class="p">,</span>
    <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1325</span>     <span class="n">quoting</span><span class="o">=</span><span class="n">quoting</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1326</span> <span class="p">)</span>
-<span class="ne">-&gt; </span><span class="mi">1328</span> <span class="k">return</span> <span class="n">fmt_obj</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">1327</span>     <span class="n">fallback_formatter</span><span class="o">=</span><span class="n">fallback_formatter</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1328</span> <span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1330</span> <span class="k">return</span> <span class="n">fmt_obj</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:1359,</span> in <span class="ni">GenericArrayFormatter.get_result</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1358</span> <span class="k">def</span> <span class="nf">get_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="ne">-&gt; </span><span class="mi">1359</span>     <span class="n">fmt_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_strings</span><span class="p">()</span>
-<span class="g g-Whitespace">   </span><span class="mi">1360</span>     <span class="k">return</span> <span class="n">_make_fixed_width</span><span class="p">(</span><span class="n">fmt_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">justify</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:1363,</span> in <span class="ni">GenericArrayFormatter.get_result</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1362</span> <span class="k">def</span> <span class="nf">get_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="ne">-&gt; </span><span class="mi">1363</span>     <span class="n">fmt_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_strings</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">1364</span>     <span class="k">return</span> <span class="n">_make_fixed_width</span><span class="p">(</span><span class="n">fmt_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">justify</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:1422,</span> in <span class="ni">GenericArrayFormatter._format_strings</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1420</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vals</span><span class="p">):</span>
-<span class="g g-Whitespace">   </span><span class="mi">1421</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">is_float_type</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="n">leading_space</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">1422</span>         <span class="n">fmt_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">_format</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1423</span>     <span class="k">elif</span> <span class="n">is_float_type</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1424</span>         <span class="n">fmt_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">float_format</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:1430,</span> in <span class="ni">GenericArrayFormatter._format_strings</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1428</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vals</span><span class="p">):</span>
+<span class="g g-Whitespace">   </span><span class="mi">1429</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">is_float_type</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="n">leading_space</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1430</span>         <span class="n">fmt_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">_format</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1431</span>     <span class="k">elif</span> <span class="n">is_float_type</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1432</span>         <span class="n">fmt_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">float_format</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:1402,</span> in <span class="ni">GenericArrayFormatter._format_strings.&lt;locals&gt;._format</span><span class="nt">(x)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1399</span>     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1400</span> <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1401</span>     <span class="c1"># object dtype</span>
-<span class="ne">-&gt; </span><span class="mi">1402</span>     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">formatter</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:1410,</span> in <span class="ni">GenericArrayFormatter._format_strings.&lt;locals&gt;._format</span><span class="nt">(x)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1407</span>     <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1408</span> <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1409</span>     <span class="c1"># object dtype</span>
+<span class="ne">-&gt; </span><span class="mi">1410</span>     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">formatter</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/formatter/base.py:351,</span> in <span class="ni">DeferredFormatter.html</span><span class="nt">(self, cell)</span>
 <span class="g g-Whitespace">    </span><span class="mi">350</span> <span class="k">def</span> <span class="nf">html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell</span><span class="p">:</span> <span class="n">DeferredCell</span><span class="p">):</span>
