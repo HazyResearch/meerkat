@@ -8,6 +8,7 @@ from .image import (
     ImageFormatter,
     ImageFormatterGroup,
 )
+from .medimage import MedicalImageFormatter, MedicalImageFormatterGroup
 from .number import NumberFormatter, NumberFormatterGroup
 from .pdf import PDFFormatter, PDFFormatterGroup
 from .raw_html import HTMLFormatter, HTMLFormatterGroup
@@ -37,6 +38,8 @@ __all__ = [
     "BooleanFormatterGroup",
     "AudioFormatter",
     "AudioFormatterGroup",
+    "MedicalImageFormatter",
+    "MedicalImageFormatterGroup",
 ]
 
 
