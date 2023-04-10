@@ -14,6 +14,7 @@ class Bar(Component):
     orientation: str = "v"
     on_click: EndpointProperty = None
 
+    # TODO (dean): convert to json_desc
     def __init__(
         self,
         df: DataFrame,

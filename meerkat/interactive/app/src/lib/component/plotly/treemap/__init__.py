@@ -17,10 +17,28 @@ class Treemap(Component):
         self,
         df: DataFrame,
         *,
+        names=None,
+        values=None,
+        parents=None,
+        ids=None,
+        path=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.treemap(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.treemap.html
+        for more details."""
+
+        fig = px.treemap(
+            df.to_pandas(),
+            names=names,
+            values=values,
+            parents=parents,
+            ids=ids,
+            path=path,
+            color=color,
+            **kwargs,
+        )
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

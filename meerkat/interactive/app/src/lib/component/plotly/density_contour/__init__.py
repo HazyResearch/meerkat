@@ -17,10 +17,24 @@ class DensityContour(Component):
         self,
         df: DataFrame,
         *,
+        x=None,
+        y=None,
+        z=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.density_contour(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.density_contour.html
+        for more details."""
+        
+        fig = px.density_contour(
+            df.to_pandas(),
+            x=x,
+            y=y,
+            z=z,
+            color=color,
+            **kwargs,
+        )
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

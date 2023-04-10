@@ -17,10 +17,20 @@ class ScatterMatrix(Component):
         self,
         df: DataFrame,
         *,
+        dimensions=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.scatter_matrix(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.scatter_matrix.html
+        for more details."""
+
+        fig = px.scatter_matrix(
+            df.to_pandas(),
+            dimensions=dimensions,
+            color=color,
+            **kwargs,
+        )
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

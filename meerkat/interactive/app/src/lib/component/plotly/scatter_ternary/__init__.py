@@ -17,10 +17,17 @@ class ScatterTernary(Component):
         self,
         df: DataFrame,
         *,
+        a=None,
+        b=None,
+        c=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.scatter_ternary(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.scatter_ternary.html
+        for more details."""
+
+        fig = px.scatter_ternary(df.to_pandas(), a=a, b=b, c=c, color=color, **kwargs)
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

@@ -17,10 +17,16 @@ class LinePolar(Component):
         self,
         df: DataFrame,
         *,
+        r=None,
+        theta=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.line_polar(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.line_polar.html
+        for more details."""
+
+        fig = px.line_polar(df.to_pandas(), r=r, theta=theta, color=color, **kwargs)
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

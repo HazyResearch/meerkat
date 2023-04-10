@@ -17,10 +17,16 @@ class Strip(Component):
         self,
         df: DataFrame,
         *,
+        x=None,
+        y=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.strip(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.strip.html
+        for more details."""
+        
+        fig = px.strip(df.to_pandas(), x=x, y=y, color=color, **kwargs)
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

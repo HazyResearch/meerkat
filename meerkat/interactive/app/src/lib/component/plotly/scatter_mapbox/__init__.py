@@ -19,10 +19,16 @@ class ScatterMapbox(Component):
         self,
         df: DataFrame,
         *,
+        lat=None,
+        lon=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.scatter_mapbox(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.scatter_mapbox.html
+        for more details."""
+
+        fig = px.scatter_mapbox(df.to_pandas(), lat=lat, lon=lon, color=color, **kwargs)
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

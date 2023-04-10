@@ -17,10 +17,24 @@ class Timeline(Component):
         self,
         df: DataFrame,
         *,
+        x_start=None,
+        x_end=None,
+        y=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.timeline(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.timeline.html
+        for more details."""
+
+        fig = px.timeline(
+            df.to_pandas(),
+            x_start=x_start,
+            x_end=x_end,
+            y=y,
+            color=color,
+            **kwargs,
+        )
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

@@ -17,10 +17,20 @@ class ParallelCategories(Component):
         self,
         df: DataFrame,
         *,
+        dimensions=None,
+        labels=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.parallel_categories(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.parallel_categories.html
+        for more details."""
+
+        fig = px.parallel_categories(
+            df.to_pandas(),
+            dimensions=dimensions,
+            labels=labels,
+            **kwargs,
+        )
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

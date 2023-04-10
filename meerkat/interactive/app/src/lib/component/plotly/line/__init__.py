@@ -17,10 +17,24 @@ class Line(Component):
         self,
         df: DataFrame,
         *,
+        x=None,
+        y=None,
+        line_group=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.line(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.line.html
+        for more details."""
+
+        fig = px.line(
+            df.to_pandas(),
+            x=x,
+            y=y,
+            line_group=line_group,
+            color=color,
+            **kwargs,
+        )
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

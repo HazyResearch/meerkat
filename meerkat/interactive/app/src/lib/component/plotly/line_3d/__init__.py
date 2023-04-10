@@ -17,10 +17,17 @@ class Line3D(Component):
         self,
         df: DataFrame,
         *,
+        x=None,
+        y=None,
+        z=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.line_3d(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.line_3d.html
+        for more details."""
+
+        fig = px.line_3d(df.to_pandas(), x=x, y=y, z=z, color=color, **kwargs)
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

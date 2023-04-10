@@ -17,10 +17,22 @@ class Pie(Component):
         self,
         df: DataFrame,
         *,
+        names=None,
+        values=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.pie(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.pie.html
+        for more details."""
+
+        fig = px.pie(
+            df.to_pandas(),
+            names=names,
+            values=values,
+            color=color,
+            **kwargs,
+        )
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

@@ -17,10 +17,28 @@ class Sunburst(Component):
         self,
         df: DataFrame,
         *,
+        names=None,
+        values=None,
+        parents=None,
+        path=None,
+        ids=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.sunburst(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.sunburst.html
+        for more details."""
+
+        fig = px.sunburst(
+            df.to_pandas(),
+            names=names,
+            values=values,
+            parents=parents,
+            path=path,
+            ids=ids,
+            color=color,
+            **kwargs,
+        )
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

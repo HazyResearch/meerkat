@@ -17,10 +17,22 @@ class FunnelArea(Component):
         self,
         df: DataFrame,
         *,
+        names=None,
+        values=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.funnel_area(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.funnel_area.html
+        for more details."""
+
+        fig = px.funnel_area(
+            df.to_pandas(),
+            names=names,
+            values=values,
+            color=color,
+            **kwargs,
+        )
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

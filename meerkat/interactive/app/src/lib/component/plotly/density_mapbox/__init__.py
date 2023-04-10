@@ -17,10 +17,16 @@ class DensityMapbox(Component):
         self,
         df: DataFrame,
         *,
+        lat=None,
+        lon=None,
+        z=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.density_mapbox(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.density_mapbox.html
+        for more details."""
+        
+        fig = px.density_mapbox(df.to_pandas(), lat=lat, lon=lon, z=z, **kwargs)
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

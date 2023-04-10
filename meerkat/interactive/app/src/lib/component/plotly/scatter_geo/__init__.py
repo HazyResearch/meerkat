@@ -17,10 +17,30 @@ class ScatterGeo(Component):
         self,
         df: DataFrame,
         *,
+        lat=None,
+        lon=None,
+        locations=None,
+        locationmode=None,
+        geojson=None,
+        featureidkey=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.scatter_geo(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.scatter_geo.html
+        for more details."""
+
+        fig = px.scatter_geo(
+            df.to_pandas(),
+            lat=lat,
+            lon=lon,
+            locations=locations,
+            locationmode=locationmode,
+            geojson=geojson,
+            featureidkey=featureidkey,
+            color=color,
+            **kwargs,
+        )
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 

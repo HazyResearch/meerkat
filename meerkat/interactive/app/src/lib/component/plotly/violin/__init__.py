@@ -17,10 +17,16 @@ class Violin(Component):
         self,
         df: DataFrame,
         *,
+        x=None,
+        y=None,
+        color=None,
         on_click: EndpointProperty = None,
         **kwargs,
     ):
-        fig = px.violin(df.to_pandas(), **kwargs)
+        """See https://plotly.com/python-api-reference/generated/plotly.express.violin.html
+        for more details."""
+
+        fig = px.violin(df.to_pandas(), x=x, y=y, color=color, **kwargs)
 
         super().__init__(df=df, on_click=on_click, json_desc=fig.to_json())
 
