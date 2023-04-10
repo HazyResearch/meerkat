@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>meerkat.interactive.endpoint &#8212; 🔮 v0.4.6</title>
+    <title>meerkat.interactive.endpoint &#8212; 🔮 v0.4.7</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -84,7 +84,7 @@
       <img src="../../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
       
       
-      <h1 class="site-logo" id="site-title">🔮 v0.4.6</h1>
+      <h1 class="site-logo" id="site-title">🔮 v0.4.7</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
@@ -1875,7 +1875,7 @@ title="Open an issue"
 
     <span class="k">def</span> <span class="nf">_validate_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate the function `fn`.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Endpoint function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="si">}</span><span class="s2"> is not callable.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Disallow *args</span>
@@ -2429,7 +2429,7 @@ title="Open an issue"
                     <span class="k">if</span> <span class="n">attrib</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">):</span>
                         <span class="k">continue</span>
                     <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">attrib</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
                         <span class="k">if</span> <span class="n">attrib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">:</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span> <span class="o">=</span> <span class="n">endpoint</span><span class="p">(</span>
                                 <span class="n">obj</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">_ids</span><span class="p">[</span><span class="bp">cls</span><span class="p">][</span><span class="bp">self</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -2447,7 +2447,7 @@ title="Open an issue"
                     <span class="k">pass</span>
 
                 <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">attrib</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">attrib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">:</span>
                         <span class="k">return</span> <span class="n">obj</span>
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span>

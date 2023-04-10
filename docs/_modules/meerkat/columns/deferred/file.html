@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>meerkat.columns.deferred.file &#8212; 🔮 v0.4.6</title>
+    <title>meerkat.columns.deferred.file &#8212; 🔮 v0.4.7</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -84,7 +84,7 @@
       <img src="../../../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
       
       
-      <h1 class="site-logo" id="site-title">🔮 v0.4.6</h1>
+      <h1 class="site-logo" id="site-title">🔮 v0.4.7</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../../../../search.html" method="get">
@@ -2006,8 +2006,8 @@ title="Open an issue"
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">loader</span><span class="p">:</span> <span class="n">callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">downloader</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">callable</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">loader</span><span class="p">:</span> <span class="nb">callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">downloader</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">callable</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">base_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">formatters</span><span class="p">:</span> <span class="n">FormatterGroup</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2078,7 +2078,7 @@ title="Open an issue"
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="n">loader</span>
 
     <span class="nd">@loader</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">loader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">:</span> <span class="n">callable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">loader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">:</span> <span class="nb">callable</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="n">loader</span> <span class="o">=</span> <span class="n">loader</span>
 
     <span class="nd">@property</span>
