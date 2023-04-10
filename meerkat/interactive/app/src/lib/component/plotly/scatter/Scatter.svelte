@@ -50,7 +50,8 @@
 					y: chunk.getColumn(y).data,
 					keyidx: chunk.getColumn(chunk.primaryKey).data,
 					type: 'scatter',
-					mode: 'markers'
+					mode: 'markers',
+					text: chunk.getColumn('index').data
 				}
 			];
 		}
@@ -92,6 +93,7 @@
 		on:selected={(e) => {
 			if (e.detail) {
 				selected = e.detail.points.map((p) => p.data.keyidx[p.pointIndex]);
+				console.log('hi', selected);
 			} else {
 				selected = [];
 			}

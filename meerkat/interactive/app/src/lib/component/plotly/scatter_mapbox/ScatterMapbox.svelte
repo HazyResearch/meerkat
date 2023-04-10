@@ -8,12 +8,12 @@
 
 	async function onEndpoint(endpoint: Endpoint, e) {
 		let data = JSON.parse(jsonDesc).data;
-		e.detail.points;
-		console.log(e);
+		console.log(e.detail.points);
+		console.log(data);
 		if (endpoint) {
 			dispatch(endpoint.endpointId, {
 				detail: {
-					keyidxs: e.detail.points.map((p) => data[0].keyidx[p.pointIndex])
+					keyidxs: e.detail.points.map((p) => data[0].customdata[p.pointIndex])
 				}
 			});
 		}

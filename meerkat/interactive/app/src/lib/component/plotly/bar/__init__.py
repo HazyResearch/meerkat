@@ -12,8 +12,6 @@ class Bar(Component):
     y: str
     title: str
     orientation: str = "v"
-    splits: Optional[list[str]] = None
-    barmode: Optional[str] = "stack"
     on_click: EndpointProperty = None
 
     def __init__(
@@ -24,9 +22,6 @@ class Bar(Component):
         y: str,
         title: str = "",
         orientation: str = "v",
-        # splits: Optional[str] = None,
-        splits: Optional[list[str]] = None,
-        barmode: Optional[str] = "stack",
         on_click: EndpointProperty = None,
     ):
         if df.primary_key_name is None:
@@ -40,8 +35,6 @@ class Bar(Component):
             y=y,
             title=title,
             orientation=orientation,
-            splits=splits,
-            barmode=barmode,
             on_click=on_click,
         )
 
