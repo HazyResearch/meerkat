@@ -8,12 +8,12 @@ from .image import (
     ImageFormatter,
     ImageFormatterGroup,
 )
+from .medimage import MedicalImageFormatter, MedicalImageFormatterGroup
 from .number import NumberFormatter, NumberFormatterGroup
 from .pdf import PDFFormatter, PDFFormatterGroup
 from .raw_html import HTMLFormatter, HTMLFormatterGroup
 from .tensor import TensorFormatter, TensorFormatterGroup
 from .text import TextFormatter, TextFormatterGroup
-from .medimage import MedicalImageFormatter, MedicalImageFormatterGroup
 
 __all__ = [
     "Formatter",
@@ -39,7 +39,7 @@ __all__ = [
     "AudioFormatter",
     "AudioFormatterGroup",
     "MedicalImageFormatter",
-    "MedicalImageFormatterGroup"
+    "MedicalImageFormatterGroup",
 ]
 
 
