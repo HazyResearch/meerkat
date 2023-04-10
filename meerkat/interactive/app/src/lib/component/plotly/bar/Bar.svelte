@@ -46,7 +46,7 @@
 
 	const layout = { xaxis: { title: x }, yaxis: { title: y }, title: title, barmode: barmode };
 
-	async function on_endpoint(endpoint: Endpoint, e) {
+	async function onEndpoint(endpoint: Endpoint, e) {
 		let data = await data_promise;
 		e.detail.points;
 		if (endpoint) {
@@ -61,7 +61,7 @@
 
 {#await data_promise}
     <div class="bg-purple-50 text-center my-1">Loading Bar Plot...</div>
-    <Plot data={[]} {layout} {config} on:click={(e) => on_endpoint(onClick, e)} />
+    <Plot data={[]} {layout} {config} on:click={(e) => onEndpoint(onClick, e)} />
 {:then data}
-	<Plot {data} {layout} {config} on:click={(e) => on_endpoint(onClick, e)} />
+	<Plot {data} {layout} {config} on:click={(e) => onEndpoint(onClick, e)} />
 {/await}
