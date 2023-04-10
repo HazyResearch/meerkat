@@ -63,5 +63,6 @@
       ~Gallery.selected
       ~Gallery.allow_selection
       ~Gallery.cell_size
+      ~Gallery.per_page
    
    

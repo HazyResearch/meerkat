@@ -25,48 +25,48 @@ button.on_click.run()
 Cell [0;32mIn[8], line 1[0m
 [0;32m----> 1[0m [43mbutton[49m[38;5;241;43m.[39;49m[43mon_click[49m[38;5;241;43m.[39;49m[43mrun[49m[43m([49m[43m)[49m
 
-File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:260[0m, in [0;36mEndpoint.run[0;34m(self, *args, **kwargs)[0m
-[1;32m    257[0m [38;5;28;01mexcept[39;00m [38;5;167;01mException[39;00m [38;5;28;01mas[39;00m e:
-[1;32m    258[0m     [38;5;66;03m# Unready the modification queue[39;00m
-[1;32m    259[0m     state[38;5;241m.[39mmodification_queue[38;5;241m.[39munready()
-[0;32m--> 260[0m     [38;5;28;01mraise[39;00m e
-[1;32m    262[0m [38;5;28;01mwith[39;00m unmarked():
-[1;32m    263[0m     modifications [38;5;241m=[39m trigger()
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:263[0m, in [0;36mEndpoint.run[0;34m(self, *args, **kwargs)[0m
+[1;32m    260[0m [38;5;28;01mexcept[39;00m [38;5;167;01mException[39;00m [38;5;28;01mas[39;00m e:
+[1;32m    261[0m     [38;5;66;03m# Unready the modification queue[39;00m
+[1;32m    262[0m     state[38;5;241m.[39mmodification_queue[38;5;241m.[39munready()
+[0;32m--> 263[0m     [38;5;28;01mraise[39;00m e
+[1;32m    265[0m [38;5;28;01mwith[39;00m unmarked():
+[1;32m    266[0m     modifications [38;5;241m=[39m trigger()
 
-File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:256[0m, in [0;36mEndpoint.run[0;34m(self, *args, **kwargs)[0m
-[1;32m    253[0m [38;5;28;01mtry[39;00m:
-[1;32m    254[0m     [38;5;66;03m# The function should not add any operations to the graph.[39;00m
-[1;32m    255[0m     [38;5;28;01mwith[39;00m unmarked():
-[0;32m--> 256[0m         result [38;5;241m=[39m [43mpartial_fn[49m[43m([49m[43m)[49m
-[1;32m    257[0m [38;5;28;01mexcept[39;00m [38;5;167;01mException[39;00m [38;5;28;01mas[39;00m e:
-[1;32m    258[0m     [38;5;66;03m# Unready the modification queue[39;00m
-[1;32m    259[0m     state[38;5;241m.[39mmodification_queue[38;5;241m.[39munready()
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:259[0m, in [0;36mEndpoint.run[0;34m(self, *args, **kwargs)[0m
+[1;32m    256[0m [38;5;28;01mtry[39;00m:
+[1;32m    257[0m     [38;5;66;03m# The function should not add any operations to the graph.[39;00m
+[1;32m    258[0m     [38;5;28;01mwith[39;00m unmarked():
+[0;32m--> 259[0m         result [38;5;241m=[39m [43mpartial_fn[49m[43m([49m[43m)[49m
+[1;32m    260[0m [38;5;28;01mexcept[39;00m [38;5;167;01mException[39;00m [38;5;28;01mas[39;00m e:
+[1;32m    261[0m     [38;5;66;03m# Unready the modification queue[39;00m
+[1;32m    262[0m     state[38;5;241m.[39mmodification_queue[38;5;241m.[39munready()
 
-File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:677[0m, in [0;36mendpoint.<locals>._endpoint.<locals>.wrapper[0;34m(*args, **kwargs)[0m
-[1;32m    662[0m         e [38;5;241m=[39m [38;5;167;01mAttributeError[39;00m(
-[1;32m    663[0m             [38;5;124mf[39m[38;5;124m"[39m[38;5;124mException raised in endpoint `[39m[38;5;132;01m{[39;00mfn[38;5;241m.[39m[38;5;18m__name__[39m[38;5;132;01m}[39;00m[38;5;124m`. [39m[38;5;124m"[39m
-[1;32m    664[0m             [38;5;124mf[39m[38;5;124m"[39m[38;5;124mThe object of type `[39m[38;5;132;01m{[39;00mobj_name[38;5;132;01m}[39;00m[38;5;124m` that you called to [39m[38;5;124m"[39m
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:680[0m, in [0;36mendpoint.<locals>._endpoint.<locals>.wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    665[0m         e [38;5;241m=[39m [38;5;167;01mAttributeError[39;00m(
+[1;32m    666[0m             [38;5;124mf[39m[38;5;124m"[39m[38;5;124mException raised in endpoint `[39m[38;5;132;01m{[39;00mfn[38;5;241m.[39m[38;5;18m__name__[39m[38;5;132;01m}[39;00m[38;5;124m`. [39m[38;5;124m"[39m
+[1;32m    667[0m             [38;5;124mf[39m[38;5;124m"[39m[38;5;124mThe object of type `[39m[38;5;132;01m{[39;00mobj_name[38;5;132;01m}[39;00m[38;5;124m` that you called to [39m[38;5;124m"[39m
 [0;32m   (...)[0m
-[1;32m    673[0m             [38;5;124m"[39m[38;5;124mif it is a `Store`.[39m[38;5;124m"[39m
-[1;32m    674[0m         )
-[1;32m    676[0m     logger[38;5;241m.[39mexception(e)
-[0;32m--> 677[0m     [38;5;28;01mraise[39;00m e
-[1;32m    679[0m [38;5;66;03m# Return the result of the function[39;00m
-[1;32m    680[0m [38;5;28;01mreturn[39;00m result
+[1;32m    676[0m             [38;5;124m"[39m[38;5;124mif it is a `Store`.[39m[38;5;124m"[39m
+[1;32m    677[0m         )
+[1;32m    679[0m     logger[38;5;241m.[39mexception(e)
+[0;32m--> 680[0m     [38;5;28;01mraise[39;00m e
+[1;32m    682[0m [38;5;66;03m# Return the result of the function[39;00m
+[1;32m    683[0m [38;5;28;01mreturn[39;00m result
 
-File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:651[0m, in [0;36mendpoint.<locals>._endpoint.<locals>.wrapper[0;34m(*args, **kwargs)[0m
-[1;32m    648[0m [38;5;28;01mtry[39;00m:
-[1;32m    649[0m     [38;5;28;01mwith[39;00m unmarked():
-[1;32m    650[0m         [38;5;66;03m# Run the function[39;00m
-[0;32m--> 651[0m         result [38;5;241m=[39m [43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43m_args[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43m_kwargs[49m[43m)[49m
-[1;32m    652[0m [38;5;28;01mexcept[39;00m [38;5;167;01mException[39;00m [38;5;28;01mas[39;00m e:
-[1;32m    653[0m     [38;5;66;03m# If the function raises an exception, log it and return[39;00m
-[1;32m    654[0m     [38;5;66;03m# the exception[39;00m
-[1;32m    655[0m     [38;5;66;03m# In case the exception is about .set() being missing, add[39;00m
-[1;32m    656[0m     [38;5;66;03m# a more helpful error message[39;00m
-[1;32m    657[0m     [38;5;28;01mif[39;00m [38;5;124m"[39m[38;5;124mno attribute [39m[38;5;124m'[39m[38;5;124mset[39m[38;5;124m'[39m[38;5;124m"[39m [38;5;129;01min[39;00m [38;5;28mstr[39m(e):
-[1;32m    658[0m         [38;5;66;03m# Get the name of the object that was passed in[39;00m
-[1;32m    659[0m         [38;5;66;03m# as a Store, but did not have a .set() method[39;00m
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:654[0m, in [0;36mendpoint.<locals>._endpoint.<locals>.wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    651[0m [38;5;28;01mtry[39;00m:
+[1;32m    652[0m     [38;5;28;01mwith[39;00m unmarked():
+[1;32m    653[0m         [38;5;66;03m# Run the function[39;00m
+[0;32m--> 654[0m         result [38;5;241m=[39m [43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43m_args[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43m_kwargs[49m[43m)[49m
+[1;32m    655[0m [38;5;28;01mexcept[39;00m [38;5;167;01mException[39;00m [38;5;28;01mas[39;00m e:
+[1;32m    656[0m     [38;5;66;03m# If the function raises an exception, log it and return[39;00m
+[1;32m    657[0m     [38;5;66;03m# the exception[39;00m
+[1;32m    658[0m     [38;5;66;03m# In case the exception is about .set() being missing, add[39;00m
+[1;32m    659[0m     [38;5;66;03m# a more helpful error message[39;00m
+[1;32m    660[0m     [38;5;28;01mif[39;00m [38;5;124m"[39m[38;5;124mno attribute [39m[38;5;124m'[39m[38;5;124mset[39m[38;5;124m'[39m[38;5;124m"[39m [38;5;129;01min[39;00m [38;5;28mstr[39m(e):
+[1;32m    661[0m         [38;5;66;03m# Get the name of the object that was passed in[39;00m
+[1;32m    662[0m         [38;5;66;03m# as a Store, but did not have a .set() method[39;00m
 
 Cell [0;32mIn[5], line 3[0m, in [0;36mget_answer[0;34m(question, answer)[0m
 [1;32m      1[0m [38;5;129m@mk[39m[38;5;241m.[39mendpoint()
