@@ -22,8 +22,10 @@
     if (dtype === "float") {
         if (percentage) {
             data = (data * 100).toPrecision(precision) + "%";
-        } else {
+        } else if (!isNaN(data)) {
             data = data.toPrecision(precision);
+        } else {
+            data = "NaN";
         }
     }
 
