@@ -75,6 +75,17 @@
 			});
 		}
 	}
+
+	async function onSelected(e) {
+		if (e.detail) {
+			selected = e.detail.points.map((p) =>
+				p.data.keyidx ? p.data.keyidx[p.pointIndex] : p.pointIndex
+			);
+		} else {
+			selected = [];
+		}
+		eventDispatcher('select', { selected: selected });
+	}
 </script>
 
 {#await dataPromise}
@@ -90,14 +101,6 @@
 		{layout}
 		{config}
 		on:click={(e) => onEndpoint(onClick, e)}
-		on:selected={(e) => {
-			if (e.detail) {
-				selected = e.detail.points.map((p) => p.data.keyidx[p.pointIndex]);
-				console.log('hi', selected);
-			} else {
-				selected = [];
-			}
-			eventDispatcher('select', { selected: selected });
-		}}
+		on:selected={(e) => onSelected(e)}
 	/>
 {/await}

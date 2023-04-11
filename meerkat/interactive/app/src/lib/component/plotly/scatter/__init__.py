@@ -25,8 +25,8 @@ class Scatter(Component):
         y: str,
         hue: str = None,
         title: str = "",
-        selected: List[str] = [],
         on_click: EndpointProperty = None,
+        selected: List[str] = [],
         on_select: Endpoint = None,
     ):
         super().__init__(
