@@ -1,11 +1,9 @@
 import asyncio
 import concurrent
 import functools
-import time
 import warnings
 from typing import Any, Callable, Union
 
-from rich import print
 from tqdm.asyncio import tqdm_asyncio
 from tqdm.auto import tqdm
 
