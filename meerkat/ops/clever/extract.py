@@ -105,18 +105,16 @@ def extract_to_schema(
     Return:
         A column with the extracted information.
     """
+
+    def _run(text):
+        # clone = engine.clone() # Shouldn't need to do this. Keeping it here for now,
+        # in case async map has issues.
+        return schema(engine.run, prompt_params=dict(text=text))[0]
+
     if isinstance(schema, Guard):
         if not async_:
-            return column.map(
-                lambda text: schema(engine.run, prompt_params=dict(text=text))[0]
-            )
-        return asyncio.run(
-            amap(
-                column,
-                lambda text: schema(engine.run, prompt_params=dict(text=text))[0],
-                max_concurrent=max_concurrent,
-            )
-        )
+            return column.map(_run)
+        return asyncio.run(amap(column, _run, max_concurrent=max_concurrent))
 
     if prompt is None:
         prompt = "Extract information from the TEXT to a SCHEMA.\n\nTEXT: {text}\nSCHEMA: {schema}\nAnswer:"

@@ -137,9 +137,9 @@ class OpenAIChatCompletion(ChatCompletion):
         self.messages = messages
         self.response = self.engine(messages=messages)
 
-        self.result = self.parse_response(self.response)
+        self.result = result = self.parse_response(self.response)
         self.on_run_end()
-        return self.result
+        return result
 
     def parse_response(self, response: dict) -> str:
         return response["choices"][0]["message"]["content"]

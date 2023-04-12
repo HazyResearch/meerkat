@@ -116,6 +116,9 @@ class TextCompletion(BaseEngine):
         kwargs = {
             self.parameter_mapping[k]: v for k, v in kwargs.items() if v is not None
         }
+        # Update the internal attributes.
+        for k, v in kwargs.items():
+            setattr(self, f"_{k}", v)
         self._engine = partial(self._engine, **kwargs)
         return self
 
@@ -165,9 +168,9 @@ class TextCompletion(BaseEngine):
         """Run the engine on a prompt and return the completion."""
         self.prompt = prompt
         self.response = self.engine(prompt=self.format_prompt(prompt))
-        self.result = self.parse_response(self.response)
+        self.result = result = self.parse_response(self.response)
         self.on_run_end()
-        return self.result
+        return result
 
     def set_logger(self, logger: WatchLogger):
         self._logger = logger
@@ -204,6 +207,14 @@ class TextCompletion(BaseEngine):
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}()"
+
+    def clone(self):
+        from copy import deepcopy
+
+        obj = self.__class__(**deepcopy(self.configuration))
+        obj._logger = self._logger
+        obj._errand_run_id = self._errand_run_id
+        return obj
 
 
 class AnthropicTextCompletion(TextCompletion):
