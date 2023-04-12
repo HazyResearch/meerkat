@@ -11,7 +11,10 @@ from ...abstract import Component
 
 class ScatterMapbox(Component):
     df: DataFrame
+    keyidxs: List[Union[str, int]]
     on_click: EndpointProperty = None
+    selected: List[str] = []
+    on_select: Endpoint = None
     selected: List[str] = []
     on_select: Endpoint = None
 

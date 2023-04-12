@@ -6,31 +6,21 @@
 
 	const eventDispatcher = createEventDispatcher();
 
+	export let keyidxs: Array<string | number>;
+
 	export let jsonDesc: string;
 	export let onClick: Endpoint;
 	export let selected: Array<number> = [];
 
 	async function onEndpoint(endpoint: Endpoint, e) {
-		let data = JSON.parse(jsonDesc).data;
-		console.log(e.detail.points);
-		console.log(data);
-		if (endpoint) {
-			dispatch(endpoint.endpointId, {
-				detail: {
-					keyidxs: e.detail.points.map((p) => data[0].customdata[p.pointIndex])
-				}
-			});
-		}
+		if (!endpoint) return;
+		dispatch(endpoint.endpointId, {
+			detail: { keyidxs: e.detail.points.map((p) => keyidxs[p.pointIndex]) }
+		});
 	}
 
 	async function onSelected(e) {
-		if (e.detail) {
-			selected = e.detail.points.map((p) =>
-				p.data.keyidx ? p.data.keyidx[p.pointIndex] : p.pointIndex
-			);
-		} else {
-			selected = [];
-		}
+		selected = e.detail ? e.detail.points.map((p) => keyidxs[p.pointIndex]) : [];
 		eventDispatcher('select', { selected: selected });
 	}
 </script>
