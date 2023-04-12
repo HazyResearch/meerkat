@@ -6,6 +6,9 @@ from meerkat.engines.text.completion import TextCompletion
 from meerkat.ops.watch.abstract import WatchLogger
 from meerkat.tools.lazy_loader import LazyLoader
 
+from ..providers import OpenAIMixin
+
+
 manifest = LazyLoader("manifest")
 openai = LazyLoader("openai")
 anthropic = LazyLoader("anthropic")
@@ -26,8 +29,8 @@ class ChatCompletion(TextCompletion):
         return MockChatCompletion(**kwargs)
 
     @classmethod
-    def with_openai(cls, key: str):
-        return OpenAIChatCompletion(key)
+    def with_openai(cls, key: str=None):
+        return OpenAIChatCompletion(key=key)
 
     def set_logger(self, logger: WatchLogger):
         self._logger = logger
@@ -73,7 +76,7 @@ class Message(BaseModel):
         return v
 
 
-class OpenAIChatCompletion(ChatCompletion):
+class OpenAIChatCompletion(ChatCompletion, OpenAIMixin):
 
     COST_PER_TOKEN = {
         "gpt-3.5-turbo": 0.002 / 1000,
@@ -102,9 +105,7 @@ class OpenAIChatCompletion(ChatCompletion):
         )
 
     def setup_engine(self, key: str = None):
-        import openai
-
-        openai.api_key = key
+        self.authenticate(key)
         self._engine = openai.ChatCompletion.create
 
     def _check_import(self):

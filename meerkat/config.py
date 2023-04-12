@@ -15,6 +15,7 @@ class MeerkatConfig:
     display: DisplayConfig
     datasets: DatasetsConfig
     system: SystemConfig
+    engines: EnginesConfig
 
     @classmethod
     def from_yaml(cls, path: str = None):
@@ -32,6 +33,7 @@ class MeerkatConfig:
             display=DisplayConfig(**config.get("display", {})),
             datasets=DatasetsConfig(**config.get("datasets", {})),
             system=SystemConfig(**config.get("system", {})),
+            engines=EnginesConfig(**config.get("engines", {})),
         )
         os.environ[DATASETS_ENV_VARIABLE] = config.datasets.root_dir
 
@@ -47,6 +49,11 @@ class DisplayConfig:
     max_image_width: int = 128
 
     show_audio: bool = True
+
+@dataclass
+class EnginesConfig:
+    openai_api_key: str = None
+    anthropic_api_key: str = None
 
 
 @dataclass
