@@ -1,42 +1,53 @@
-from typing import Optional
+from typing import List, Union
+
+import plotly.express as px
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.endpoint import EndpointProperty
+from meerkat.interactive.endpoint import Endpoint, EndpointProperty
 from meerkat.tools.utils import classproperty
+
+from ...abstract import Component
 
 
 class Bar(Component):
     df: DataFrame
-    x: str
-    y: str
-    title: str
-    orientation: str = "v"
+    keyidxs: List[Union[str, int]]
     on_click: EndpointProperty = None
+    selected: List[str] = []
+    on_select: Endpoint = None
 
-    # TODO (dean): convert to json_desc
+    json_desc: str = ""
+
     def __init__(
         self,
         df: DataFrame,
         *,
-        x: str,
-        y: str,
-        title: str = "",
-        orientation: str = "v",
+        x=None,
+        y=None,
+        color=None,
         on_click: EndpointProperty = None,
+        selected: List[str] = [],
+        on_select: Endpoint = None,
+        **kwargs,
     ):
+        """See https://plotly.com/python-api-reference/generated/plotly.express.scatter_mapbox.html
+        for more details."""
+
         if df.primary_key_name is None:
             raise ValueError("Dataframe must have a primary key")
         if len(df[x].unique()) != len(df):
             df = df.groupby(x)[[x, y]].mean()
             df.create_primary_key("id")
+
+        fig = px.bar(df.to_pandas(), x=x, y=y, color=color, **kwargs)
+
         super().__init__(
             df=df,
-            x=x,
-            y=y,
-            title=title,
-            orientation=orientation,
+            keyidxs=df.primary_key.values.tolist(),
             on_click=on_click,
+            selected=selected,
+            on_select=on_select,
+            json_desc=fig.to_json(),
         )
 
     @classproperty
@@ -44,4 +55,4 @@ class Bar(Component):
         return "plotly"
 
     def _get_ipython_height(self):
-        return "600px"
+        return "800px"

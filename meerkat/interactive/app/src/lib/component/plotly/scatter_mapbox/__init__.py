@@ -31,7 +31,6 @@ class ScatterMapbox(Component):
     ):
         """See https://plotly.com/python-api-reference/generated/plotly.express.scatter_mapbox.html
         for more details."""
-        print("kwargs", kwargs)
 
         fig = px.scatter_mapbox(df.to_pandas(), lat=lat, lon=lon, color=color, **kwargs)
 
