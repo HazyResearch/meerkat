@@ -5,6 +5,8 @@ from meerkat.engines.abstract import BaseEngine
 from meerkat.ops.watch.abstract import WatchLogger
 from meerkat.tools.lazy_loader import LazyLoader
 
+from ..providers import OpenAIMixin
+
 manifest = LazyLoader("manifest")
 openai = LazyLoader("openai")
 anthropic = LazyLoader("anthropic")
@@ -313,7 +315,7 @@ class MockTextCompletion(TextCompletion):
         return response
 
 
-class OpenAITextCompletion(TextCompletion):
+class OpenAITextCompletion(TextCompletion, OpenAIMixin):
     """
     A text completion engine that takes in a prompt and returns a completion.
     """
@@ -345,9 +347,7 @@ class OpenAITextCompletion(TextCompletion):
         )
 
     def setup_engine(self, key: str = None):
-        import openai
-
-        openai.api_key = key
+        self.authenticate(key=key)
         self._engine = openai.Completion.create
 
     def _check_import(self):
