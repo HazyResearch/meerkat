@@ -9,15 +9,9 @@ from meerkat import DataFrame
 logger = logging.getLogger("postgresql")
 logger.setLevel(logging.WARNING)
 
-import sqlalchemy  # type: ignore
-from sqlalchemy import (  # type: ignore
-    Column,
-    Float,
-    Integer,
-    String,
-    create_engine,
-)
-from sqlalchemy.engine import Engine
+import sqlalchemy  # type: ignore, noqa: E402
+from sqlalchemy import Column, Float, Integer, String, create_engine  # type: ignore
+from sqlalchemy.engine import Engine  # noqa: E402
 from sqlalchemy.ext.declarative import declarative_base  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
 
@@ -265,9 +259,11 @@ class SQLAlchemyWatchLogger(WatchLogger):
     def get_table(self, model: type):
         session = self.session
         result = session.query(model).all()
-        return DataFrame(
-            [
-                {c.name: getattr(row, c.name) for c in model.__table__.columns}
-                for row in result
-            ]
-        )
+
+        records = [
+            {c.name: getattr(row, c.name) for c in model.__table__.columns}
+            for row in result
+        ]
+        if len(records) == 0:
+            raise ValueError("No records found.")
+        return DataFrame(records)
