@@ -1,12 +1,14 @@
 from typing import List, Union
 
-import plotly.express as px
-
+from meerkat import env
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty
-from meerkat.tools.utils import classproperty
+from meerkat.tools.lazy_loader import LazyLoader
+from meerkat.tools.utils import classproperty, requires
 
 from ...abstract import Component
+
+px = LazyLoader("plotly.express")
 
 
 class Bar(Component):
@@ -18,6 +20,7 @@ class Bar(Component):
 
     json_desc: str = ""
 
+    @requires("plotly.express")
     def __init__(
         self,
         df: DataFrame,
@@ -32,6 +35,11 @@ class Bar(Component):
     ):
         """See https://plotly.com/python-api-reference/generated/plotly.express.scatter_mapbox.html
         for more details."""
+
+        if not env.is_package_installed("plotly"):
+            raise ValueError(
+                "Plotly components require plotly. Install with `pip install plotly`."
+            )
 
         if df.primary_key_name is None:
             raise ValueError("Dataframe must have a primary key")
