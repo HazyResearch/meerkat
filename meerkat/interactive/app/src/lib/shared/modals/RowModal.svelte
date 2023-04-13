@@ -55,7 +55,6 @@
 
 	const onKeyPress = async (e) => {
 		// q / esc / enter
-		console.log(e.charCode)
 		if ( e.charCode === 27) {
 			closeModal();
 			// a / left arrow
