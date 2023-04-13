@@ -25,7 +25,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
@@ -2145,7 +2145,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "4b504cb75fa54576a33732aa5de2e483"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "ea0427405e22465fb430a075fa80901f"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -2352,7 +2352,7 @@ Using the <a class="reference external" href="https://seaborn.pydata.org/install
   warnings.warn(
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7f668fe88d60&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7f5b6dea06a0&gt;
 </pre></div>
 </div>
 <img alt="../../_images/7e234957b14e939fce17327c18d898143278432b13bb3e39e1316f507cea4bbb.png" src="../../_images/7e234957b14e939fce17327c18d898143278432b13bb3e39e1316f507cea4bbb.png" />
@@ -2391,16 +2391,16 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/44.7M [00:00&lt;?, ?B/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 19%|█▊        | 8.31M/44.7M [00:00&lt;00:00, 87.1MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 17%|█▋        | 7.69M/44.7M [00:00&lt;00:00, 80.2MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 53%|█████▎    | 23.6M/44.7M [00:00&lt;00:00, 130MB/s] 
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 49%|████▉     | 22.0M/44.7M [00:00&lt;00:00, 121MB/s] 
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 95%|█████████▍| 42.2M/44.7M [00:00&lt;00:00, 159MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 81%|████████  | 36.2M/44.7M [00:00&lt;00:00, 133MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 44.7M/44.7M [00:00&lt;00:00, 149MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 44.7M/44.7M [00:00&lt;00:00, 130MB/s]
 </pre></div>
 </div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
@@ -2703,281 +2703,66 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">19</span><span class="p">],</span> <span class="n">line</span> <span class="mi">22</span>
-<span class="g g-Whitespace">     </span><span class="mi">14</span>     <span class="k">return</span> <span class="p">{</span>
-<span class="g g-Whitespace">     </span><span class="mi">15</span>         <span class="s2">&quot;pred&quot;</span><span class="p">:</span> <span class="n">out</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
-<span class="g g-Whitespace">     </span><span class="mi">16</span>         <span class="s2">&quot;probs&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
-<span class="g g-Whitespace">     </span><span class="mi">17</span>         <span class="s2">&quot;activation&quot;</span><span class="p">:</span> <span class="n">extractor</span><span class="o">.</span><span class="n">activation</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">18</span>     <span class="p">}</span>
-<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="c1"># 3. Apply the update. Note that the `predict` function operates on batches, so we set </span>
-<span class="g g-Whitespace">     </span><span class="mi">20</span> <span class="c1"># `batched=True`. Also, the `predict` function only accesses the &quot;input&quot; column, by </span>
-<span class="g g-Whitespace">     </span><span class="mi">21</span> <span class="c1"># specifying that here we instruct update to only load that one column and skip others </span>
-<span class="ne">---&gt; </span><span class="mi">22</span> <span class="n">pred_df</span> <span class="o">=</span> <span class="n">valid_df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">predict</span><span class="p">,</span> <span class="n">is_batched_fn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="n">valid_df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">valid_df</span><span class="p">,</span> <span class="n">pred_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;columns&quot;</span><span class="p">)</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74,</span> in <span class="ni">unmarked.__call__.&lt;locals&gt;.decorate_context</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">71</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">72</span> <span class="k">def</span> <span class="nf">decorate_context</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="g g-Whitespace">     </span><span class="mi">73</span>     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">():</span>
-<span class="ne">---&gt; </span><span class="mi">74</span>         <span class="k">return</span> <span class="n">reactive</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">nested_return</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">202</span> <span class="c1"># Call the function on the args and kwargs</span>
-<span class="g g-Whitespace">    </span><span class="mi">203</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
-<span class="ne">--&gt; </span><span class="mi">204</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">unpacked_args</span><span class="p">,</span> <span class="o">**</span><span class="n">unpacked_kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">206</span> <span class="c1"># TODO: Check if result is equal to one of the inputs.</span>
-<span class="g g-Whitespace">    </span><span class="mi">207</span> <span class="c1"># If it is, we need to copy it.</span>
-<span class="g g-Whitespace">    </span><span class="mi">209</span> <span class="k">if</span> <span class="n">_is_unmarked_context</span> <span class="ow">or</span> <span class="n">_force_no_react</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">any_inputs_marked</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">210</span>     <span class="c1"># If we are in an unmarked context, then we don&#39;t need to create</span>
-<span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="c1"># any nodes in the graph.</span>
-<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># `fn` should be run as normal.</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper.&lt;locals&gt;._fn_outer_wrapper.&lt;locals&gt;._fn_wrapper</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">135</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">_fn</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:1208,</span> in <span class="ni">DataFrame.map</span><span class="nt">(self, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, **kwargs)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1195</span> <span class="k">def</span> <span class="nf">map</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1196</span>     <span class="bp">self</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1197</span>     <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1204</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1205</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Column</span><span class="p">]]:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1206</span>     <span class="kn">from</span> <span class="nn">meerkat.ops.map</span> <span class="kn">import</span> <span class="nb">map</span>
-<span class="ne">-&gt; </span><span class="mi">1208</span>     <span class="k">return</span> <span class="nb">map</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1209</span>         <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1210</span>         <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1211</span>         <span class="n">is_batched_fn</span><span class="o">=</span><span class="n">is_batched_fn</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1212</span>         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1213</span>         <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1214</span>         <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1215</span>         <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1216</span>         <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1217</span>         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1218</span>     <span class="p">)</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:483,</span> in <span class="ni">map</span><span class="nt">(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, use_ray, num_blocks, blocks_per_window, pbar, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">379</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Create a new :class:`Column` or :class:`DataFrame` by applying a</span>
-<span class="g g-Whitespace">    </span><span class="mi">380</span><span class="sd"> function to each row in ${data}.</span>
-<span class="g g-Whitespace">    </span><span class="mi">381</span><span class="sd"> </span>
-<span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">470</span><span class="sd">     df[&quot;ma_eligible&quot;]</span>
-<span class="g g-Whitespace">    </span><span class="mi">471</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">473</span> <span class="n">deferred</span> <span class="o">=</span> <span class="n">defer</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">474</span>     <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">475</span>     <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">481</span>     <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">482</span> <span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">483</span> <span class="k">return</span> <span class="n">_materialize</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">484</span>     <span class="n">deferred</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">485</span>     <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">486</span>     <span class="n">pbar</span><span class="o">=</span><span class="n">pbar</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">487</span>     <span class="n">use_ray</span><span class="o">=</span><span class="n">use_ray</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">488</span>     <span class="n">num_blocks</span><span class="o">=</span><span class="n">num_blocks</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">489</span>     <span class="n">blocks_per_window</span><span class="o">=</span><span class="n">blocks_per_window</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">490</span> <span class="p">)</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:618,</span> in <span class="ni">_materialize</span><span class="nt">(data, batch_size, pbar, use_ray, num_blocks, blocks_per_window)</span>
-<span class="g g-Whitespace">    </span><span class="mi">615</span> <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="g g-Whitespace">    </span><span class="mi">616</span> <span class="k">for</span> <span class="n">batch_start</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">),</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">pbar</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">617</span>     <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<span class="ne">--&gt; </span><span class="mi">618</span>         <span class="n">data</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">619</span>             <span class="nb">slice</span><span class="p">(</span><span class="n">batch_start</span><span class="p">,</span> <span class="n">batch_start</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">materialize</span><span class="o">=</span><span class="kc">True</span>
-<span class="g g-Whitespace">    </span><span class="mi">620</span>         <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">621</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">622</span> <span class="k">return</span> <span class="n">concat</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74,</span> in <span class="ni">unmarked.__call__.&lt;locals&gt;.decorate_context</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">71</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">72</span> <span class="k">def</span> <span class="nf">decorate_context</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="g g-Whitespace">     </span><span class="mi">73</span>     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">():</span>
-<span class="ne">---&gt; </span><span class="mi">74</span>         <span class="k">return</span> <span class="n">reactive</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">nested_return</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">202</span> <span class="c1"># Call the function on the args and kwargs</span>
-<span class="g g-Whitespace">    </span><span class="mi">203</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
-<span class="ne">--&gt; </span><span class="mi">204</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">unpacked_args</span><span class="p">,</span> <span class="o">**</span><span class="n">unpacked_kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">206</span> <span class="c1"># TODO: Check if result is equal to one of the inputs.</span>
-<span class="g g-Whitespace">    </span><span class="mi">207</span> <span class="c1"># If it is, we need to copy it.</span>
-<span class="g g-Whitespace">    </span><span class="mi">209</span> <span class="k">if</span> <span class="n">_is_unmarked_context</span> <span class="ow">or</span> <span class="n">_force_no_react</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">any_inputs_marked</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">210</span>     <span class="c1"># If we are in an unmarked context, then we don&#39;t need to create</span>
-<span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="c1"># any nodes in the graph.</span>
-<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># `fn` should be run as normal.</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper.&lt;locals&gt;._fn_outer_wrapper.&lt;locals&gt;._fn_wrapper</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">135</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">_fn</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:531,</span> in <span class="ni">DataFrame._get</span><span class="nt">(self, posidx, materialize)</span>
-<span class="g g-Whitespace">    </span><span class="mi">528</span>     <span class="k">return</span> <span class="n">df</span>
-<span class="g g-Whitespace">    </span><span class="mi">529</span> <span class="k">elif</span> <span class="n">index_type</span> <span class="o">==</span> <span class="s2">&quot;row&quot;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-<span class="g g-Whitespace">    </span><span class="mi">530</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clone</span><span class="p">(</span>
-<span class="ne">--&gt; </span><span class="mi">531</span>         <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">&quot;_get&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">posidx</span><span class="p">,</span> <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">532</span>     <span class="p">)</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/block/manager.py:91,</span> in <span class="ni">BlockManager.apply</span><span class="nt">(self, method_name, *args, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">87</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">block_ref</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topological_block_refs</span><span class="p">():</span>
-<span class="g g-Whitespace">     </span><span class="mi">88</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">block_ref</span><span class="o">.</span><span class="n">block</span><span class="p">,</span> <span class="n">DeferredBlock</span><span class="p">):</span>
-<span class="g g-Whitespace">     </span><span class="mi">89</span>         <span class="c1"># defer computation of lambda columns, since they may be functions of</span>
-<span class="g g-Whitespace">     </span><span class="mi">90</span>         <span class="c1"># the other columns</span>
-<span class="ne">---&gt; </span><span class="mi">91</span>         <span class="n">result</span> <span class="o">=</span> <span class="n">block_ref</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">92</span>             <span class="n">method_name</span><span class="o">=</span><span class="n">method_name</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">93</span>             <span class="n">indexed_inputs</span><span class="o">=</span><span class="n">indexed_inputs</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">94</span>             <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">95</span>             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">96</span>         <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">97</span>     <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">     </span><span class="mi">98</span>         <span class="n">result</span> <span class="o">=</span> <span class="n">block_ref</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">method_name</span><span class="o">=</span><span class="n">method_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/block/ref.py:44,</span> in <span class="ni">BlockRef.apply</span><span class="nt">(self, method_name, *args, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">40</span> <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">41</span>     <span class="bp">self</span><span class="p">,</span> <span class="n">method_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;_get&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-<span class="g g-Whitespace">     </span><span class="mi">42</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">BlockRef</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">BlockRef</span><span class="p">],</span> <span class="nb">dict</span><span class="p">]:</span>
-<span class="g g-Whitespace">     </span><span class="mi">43</span>     <span class="c1"># apply method to the block</span>
-<span class="ne">---&gt; </span><span class="mi">44</span>     <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">block</span><span class="p">,</span> <span class="n">method_name</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">block_ref</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/block/deferred_block.py:414,</span> in <span class="ni">DeferredBlock._get</span><span class="nt">(self, index, block_ref, indexed_inputs, materialize)</span>
-<span class="g g-Whitespace">    </span><span class="mi">410</span>     <span class="n">indexed_inputs</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="g g-Whitespace">    </span><span class="mi">412</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">414</span> <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">415</span>     <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">indexed_inputs</span><span class="o">=</span><span class="n">indexed_inputs</span><span class="p">,</span> <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span>
-<span class="g g-Whitespace">    </span><span class="mi">416</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">418</span> <span class="c1"># convert raw outputs into columns</span>
-<span class="g g-Whitespace">    </span><span class="mi">419</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/block/deferred_block.py:264,</span> in <span class="ni">DeferredOp._get</span><span class="nt">(self, index, indexed_inputs, materialize)</span>
-<span class="g g-Whitespace">    </span><span class="mi">262</span> <span class="k">if</span> <span class="n">materialize</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">263</span>     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_batched_fn</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">264</span>         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">266</span>         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">267</span>             <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">return_index</span><span class="p">]</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torch/utils/_contextlib.py:115,</span> in <span class="ni">context_decorator.&lt;locals&gt;.decorate_context</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">112</span> <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">113</span> <span class="k">def</span> <span class="nf">decorate_context</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">114</span>     <span class="k">with</span> <span class="n">ctx_factory</span><span class="p">():</span>
-<span class="ne">--&gt; </span><span class="mi">115</span>         <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="nn">Cell In[19], line 10,</span> in <span class="ni">predict</span><span class="nt">(input)</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">TensorColumn</span><span class="p">):</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span>     <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># We get the underlying torch tensor with `data` and move to GPU </span>
-<span class="ne">---&gt; </span><span class="mi">10</span>     <span class="n">out</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># Run forward pass</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span>     <span class="c1"># Return a dictionary with one key for each of the new columns. Each value in the</span>
-<span class="g g-Whitespace">     </span><span class="mi">13</span>     <span class="c1"># dictionary should have the same length as the batch. </span>
-<span class="g g-Whitespace">     </span><span class="mi">14</span>     <span class="k">return</span> <span class="p">{</span>
-<span class="g g-Whitespace">     </span><span class="mi">15</span>         <span class="s2">&quot;pred&quot;</span><span class="p">:</span> <span class="n">out</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
-<span class="g g-Whitespace">     </span><span class="mi">16</span>         <span class="s2">&quot;probs&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
-<span class="g g-Whitespace">     </span><span class="mi">17</span>         <span class="s2">&quot;activation&quot;</span><span class="p">:</span> <span class="n">extractor</span><span class="o">.</span><span class="n">activation</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">18</span>     <span class="p">}</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torch/nn/modules/module.py:1501,</span> in <span class="ni">Module._call_impl</span><span class="nt">(self, *args, **kwargs)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1496</span> <span class="c1"># If we don&#39;t have any hooks, we want to skip the rest of the logic in</span>
-<span class="g g-Whitespace">   </span><span class="mi">1497</span> <span class="c1"># this function, and just call forward.</span>
-<span class="g g-Whitespace">   </span><span class="mi">1498</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backward_hooks</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backward_pre_hooks</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_hooks</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_pre_hooks</span>
-<span class="g g-Whitespace">   </span><span class="mi">1499</span>         <span class="ow">or</span> <span class="n">_global_backward_pre_hooks</span> <span class="ow">or</span> <span class="n">_global_backward_hooks</span>
-<span class="g g-Whitespace">   </span><span class="mi">1500</span>         <span class="ow">or</span> <span class="n">_global_forward_hooks</span> <span class="ow">or</span> <span class="n">_global_forward_pre_hooks</span><span class="p">):</span>
-<span class="ne">-&gt; </span><span class="mi">1501</span>     <span class="k">return</span> <span class="n">forward_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1502</span> <span class="c1"># Do not call functions when jit is used</span>
-<span class="g g-Whitespace">   </span><span class="mi">1503</span> <span class="n">full_backward_hooks</span><span class="p">,</span> <span class="n">non_full_backward_hooks</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torchvision/models/resnet.py:285,</span> in <span class="ni">ResNet.forward</span><span class="nt">(self, x)</span>
-<span class="g g-Whitespace">    </span><span class="mi">284</span> <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">285</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_impl</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torchvision/models/resnet.py:276,</span> in <span class="ni">ResNet._forward_impl</span><span class="nt">(self, x)</span>
-<span class="g g-Whitespace">    </span><span class="mi">274</span> <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">275</span> <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer3</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">276</span> <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer4</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">278</span> <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">avgpool</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">279</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torch/nn/modules/module.py:1538,</span> in <span class="ni">Module._call_impl</span><span class="nt">(self, *args, **kwargs)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1535</span>     <span class="n">bw_hook</span> <span class="o">=</span> <span class="n">hooks</span><span class="o">.</span><span class="n">BackwardHook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">full_backward_hooks</span><span class="p">,</span> <span class="n">backward_pre_hooks</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1536</span>     <span class="n">args</span> <span class="o">=</span> <span class="n">bw_hook</span><span class="o">.</span><span class="n">setup_input_hook</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-<span class="ne">-&gt; </span><span class="mi">1538</span> <span class="n">result</span> <span class="o">=</span> <span class="n">forward_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1539</span> <span class="k">if</span> <span class="n">_global_forward_hooks</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_hooks</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1540</span>     <span class="k">for</span> <span class="n">hook_id</span><span class="p">,</span> <span class="n">hook</span> <span class="ow">in</span> <span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1541</span>         <span class="o">*</span><span class="n">_global_forward_hooks</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
-<span class="g g-Whitespace">   </span><span class="mi">1542</span>         <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_forward_hooks</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
-<span class="g g-Whitespace">   </span><span class="mi">1543</span>     <span class="p">):</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torch/nn/modules/container.py:217,</span> in <span class="ni">Sequential.forward</span><span class="nt">(self, input)</span>
-<span class="g g-Whitespace">    </span><span class="mi">215</span> <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">216</span>     <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">217</span>         <span class="nb">input</span> <span class="o">=</span> <span class="n">module</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">218</span>     <span class="k">return</span> <span class="nb">input</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torch/nn/modules/module.py:1501,</span> in <span class="ni">Module._call_impl</span><span class="nt">(self, *args, **kwargs)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1496</span> <span class="c1"># If we don&#39;t have any hooks, we want to skip the rest of the logic in</span>
-<span class="g g-Whitespace">   </span><span class="mi">1497</span> <span class="c1"># this function, and just call forward.</span>
-<span class="g g-Whitespace">   </span><span class="mi">1498</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backward_hooks</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backward_pre_hooks</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_hooks</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_pre_hooks</span>
-<span class="g g-Whitespace">   </span><span class="mi">1499</span>         <span class="ow">or</span> <span class="n">_global_backward_pre_hooks</span> <span class="ow">or</span> <span class="n">_global_backward_hooks</span>
-<span class="g g-Whitespace">   </span><span class="mi">1500</span>         <span class="ow">or</span> <span class="n">_global_forward_hooks</span> <span class="ow">or</span> <span class="n">_global_forward_pre_hooks</span><span class="p">):</span>
-<span class="ne">-&gt; </span><span class="mi">1501</span>     <span class="k">return</span> <span class="n">forward_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1502</span> <span class="c1"># Do not call functions when jit is used</span>
-<span class="g g-Whitespace">   </span><span class="mi">1503</span> <span class="n">full_backward_hooks</span><span class="p">,</span> <span class="n">non_full_backward_hooks</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torchvision/models/resnet.py:93,</span> in <span class="ni">BasicBlock.forward</span><span class="nt">(self, x)</span>
-<span class="g g-Whitespace">     </span><span class="mi">90</span> <span class="n">identity</span> <span class="o">=</span> <span class="n">x</span>
-<span class="g g-Whitespace">     </span><span class="mi">92</span> <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="ne">---&gt; </span><span class="mi">93</span> <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">94</span> <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">96</span> <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torch/nn/modules/module.py:1501,</span> in <span class="ni">Module._call_impl</span><span class="nt">(self, *args, **kwargs)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1496</span> <span class="c1"># If we don&#39;t have any hooks, we want to skip the rest of the logic in</span>
-<span class="g g-Whitespace">   </span><span class="mi">1497</span> <span class="c1"># this function, and just call forward.</span>
-<span class="g g-Whitespace">   </span><span class="mi">1498</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backward_hooks</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backward_pre_hooks</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_hooks</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_pre_hooks</span>
-<span class="g g-Whitespace">   </span><span class="mi">1499</span>         <span class="ow">or</span> <span class="n">_global_backward_pre_hooks</span> <span class="ow">or</span> <span class="n">_global_backward_hooks</span>
-<span class="g g-Whitespace">   </span><span class="mi">1500</span>         <span class="ow">or</span> <span class="n">_global_forward_hooks</span> <span class="ow">or</span> <span class="n">_global_forward_pre_hooks</span><span class="p">):</span>
-<span class="ne">-&gt; </span><span class="mi">1501</span>     <span class="k">return</span> <span class="n">forward_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1502</span> <span class="c1"># Do not call functions when jit is used</span>
-<span class="g g-Whitespace">   </span><span class="mi">1503</span> <span class="n">full_backward_hooks</span><span class="p">,</span> <span class="n">non_full_backward_hooks</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torch/nn/modules/batchnorm.py:171,</span> in <span class="ni">_BatchNorm.forward</span><span class="nt">(self, input)</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span>     <span class="n">bn_training</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">running_mean</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">running_var</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">166</span><span class="w"> </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">167</span><span class="sd"> Buffers are only updated if they are to be tracked and we are in training mode. Thus they only need to be</span>
-<span class="g g-Whitespace">    </span><span class="mi">168</span><span class="sd"> passed when the update should occur (i.e. in training mode when they are tracked), or when buffer stats are</span>
-<span class="g g-Whitespace">    </span><span class="mi">169</span><span class="sd"> used for normalization (i.e. in eval mode when buffers are not None).</span>
-<span class="g g-Whitespace">    </span><span class="mi">170</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">171</span> <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">batch_norm</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">172</span>     <span class="nb">input</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">173</span>     <span class="c1"># If buffers are not to be tracked, ensure that they won&#39;t be updated</span>
-<span class="g g-Whitespace">    </span><span class="mi">174</span>     <span class="bp">self</span><span class="o">.</span><span class="n">running_mean</span>
-<span class="g g-Whitespace">    </span><span class="mi">175</span>     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">track_running_stats</span>
-<span class="g g-Whitespace">    </span><span class="mi">176</span>     <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">177</span>     <span class="bp">self</span><span class="o">.</span><span class="n">running_var</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">track_running_stats</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">178</span>     <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">179</span>     <span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">180</span>     <span class="n">bn_training</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">181</span>     <span class="n">exponential_average_factor</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">182</span>     <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torch/nn/functional.py:2450,</span> in <span class="ni">batch_norm</span><span class="nt">(input, running_mean, running_var, weight, bias, training, momentum, eps)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2447</span> <span class="k">if</span> <span class="n">training</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">2448</span>     <span class="n">_verify_batch_size</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
-<span class="ne">-&gt; </span><span class="mi">2450</span> <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">batch_norm</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">2451</span>     <span class="nb">input</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">running_mean</span><span class="p">,</span> <span class="n">running_var</span><span class="p">,</span> <span class="n">training</span><span class="p">,</span> <span class="n">momentum</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">enabled</span>
-<span class="g g-Whitespace">   </span><span class="mi">2452</span> <span class="p">)</span>
-
-<span class="ne">KeyboardInterrupt</span>: 
-</pre></div>
-</div>
-</div>
 </div>
 <p>The predictions, output probabilities, and activations are now stored alongside the examples in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span><span class="p">[[</span><span class="s2">&quot;label_id&quot;</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;pred&quot;</span><span class="p">,</span> <span class="s2">&quot;probs&quot;</span><span class="p">,</span> <span class="s2">&quot;activation&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyError</span><span class="g g-Whitespace">                                  </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">20</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">valid_df</span><span class="p">[[</span><span class="s2">&quot;label_id&quot;</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;pred&quot;</span><span class="p">,</span> <span class="s2">&quot;probs&quot;</span><span class="p">,</span> <span class="s2">&quot;activation&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">202</span> <span class="c1"># Call the function on the args and kwargs</span>
+<span class="g g-Whitespace">    </span><span class="mi">203</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
+<span class="ne">--&gt; </span><span class="mi">204</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">unpacked_args</span><span class="p">,</span> <span class="o">**</span><span class="n">unpacked_kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">206</span> <span class="c1"># TODO: Check if result is equal to one of the inputs.</span>
+<span class="g g-Whitespace">    </span><span class="mi">207</span> <span class="c1"># If it is, we need to copy it.</span>
+<span class="g g-Whitespace">    </span><span class="mi">209</span> <span class="k">if</span> <span class="n">_is_unmarked_context</span> <span class="ow">or</span> <span class="n">_force_no_react</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">any_inputs_marked</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">210</span>     <span class="c1"># If we are in an unmarked context, then we don&#39;t need to create</span>
+<span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="c1"># any nodes in the graph.</span>
+<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># `fn` should be run as normal.</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:537,</span> in <span class="ni">DataFrame.__getitem__</span><span class="nt">(self, posidx)</span>
+<span class="g g-Whitespace">    </span><span class="mi">535</span> <span class="nd">@reactive</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">536</span> <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">posidx</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">537</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">posidx</span><span class="p">,</span> <span class="n">materialize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74,</span> in <span class="ni">unmarked.__call__.&lt;locals&gt;.decorate_context</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">71</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">72</span> <span class="k">def</span> <span class="nf">decorate_context</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">73</span>     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">():</span>
+<span class="ne">---&gt; </span><span class="mi">74</span>         <span class="k">return</span> <span class="n">reactive</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">nested_return</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">202</span> <span class="c1"># Call the function on the args and kwargs</span>
+<span class="g g-Whitespace">    </span><span class="mi">203</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
+<span class="ne">--&gt; </span><span class="mi">204</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">unpacked_args</span><span class="p">,</span> <span class="o">**</span><span class="n">unpacked_kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">206</span> <span class="c1"># TODO: Check if result is equal to one of the inputs.</span>
+<span class="g g-Whitespace">    </span><span class="mi">207</span> <span class="c1"># If it is, we need to copy it.</span>
+<span class="g g-Whitespace">    </span><span class="mi">209</span> <span class="k">if</span> <span class="n">_is_unmarked_context</span> <span class="ow">or</span> <span class="n">_force_no_react</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">any_inputs_marked</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">210</span>     <span class="c1"># If we are in an unmarked context, then we don&#39;t need to create</span>
+<span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="c1"># any nodes in the graph.</span>
+<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># `fn` should be run as normal.</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper.&lt;locals&gt;._fn_outer_wrapper.&lt;locals&gt;._fn_wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">135</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">_fn</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:525,</span> in <span class="ni">DataFrame._get</span><span class="nt">(self, posidx, materialize)</span>
+<span class="g g-Whitespace">    </span><span class="mi">523</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">posidx</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">524</span>     <span class="n">missing_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">posidx</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">525</span>     <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DataFrame does not have columns </span><span class="si">{</span><span class="n">missing_cols</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">527</span> <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clone</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">posidx</span><span class="p">])</span>
+<span class="g g-Whitespace">    </span><span class="mi">528</span> <span class="k">return</span> <span class="n">df</span>
+
+<span class="ne">KeyError</span>: &quot;DataFrame does not have columns {&#39;label_id&#39;}&quot;
 </pre></div>
 </div>
 </div>
