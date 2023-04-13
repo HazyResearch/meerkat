@@ -8,7 +8,7 @@
 	} from '$lib/api/dataframe';
 	import type { RefreshCallback } from '$lib/shared/deprecate/callbacks';
 	import MatchHeader from '$lib/shared/deprecate/match_header/MatchHeader.svelte';
-	import ScatterPlot from '$lib/shared/plot/layercake/ScatterPlot.svelte';
+	import Scatter from '$lib/shared/plot/layercake/Scatter.svelte';
 	import type { Point2D } from '../../plot/types';
 	import ColumnSelect from '../column_select/ColumnSelect.svelte';
 	import Toggle from '../common/Toggle.svelte';
@@ -61,7 +61,7 @@
 <div>
 	<div class="flex flex-col items-center mb-4">
 		{#await datum_promise}
-			<ScatterPlot
+			<Scatter
 				data={[{ x: 0, y: 0, id: 0 }]}
 				bind:xlabel
 				bind:ylabel
@@ -69,7 +69,7 @@
 				height="300px"
 			/>
 		{:then datum}
-			<ScatterPlot
+			<Scatter
 				data={datum}
 				bind:xlabel
 				bind:ylabel

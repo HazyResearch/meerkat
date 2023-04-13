@@ -11,7 +11,7 @@ from ...abstract import Component
 px = LazyLoader("plotly.express")
 
 
-class Bar(Component):
+class Timeline(Component):
     df: DataFrame
     keyidxs: List[Union[str, int]]
     on_click: EndpointProperty = None
@@ -25,7 +25,8 @@ class Bar(Component):
         self,
         df: DataFrame,
         *,
-        x=None,
+        x_start=None,
+        x_end=None,
         y=None,
         color=None,
         on_click: EndpointProperty = None,
@@ -34,7 +35,7 @@ class Bar(Component):
         **kwargs,
     ):
         """See
-        https://plotly.com/python-api-reference/generated/plotly.express.scatter_mapbox.html
+        https://plotly.com/python-api-reference/generated/plotly.express.timeline.html
         for more details."""
 
         if not env.is_package_installed("plotly"):
@@ -44,11 +45,15 @@ class Bar(Component):
 
         if df.primary_key_name is None:
             raise ValueError("Dataframe must have a primary key")
-        if len(df[x].unique()) != len(df):
-            df = df.groupby(x)[[x, y]].mean()
-            df.create_primary_key("id")
 
-        fig = px.bar(df.to_pandas(), x=x, y=y, color=color, **kwargs)
+        fig = px.timeline(
+            df.to_pandas(),
+            x_start=x_start,
+            x_end=x_end,
+            y=y,
+            color=color,
+            **kwargs,
+        )
 
         super().__init__(
             df=df,

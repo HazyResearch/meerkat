@@ -11,7 +11,7 @@ from ...abstract import Component
 px = LazyLoader("plotly.express")
 
 
-class Bar(Component):
+class ParallelCoordinates(Component):
     df: DataFrame
     keyidxs: List[Union[str, int]]
     on_click: EndpointProperty = None
@@ -25,8 +25,7 @@ class Bar(Component):
         self,
         df: DataFrame,
         *,
-        x=None,
-        y=None,
+        dimensions=None,
         color=None,
         on_click: EndpointProperty = None,
         selected: List[str] = [],
@@ -34,7 +33,7 @@ class Bar(Component):
         **kwargs,
     ):
         """See
-        https://plotly.com/python-api-reference/generated/plotly.express.scatter_mapbox.html
+        https://plotly.com/python-api-reference/generated/plotly.express.parallel_categories.html
         for more details."""
 
         if not env.is_package_installed("plotly"):
@@ -44,11 +43,13 @@ class Bar(Component):
 
         if df.primary_key_name is None:
             raise ValueError("Dataframe must have a primary key")
-        if len(df[x].unique()) != len(df):
-            df = df.groupby(x)[[x, y]].mean()
-            df.create_primary_key("id")
 
-        fig = px.bar(df.to_pandas(), x=x, y=y, color=color, **kwargs)
+        fig = px.parallel_categories(
+            df.to_pandas(),
+            dimensions=dimensions,
+            color=color,
+            **kwargs,
+        )
 
         super().__init__(
             df=df,

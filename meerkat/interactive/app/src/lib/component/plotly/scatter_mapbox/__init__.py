@@ -11,10 +11,12 @@ from ...abstract import Component
 px = LazyLoader("plotly.express")
 
 
-class Bar(Component):
+class ScatterMapbox(Component):
     df: DataFrame
     keyidxs: List[Union[str, int]]
     on_click: EndpointProperty = None
+    selected: List[str] = []
+    on_select: Endpoint = None
     selected: List[str] = []
     on_select: Endpoint = None
 
@@ -25,8 +27,8 @@ class Bar(Component):
         self,
         df: DataFrame,
         *,
-        x=None,
-        y=None,
+        lat=None,
+        lon=None,
         color=None,
         on_click: EndpointProperty = None,
         selected: List[str] = [],
@@ -44,15 +46,11 @@ class Bar(Component):
 
         if df.primary_key_name is None:
             raise ValueError("Dataframe must have a primary key")
-        if len(df[x].unique()) != len(df):
-            df = df.groupby(x)[[x, y]].mean()
-            df.create_primary_key("id")
 
-        fig = px.bar(df.to_pandas(), x=x, y=y, color=color, **kwargs)
+        fig = px.scatter_mapbox(df.to_pandas(), lat=lat, lon=lon, color=color, **kwargs)
 
         super().__init__(
             df=df,
-            keyidxs=df.primary_key.values.tolist(),
             on_click=on_click,
             selected=selected,
             on_select=on_select,
