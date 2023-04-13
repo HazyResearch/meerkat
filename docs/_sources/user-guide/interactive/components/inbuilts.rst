@@ -96,9 +96,41 @@ plotly
    :toctree: ../../apidocs/generated
    :nosignatures:
 
-   meerkat.interactive.app.src.lib.component.plotly.BarPlot
-   meerkat.interactive.app.src.lib.component.plotly.Plot
-   meerkat.interactive.app.src.lib.component.plotly.ScatterPlot
+   meerkat.interactive.app.src.lib.component.plotly.Area
+   meerkat.interactive.app.src.lib.component.plotly.Bar
+   meerkat.interactive.app.src.lib.component.plotly.BarPolar
+   meerkat.interactive.app.src.lib.component.plotly.Box
+   meerkat.interactive.app.src.lib.component.plotly.Choropleth
+   meerkat.interactive.app.src.lib.component.plotly.ChoroplethMapbox
+   meerkat.interactive.app.src.lib.component.plotly.DensityContour
+   meerkat.interactive.app.src.lib.component.plotly.DensityHeatmap
+   meerkat.interactive.app.src.lib.component.plotly.DensityMapbox
+   meerkat.interactive.app.src.lib.component.plotly.ECDF
+   meerkat.interactive.app.src.lib.component.plotly.Funnel
+   meerkat.interactive.app.src.lib.component.plotly.FunnelArea
+   meerkat.interactive.app.src.lib.component.plotly.Histogram
+   meerkat.interactive.app.src.lib.component.plotly.Icicle
+   meerkat.interactive.app.src.lib.component.plotly.Line
+   meerkat.interactive.app.src.lib.component.plotly.Line3D
+   meerkat.interactive.app.src.lib.component.plotly.LineGeo
+   meerkat.interactive.app.src.lib.component.plotly.LineMapbox
+   meerkat.interactive.app.src.lib.component.plotly.LinePolar
+   meerkat.interactive.app.src.lib.component.plotly.LineTernary
+   meerkat.interactive.app.src.lib.component.plotly.ParallelCategories
+   meerkat.interactive.app.src.lib.component.plotly.ParallelCoordinates
+   meerkat.interactive.app.src.lib.component.plotly.Pie
+   meerkat.interactive.app.src.lib.component.plotly.Scatter
+   meerkat.interactive.app.src.lib.component.plotly.Scatter3D
+   meerkat.interactive.app.src.lib.component.plotly.ScatterGeo
+   meerkat.interactive.app.src.lib.component.plotly.ScatterMapbox
+   meerkat.interactive.app.src.lib.component.plotly.ScatterMatrix
+   meerkat.interactive.app.src.lib.component.plotly.ScatterPolar
+   meerkat.interactive.app.src.lib.component.plotly.ScatterTernary
+   meerkat.interactive.app.src.lib.component.plotly.Strip
+   meerkat.interactive.app.src.lib.component.plotly.Sunburst
+   meerkat.interactive.app.src.lib.component.plotly.Timeline
+   meerkat.interactive.app.src.lib.component.plotly.Treemap
+   meerkat.interactive.app.src.lib.component.plotly.Violin
 
 flowbite
 --------
