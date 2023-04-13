@@ -1,62 +1,34 @@
-from typing import List, Union
-
-from meerkat import env
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.endpoint import Endpoint, EndpointProperty
-from meerkat.tools.lazy_loader import LazyLoader
-from meerkat.tools.utils import classproperty, requires
-
-from ...abstract import Component
-
-px = LazyLoader("plotly.express")
+from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.interactive.endpoint import EndpointProperty
+from meerkat.tools.utils import classproperty
 
 
-class Bar(Component):
+class BarPlot(Component):
     df: DataFrame
-    keyidxs: List[Union[str, int]]
+    x: str
+    y: str
+    title: str
+    orientation: str = "v"
     on_click: EndpointProperty = None
-    selected: List[str] = []
-    on_select: Endpoint = None
 
-    json_desc: str = ""
-
-    @requires("plotly.express")
     def __init__(
         self,
         df: DataFrame,
         *,
-        x=None,
-        y=None,
-        color=None,
+        x: str,
+        y: str,
+        title: str = "",
+        orientation: str = "v",
         on_click: EndpointProperty = None,
-        selected: List[str] = [],
-        on_select: Endpoint = None,
-        **kwargs,
     ):
-        """See
-        https://plotly.com/python-api-reference/generated/plotly.express.scatter_mapbox.html
-        for more details."""
-
-        if not env.is_package_installed("plotly"):
-            raise ValueError(
-                "Plotly components require plotly. Install with `pip install plotly`."
-            )
-
         if df.primary_key_name is None:
             raise ValueError("Dataframe must have a primary key")
         if len(df[x].unique()) != len(df):
             df = df.groupby(x)[[x, y]].mean()
             df.create_primary_key("id")
-
-        fig = px.bar(df.to_pandas(), x=x, y=y, color=color, **kwargs)
-
         super().__init__(
-            df=df,
-            keyidxs=df.primary_key.values.tolist(),
-            on_click=on_click,
-            selected=selected,
-            on_select=on_select,
-            json_desc=fig.to_json(),
+            df=df, x=x, y=y, orientation=orientation, on_click=on_click, title=title
         )
 
     @classproperty
@@ -64,4 +36,4 @@ class Bar(Component):
         return "plotly"
 
     def _get_ipython_height(self):
-        return "800px"
+        return "600px"

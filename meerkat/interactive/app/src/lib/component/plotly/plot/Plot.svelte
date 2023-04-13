@@ -25,10 +25,6 @@
 	const onRelayout = (d) => dispatch('relayout', d);
 
 	const generatePlot = (node, data, layout, config, reloadPlot) => {
-		$PlotlyLib.setPlotConfig({
-			mapboxAccessToken:
-				'pk.eyJ1IjoiZGVhbi1zdHJhdGFrb3MiLCJhIjoiY2xlODMzb3loMGJtazNwcGdwYWYwdjdkcSJ9.MhwksxnGVZzGs7Xm2V4ywg'
-		});
 		return $PlotlyLib.newPlot(node, data, { ...layout }, { ...config }).then(() => {
 			node.on('plotly_hover', onHover);
 			node.on('plotly_unhover', onUnhover);

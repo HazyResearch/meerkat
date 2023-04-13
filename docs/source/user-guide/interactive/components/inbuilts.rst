@@ -96,9 +96,9 @@ plotly
    :toctree: ../../apidocs/generated
    :nosignatures:
 
-   meerkat.interactive.app.src.lib.component.plotly.Bar
+   meerkat.interactive.app.src.lib.component.plotly.BarPlot
    meerkat.interactive.app.src.lib.component.plotly.Plot
-   meerkat.interactive.app.src.lib.component.plotly.Scatter
+   meerkat.interactive.app.src.lib.component.plotly.ScatterPlot
 
 flowbite
 --------
