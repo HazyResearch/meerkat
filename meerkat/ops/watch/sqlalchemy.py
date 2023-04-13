@@ -2,6 +2,7 @@
 import logging
 import threading
 import uuid
+from datetime import datetime
 from typing import Any, Dict
 
 from meerkat import DataFrame
@@ -42,6 +43,7 @@ class ErrandRun(Base):
     errand_id = Column(String)
     parent_id = Column(String)
     engine = Column(String)
+    time = Column(String)
 
 
 class Errand(Base):
@@ -163,6 +165,7 @@ class SQLAlchemyWatchLogger(WatchLogger):
             errand_id=errand_id,
             parent_id=None,
             engine=engine,
+            time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         )
         session = self.session
         session.add(errand_run)
