@@ -33,7 +33,8 @@ class ECDF(Component):
         on_select: Endpoint = None,
         **kwargs,
     ):
-        """See https://plotly.com/python-api-reference/generated/plotly.express.ecdf.html
+        """See
+        https://plotly.com/python-api-reference/generated/plotly.express.ecdf.html
         for more details."""
 
         if not env.is_package_installed("plotly"):

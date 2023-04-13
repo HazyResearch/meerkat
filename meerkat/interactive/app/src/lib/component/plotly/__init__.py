@@ -21,7 +21,6 @@ from .line_ternary import LineTernary
 from .parallel_categories import ParallelCategories
 from .parallel_coordinates import ParallelCoordinates
 from .pie import Pie
-from .plot import Plot
 from .scatter import Scatter
 from .scatter_3d import Scatter3D
 from .scatter_geo import ScatterGeo

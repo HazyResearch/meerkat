@@ -33,7 +33,8 @@ class DensityHeatmap(Component):
         on_select: Endpoint = None,
         **kwargs,
     ):
-        """See https://plotly.com/python-api-reference/generated/plotly.express.density_heatmap.html
+        """See
+        https://plotly.com/python-api-reference/generated/plotly.express.density_heatmap.html
         for more details."""
 
         if not env.is_package_installed("plotly"):
