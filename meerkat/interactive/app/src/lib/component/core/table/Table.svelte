@@ -29,7 +29,8 @@
 		openModal(RowModal, {
 			df: df,
 			posidx: posidx,
-			mainColumn: undefined
+			mainColumn: undefined,
+			onEdit: onEdit
 		});
 	};
 
@@ -53,9 +54,8 @@
 		df: df,
 		start: page * perPage,
 		end: (page + 1) * perPage,
-		formatter: 'tiny'
+		formatter: 'table'
 	}).then((newChunk) => {
-		console.log('here');
 		chunk.set(newChunk);
 	});
 
@@ -200,8 +200,7 @@
 									}
 								}
 								selected = selected;
-								if (dispatchSelect) {
-									console.log('dispatching onSelect', selected);
+								if (dispatchSelect && onSelect) {
 									dispatch(onSelect.endpointId, { detail: { selected: selected } });
 								}
 							}}
@@ -215,7 +214,6 @@
 								{...$chunk.getCell(rowi, col.name)}
 								editable={true}
 								on:edit={(e) => {
-									console.log(keyidx);
 									dispatch(onEdit.endpointId, {
 										detail: {
 											column: col.name,

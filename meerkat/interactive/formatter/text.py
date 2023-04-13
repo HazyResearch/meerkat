@@ -54,7 +54,8 @@ class TextFormatterGroup(FormatterGroup):
             tiny=TextFormatter(classes=classes),
             small=TextFormatter(classes=classes),
             thumbnail=TextFormatter(classes=classes),
-            gallery=TextFormatter(classes="aspect-video h-full p-2" + classes),
+            table=TextFormatter(classes="max-h-64 overflow-hidden focus:overflow-y-scroll " + classes),
+            gallery=TextFormatter(classes="aspect-video h-full p-2 " + classes),
             tag=TextFormatter(
                 classes="whitespace-nowrap text-ellipsis overflow-hidden text-right "
                 + classes
