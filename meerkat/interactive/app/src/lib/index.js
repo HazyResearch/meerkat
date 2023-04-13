@@ -79,6 +79,7 @@ export { default as LineTernary } from './component/plotly/line_ternary/LineTern
 export { default as ParallelCategories } from './component/plotly/parallel_categories/ParallelCategories.svelte';
 export { default as ParallelCoordinates } from './component/plotly/parallel_coordinates/ParallelCoordinates.svelte';
 export { default as Pie } from './component/plotly/pie/Pie.svelte';
+export { default as Plot } from './component/plotly/plot/Plot.svelte';
 export { default as Scatter } from './component/plotly/scatter/Scatter.svelte';
 export { default as Scatter3D } from './component/plotly/scatter_3d/Scatter3D.svelte';
 export { default as ScatterGeo } from './component/plotly/scatter_geo/ScatterGeo.svelte';
