@@ -8,7 +8,6 @@ from meerkat.tools.lazy_loader import LazyLoader
 
 from ..providers import OpenAIMixin
 
-
 manifest = LazyLoader("manifest")
 openai = LazyLoader("openai")
 anthropic = LazyLoader("anthropic")
@@ -29,8 +28,8 @@ class ChatCompletion(TextCompletion):
         return MockChatCompletion(**kwargs)
 
     @classmethod
-    def with_openai(cls, key: str=None):
-        return OpenAIChatCompletion(key=key)
+    def with_openai(cls, key: str = None, organization: str = None):
+        return OpenAIChatCompletion(key=key, organization=organization)
 
     def set_logger(self, logger: WatchLogger):
         self._logger = logger
@@ -76,7 +75,7 @@ class Message(BaseModel):
         return v
 
 
-class OpenAIChatCompletion(ChatCompletion, OpenAIMixin):
+class OpenAIChatCompletion(OpenAIMixin, ChatCompletion):
 
     COST_PER_TOKEN = {
         "gpt-3.5-turbo": 0.002 / 1000,
@@ -85,6 +84,7 @@ class OpenAIChatCompletion(ChatCompletion, OpenAIMixin):
     def __init__(
         self,
         key: Optional[str] = None,
+        organization: Optional[str] = None,
         model: Optional[str] = "gpt-3.5-turbo",
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = 20,
@@ -93,6 +93,8 @@ class OpenAIChatCompletion(ChatCompletion, OpenAIMixin):
         n: Optional[int] = None,
         stop: Optional[Union[str, List[str]]] = None,
     ):
+        self._organization = organization
+
         super().__init__(
             key=key,
             model=model,

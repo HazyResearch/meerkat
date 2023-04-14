@@ -5,6 +5,8 @@ from meerkat.config import config
 
 
 class OpenAIMixin:
+    _organization: Optional[str] = None
+
     def authenticate(self, key: Optional[str] = None):
         import openai
 
@@ -20,5 +22,18 @@ class OpenAIMixin:
                     " configuration variable."
                 )
 
+        organization = self.organization
+        if organization is None:
+            if config.engines.openai_organization is not None:
+                organization = config.engines.openai_organization
+            elif "OPENAI_ORGANIZATION" in os.environ:
+                organization = os.environ["OPENAI_ORGANIZATION"]
+
         openai.api_key = key
+        if organization is not None:
+            openai.organization = organization
         self._engine = openai.Completion()
+
+    @property
+    def organization(self):
+        return self._organization
