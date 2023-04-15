@@ -1,4 +1,5 @@
 import logging
+import re
 import traceback
 
 from fastapi import HTTPException
@@ -35,7 +36,16 @@ def update(store: Store, value=Endpoint.EmbeddedBody()):
 
     # Check if this request would actually change the value of the store
     # current_store_value = store_modification.node
-    if store == value:
+    try:
+        is_value_same = store == value
+    except ValueError as e:
+        # TODO: Handle the numpy case.
+        if re.match("The truth value of an array.*", str(e)):
+            is_value_same = False
+        else:
+            raise e
+
+    if is_value_same:
         logger.debug("Store value did not change. Skipping trigger.")
         return []
 

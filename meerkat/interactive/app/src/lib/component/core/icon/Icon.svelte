@@ -16,7 +16,9 @@
 		Soundwave,
 		Tag,
 		Fullscreen,
-		FullscreenExit
+		FullscreenExit,
+		ChevronLeft,
+		ChevronRight,
 	} from 'svelte-bootstrap-icons';
 
 	export let name: string = 'Globe2';
@@ -37,7 +39,9 @@
 		Soundwave: Soundwave,
 		Tag: Tag,
 		Fullscreen: Fullscreen,
-		FullscreenExit: FullscreenExit
+		FullscreenExit: FullscreenExit,
+		ChevronLeft: ChevronLeft,
+		ChevronRight: ChevronRight,
 	};
 </script>
 
