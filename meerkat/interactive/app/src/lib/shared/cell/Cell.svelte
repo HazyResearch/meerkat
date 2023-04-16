@@ -24,17 +24,18 @@
 		cellProps[cellDataProp] = data;
 		cellProps['cell_info'] = cellInfo;
 
-		console.log("propaganda", cellProps)
-
 		// iterate over cell_props and turn them into stores if they aren't already
 		for (const [key, value] of Object.entries(cellProps)) {
-			if ((value === null || value.subscribe === undefined) && !key.startsWith('on_')) {
+			if (
+				value !== undefined &&
+				(value === null || value.subscribe === undefined) &&
+				!key.startsWith('on_')
+			) {
 				cellProps[key] = writable(value);
 			}
 		}
 	}
 
-	console.log("cellprops", cellProps)
 </script>
 
-<DynamicComponent name={cellComponent} props={{ ...cellProps, editable: writable(editable)}} />
+<DynamicComponent name={cellComponent} props={{ ...cellProps, editable: writable(editable) }} />
