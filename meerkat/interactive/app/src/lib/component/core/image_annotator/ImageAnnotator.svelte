@@ -10,6 +10,7 @@
 	export let categories: object;
 	export let segmentations: Array<object>;
 	export let opacity: number = 0.85;
+	export let toolbar: Array<string> = ["segmentation", "select"];
 
 	$: labels = [...new Set(segmentations.map((arr) => arr[1]))];
 
@@ -52,9 +53,6 @@
 	}
 
 	// Color picker logic
-	const handleClick = (e) => {
-		console.log(e);
-	};
 	function handleColorChange(label: string, hexColor: string) {
 		console.log(label, hexColor);
 		categories[label] = hex2rgba(hexColor);

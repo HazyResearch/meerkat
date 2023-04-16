@@ -1,16 +1,27 @@
 import base64
 import io
-from typing import Dict, Hashable, List, Sequence, Tuple, Union
+from typing import Dict, Hashable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from PIL import Image as PILImage
 
 from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph.reactivity import reactive
 from meerkat.interactive.graph.store import Store
 
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+
 ColorCode = Union[str, Tuple[int, int, int]]
+
+
+class SelectInterface(EventInterface):
+    coordinates: Tuple[int, int]  # (x, y), not (row, col)
+    click_type: Literal["single", "double", "right"]
 
 
 class ColorChangeEvent(EventInterface):
@@ -18,26 +29,31 @@ class ColorChangeEvent(EventInterface):
     color: str  # the hex code
 
 
+Segmentation = Union[np.ndarray, str]
+BoundingBox = Union[np.ndarray, Tuple[float]]
+
+
 class ImageAnnotator(Component):
     data: Union[np.ndarray, PILImage.Image, str]
-    categories: Union[List, Dict[Hashable, ColorCode]]
-    segmentations: Sequence[Tuple[Union[np.ndarray, str], str]]
+    categories: Optional[Union[List, Dict[Hashable, ColorCode]]] = None
+
+    segmentations: Optional[Sequence[Tuple[Segmentation, str]]] = None
 
     opacity: float = 0.85
 
     # TODO: Parameters to add
     # boxes: Bounding boxes to draw on the image.
     # polygons: Polygons to draw on the image.
-
-    # on_color_change: Endpoint
+    on_select: Endpoint[SelectInterface] = None
 
     def __init__(
         self,
         data,
         *,
-        categories,
-        segmentations,
+        categories=None,
+        segmentations=None,
         opacity: float = 0.85,
+        on_select: Endpoint[SelectInterface] = None,
     ):
         """
         Args:
@@ -46,14 +62,19 @@ class ImageAnnotator(Component):
             categories: A list of categories or a dictionary mapping
             segmentations: A list of (mask, category) tuples.
             opacity: The initial opacity of the segmentation masks.
+            on_select: An endpoint to call when the user clicks on the image.
         """
         super().__init__(
             data=data,
             categories=categories,
             segmentations=segmentations,
             opacity=opacity,
+            on_select=on_select,
         )
         self.data = self.prepare_data(self.data)
+        if self.categories is None:
+            self.categories = [category for _, category in self.segmentations]
+
         self.categories = self.prepare_categories(self.categories)
         self.segmentations = colorize_segmentations(self.segmentations, self.categories)
         # At some point get rid of this and see if we can pass colorized segmentations.
