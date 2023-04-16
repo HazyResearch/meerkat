@@ -16,8 +16,6 @@
 		if (name in components) {
 			component = components[name];
 			return;
-		} else {
-			console.log(`Component ${name} was not imported and added to the Components context.`);
 		}
 	});
 	$:{
