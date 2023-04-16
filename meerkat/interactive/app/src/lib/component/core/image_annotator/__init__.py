@@ -6,25 +6,39 @@ import numpy as np
 from PIL import Image as PILImage
 
 from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph.reactivity import reactive
 from meerkat.interactive.graph.store import Store
 
 ColorCode = Union[str, Tuple[int, int, int]]
 
 
+class ColorChangeEvent(EventInterface):
+    category: Hashable
+    color: str  # the hex code
+
+
 class ImageAnnotator(Component):
     data: Union[np.ndarray, PILImage.Image, str]
     categories: Union[List, Dict[Hashable, ColorCode]]
     segmentations: Sequence[Tuple[Union[np.ndarray, str], str]]
+
     opacity: float = 0.85
 
     # TODO: Parameters to add
     # boxes: Bounding boxes to draw on the image.
     # polygons: Polygons to draw on the image.
 
-    # onColorChange: Update the color dictionary when label color changes.
+    # on_color_change: Endpoint
 
-    def __init__(self, data, *, categories, segmentations, opacity: float = 0.85):
+    def __init__(
+        self,
+        data,
+        *,
+        categories,
+        segmentations,
+        opacity: float = 0.85,
+    ):
         """
         Args:
             data: The base image.
@@ -74,6 +88,10 @@ class ImageAnnotator(Component):
                 categories[k] = np.asarray(tuple(categories[k]) + (255,))
 
         return categories
+
+    # @endpoint()
+    # def on_color_change(self, category: Hashable, color: ColorCode):
+    #     self.categories[category] = _fromcolor
 
 
 @reactive()

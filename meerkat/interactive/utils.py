@@ -49,9 +49,9 @@ def is_equal(a, b):
         True if the objects are equal, False otherwise.
     """
     if isinstance(a, np.ndarray) or isinstance(b, np.ndarray):
-        return np.all(a, b)
+        return isinstance(a, type(b)) and isinstance(b, type(a)) and np.all(a, b)
     elif isinstance(a, pd.Series) or isinstance(b, pd.Series):
-        return np.all(a == b)
+        return isinstance(a, type(b)) and isinstance(b, type(a)) and np.all(a == b)
     elif isinstance(a, (list, tuple)) or isinstance(b, (list, tuple)):
         return (
             isinstance(a, type(b))
