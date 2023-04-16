@@ -30,7 +30,7 @@ class EndpointMixin:
             obj = self.__getattribute__(attrib)
             if callable(obj):
                 if attrib not in self._endpoints:
-                    # print(attrib)
+                    print(attrib)
                     self._endpoints[attrib] = endpoint(
                         obj, prefix=prefix + f"/{self.id}"
                     )
