@@ -159,6 +159,7 @@ def _update_result(
     """
     from meerkat.dataframe import DataFrame
     from meerkat.interactive.graph.store import Store
+    from meerkat.interactive.utils import is_equal
 
     if isinstance(result, DataFrame):
         # Detach the result object from the Node
@@ -180,7 +181,7 @@ def _update_result(
         # defined that can be used to check if the value has changed.
         if isinstance(result, (str, int, float, bool, type(None), tuple)):
             # We can just check if the value is the same
-            if result.value != update:
+            if not is_equal(result.value, update):
                 result.set(update)
                 modifications.append(
                     StoreModification(id=result.inode.id, value=update)
