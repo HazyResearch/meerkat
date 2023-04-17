@@ -8,7 +8,6 @@
 
 	const eventDispatcher = createEventDispatcher();
 
-	export let keyidxs: Array<string | number>;
     export let filteredDf: string;
 	export let data: string;
     export let layout: string;
@@ -20,17 +19,10 @@
 		openModal(RowModal, {
 			df: filteredDf,
 			posidx: posidx,
-			mainColumn: 'text'
+			mainColumn: 'full_text'
 		});
 	};
 
-
-	async function onEndpoint(endpoint: Endpoint, e) {
-		if (!endpoint) return;
-		dispatch(endpoint.endpointId, {
-			detail: { keyidxs: e.detail.points.map((p) => keyidxs[p.pointIndex]) }
-		});
-	}
 
     async function onClick(e) {
         console.log("click", e)
@@ -54,6 +46,27 @@
 	}
     let layout_json = JSON.parse(layout);
     layout_json["plot_bgcolor"] = "rgba(0,0,0,0)"
+    layout_json["showlegend"] = false
+    layout_json["margin"] = {"l": 0, "r": 0, "t": 0, "b": 0}
+    layout_json["xaxis"] = {
+        autorange: true,
+        showgrid: false,
+        zeroline: false,
+        showline: false,
+        autotick: true,
+        ticks: '',
+        showticklabels: false
+    }
+    layout_json["yaxis"] = {
+        autorange: true,
+        showgrid: false,
+        zeroline: false,
+        showline: false,
+        autotick: true,
+        ticks: '',
+        showticklabels: false
+    }
+
     let config = {'displayModeBar': false}
 </script>
 

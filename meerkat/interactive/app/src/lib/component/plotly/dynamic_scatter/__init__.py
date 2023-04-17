@@ -32,11 +32,8 @@ class OnRelayoutInterface(EventInterface):
     y_range: List[float]
 
 
-
-
 class DynamicScatter(Component):
     df: DataFrame
-    keyidxs: List[Union[str, int]]
     on_click: EndpointProperty = None
     on_relayout: EndpointProperty = None
     selected: List[str] = []
@@ -76,9 +73,12 @@ class DynamicScatter(Component):
             raise ValueError("Dataframe must have a primary key")
 
         fig_df = df if len(df) <= max_points else df.sample(max_points)
-        fig = px.scatter(fig_df.to_pandas(), x=x, y=y, color=color, **kwargs)
-        
-        json_desc = json.loads(fig.to_json())
+
+        @reactive()
+        def get_layout(df: DataFrame, x: str, y: str, color: str):
+            fig = px.scatter(df.to_pandas(), x=x, y=y, color=color, **kwargs)
+            return json.dumps(json.loads(fig.to_json())["layout"])
+        layout = get_layout(df, x=x, y=y, color=color)
 
         axis_range = Store({
             "x0": None, 
@@ -97,7 +97,7 @@ class DynamicScatter(Component):
             })
 
         @reactive()
-        def filter_df(df: DataFrame, axis_range: dict):
+        def filter_df(df: DataFrame, axis_range: dict, x: str, y: str):
             df = df.view()
             if axis_range["x0"] is not None:
                 df = df[(axis_range["x0"]  < df[x])]
@@ -117,22 +117,21 @@ class DynamicScatter(Component):
             return df
         
         @reactive()
-        def compute_plotly(df: DataFrame):
+        def compute_plotly(df: DataFrame, x: str, y: str, color: str):
             fig = px.scatter(df.to_pandas(), x=x, y=y, color=color, **kwargs)
             return json.dumps(json.loads(fig.to_json())["data"])
         df.mark()
-        filtered_df = filter_df(df=df, axis_range=axis_range)
+        filtered_df = filter_df(df=df, axis_range=axis_range, x=x, y=y)
         sampled_df = sample_df(df=filtered_df)
-        plotly_data = compute_plotly(df=sampled_df)
+        plotly_data = compute_plotly(df=sampled_df, x=x, y=y, color=color)
         super().__init__(
             df=df,
-            keyidxs=df.primary_key.values.tolist(),
             on_click=on_click,
             selected=selected,
             on_select=on_select,
             on_relayout=on_relayout.partial(axis_range=axis_range),
             data=plotly_data,
-            layout=json.dumps(json_desc["layout"]),
+            layout=layout,
             filtered_df=filtered_df,
         )
 
