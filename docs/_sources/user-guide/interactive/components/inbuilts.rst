@@ -105,6 +105,7 @@ plotly
    meerkat.interactive.app.src.lib.component.plotly.DensityContour
    meerkat.interactive.app.src.lib.component.plotly.DensityHeatmap
    meerkat.interactive.app.src.lib.component.plotly.DensityMapbox
+   meerkat.interactive.app.src.lib.component.plotly.DynamicScatter
    meerkat.interactive.app.src.lib.component.plotly.ECDF
    meerkat.interactive.app.src.lib.component.plotly.Funnel
    meerkat.interactive.app.src.lib.component.plotly.FunnelArea
