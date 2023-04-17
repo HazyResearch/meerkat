@@ -27,7 +27,7 @@
 </svelte:head>
 
 <div
-	class={"text-left whitespace-pre overflow-auto py-2 px-4 h-full aspect-video " + background + " " + classes}
+	class={"text-left whitespace-pre overflow-auto py-2 px-4 h-full " + background + " " + classes}
 >
 	<pre><code class="language-{language}">{@html code}</code></pre>
 </div>
