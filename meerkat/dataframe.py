@@ -1580,10 +1580,11 @@ class DataFrame(
         metadata_path = os.path.join(path, "meta.yaml")
         dump_yaml(metadata, metadata_path)
 
-    def to_huggingface(self, repository, commit_message: str):
+    def to_huggingface(self, repository, commit_message: str = None):
         """Upload a DataFrame to a HuggingFace repository.
 
-        This will overwrite the existing DataFrame in the repository.
+        This method will dump the dataframe into the ``repository.local_dir``.
+        If ``commit_message`` is specified, the repository will be pushed to the hub.
 
         The dataframe can then be accessed with:
             >>> repo = huggingface_hub.snapshot_download(repository)
@@ -1593,6 +1594,9 @@ class DataFrame(
         Args:
             repository: The huggingface_hub.Repository object to upload to.
             commit_message: The commit message to use when pushing to the huggingface.
+
+        Note:
+            This will overwrite the existing DataFrame in the repository.
 
         Example:
             >>> repo = huggingface_hub.Repository(
