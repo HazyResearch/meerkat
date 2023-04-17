@@ -23,6 +23,7 @@
 	const onClick = (d) => dispatch('click', d);
 	const onSelected = (d) => dispatch('selected', d);
 	const onRelayout = (d) => dispatch('relayout', d);
+	
 
 	const generatePlot = (node, data, layout, config, reloadPlot) => {
 		$PlotlyLib.setPlotConfig({
@@ -63,6 +64,7 @@
 			}
 		};
 	}
+	
 </script>
 
 <svelte:head>

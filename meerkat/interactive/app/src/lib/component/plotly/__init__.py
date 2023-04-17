@@ -7,6 +7,7 @@ from .choropleth_mapbox import ChoroplethMapbox
 from .density_contour import DensityContour
 from .density_heatmap import DensityHeatmap
 from .density_mapbox import DensityMapbox
+from .dynamic_scatter import DynamicScatter
 from .ecdf import ECDF
 from .funnel import Funnel
 from .funnel_area import FunnelArea
@@ -44,6 +45,7 @@ __all__ = [
     "DensityContour",
     "DensityHeatmap",
     "DensityMapbox",
+    "DynamicScatter",
     "ECDF",
     "Funnel",
     "FunnelArea",

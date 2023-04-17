@@ -16,6 +16,6 @@ class CodeFormatterGroup(FormatterGroup):
             tiny=IconFormatter(name="CodeSquare"),
             tag=IconFormatter(name="CodeSquare"),
             thumbnail=CodeFormatter(),
-            gallery=CodeFormatter(classes="h-full aspect-video"),
+            gallery=CodeFormatter(classes="h-full aspect-[3/4]"),
             full=CodeFormatter(classes="h-full w-ful rounded-lg"),
         )

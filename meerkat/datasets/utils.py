@@ -2,7 +2,13 @@ import os
 import shutil
 import tarfile
 
+from meerkat import env
 from meerkat.dataframe import DataFrame
+from meerkat.tools.utils import requires
+
+_IS_HF_AVAILABLE = env.package_available("huggingface_hub")
+if _IS_HF_AVAILABLE:
+    import huggingface_hub
 
 
 def download_url(url: str, dataset_dir: str, force: bool = False):
@@ -77,6 +83,15 @@ def download_df(
     if download_dir is None:
         download_dir = os.path.abspath(os.path.expanduser("~/.meerkat/dataframes"))
 
+    # Handle huggingface repositories.
+    # Ignore tar.gz files, which we download separately.
+    # TODO: Consolidate so that we can
+    is_hf_repo = _IS_HF_AVAILABLE and isinstance(url, huggingface_hub.Repository)
+    if is_hf_repo:
+        return DataFrame.read(url)
+    if "huggingface.co" in url and "resolve" not in url:
+        return DataFrame.read(_download_huggingface_repo(url))
+
     # A hacky way of getting the name from the url.
     # This won't always work, because we could have name conflicts.
     # TODO: Find a better way to do this.
@@ -107,3 +122,26 @@ def extract_tar_file(filepath: str, download_dir: str, mode: str = None):
     tar = tarfile.open(filepath, mode=mode)
     tar.extractall(download_dir)
     tar.close()
+
+
+@requires("huggingface_hub")
+def _download_huggingface_repo(url: str) -> str:
+    """Download a huggingface repository.
+
+    This function uses huggingface_hub.snapshot_download.
+    It does not download the repo with huggingface_hub.Repository.
+
+    Args:
+        url: The url of the huggingface repository.
+        cache: Whether to cache the downloaded repository.
+
+    Returns:
+        str: The downloaded path.
+    """
+    parts = str(url).strip("/").split("/")
+    repo_type, user, repo_name = parts[-3:]
+    repo_type = repo_type.rstrip("s")  # e.g. models -> model
+    path = huggingface_hub.snapshot_download(
+        repo_id=f"{user}/{repo_name}", repo_type=repo_type
+    )
+    return path

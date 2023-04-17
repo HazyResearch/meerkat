@@ -11,10 +11,10 @@
 	export let live: boolean = false;
 
     /** The endpoint to call when the user runs the code. */
-	export let on_run: Endpoint;
+	export let onRun: Endpoint;
 
 	let runSearch = async (text) => {
-		await dispatch(on_run.endpointId, {
+		await dispatch(onRun.endpointId, {
 			detail: {
 				new_code: text
 			}
@@ -30,10 +30,11 @@
 
 		editor = monaco.editor.create(divEl as HTMLDivElement, {
 			value: code,
-			language: 'text',
+			language: 'python',
 			minimap: { enabled: false }
 		});
 		editor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
+			console.log("heree")
 			runSearch(editor.getValue());
 		});
 
@@ -53,7 +54,7 @@
 	}
 </script>
 
-<div class="h-20 grid grid-rows-[auto_1fr] w-full border-slate-400 pb-1 rounded-sm shadow-md overflow-hidden">
+<div class="h-full grid grid-rows-[auto_1fr] w-full border-slate-400 pb-1 rounded-sm shadow-md overflow-hidden">
 	<div class="w-full pl-4 text-sm text-slate-400">{title}</div>
 	<div 
 		id="editor" 
