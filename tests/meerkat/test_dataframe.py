@@ -6,6 +6,7 @@ from functools import wraps
 from itertools import product
 from typing import Dict, Sequence, Set, Union
 
+import huggingface_hub
 import numpy as np
 import pandas as pd
 import pyarrow as pa
@@ -747,6 +748,22 @@ def test_read_meerkat_hf_dataframe(url_suffix):
         url_suffix,
     )
     df = DataFrame.read(url)
+    assert isinstance(df, DataFrame)
+
+
+def test_read_meerkat_hf_dataframe_from_repo(tmp_path):
+    """Test reading meerkat dataframe from a meerkat repository."""
+    repo = huggingface_hub.Repository(
+        local_dir=tmp_path / "repo",
+        clone_from="meerkat-ml/test-hf_url",
+        repo_type="dataset",
+    )
+    df = DataFrame.read(repo.local_dir)
+    assert isinstance(df, DataFrame)
+
+
+def test_read_meerkat_hf_dataframe_from_url():
+    df = DataFrame.read("https://huggingface.co/datasets/meerkat-ml/test-hf_url")
     assert isinstance(df, DataFrame)
 
 

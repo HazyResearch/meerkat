@@ -86,9 +86,7 @@ def download_df(
     # Handle huggingface repositories.
     # Ignore tar.gz files, which we download separately.
     # TODO: Consolidate so that we can
-    is_hf_repo = _IS_HF_AVAILABLE and isinstance(
-        url, huggingface_hub.repository.Repository
-    )
+    is_hf_repo = _IS_HF_AVAILABLE and isinstance(url, huggingface_hub.Repository)
     if is_hf_repo:
         return DataFrame.read(url)
     if "huggingface.co" in url and "resolve" not in url:
