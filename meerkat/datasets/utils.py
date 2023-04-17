@@ -2,7 +2,14 @@ import os
 import shutil
 import tarfile
 
+from meerkat import env
 from meerkat.dataframe import DataFrame
+
+_IS_HF_AVAILABLE = env.package_available("huggingface_hub")
+if _IS_HF_AVAILABLE:
+    import huggingface_hub
+else:
+    huggingface_hub = None
 
 
 def download_url(url: str, dataset_dir: str, force: bool = False):
