@@ -105,8 +105,6 @@ class Column(
             formatters if formatters is not None else self._get_default_formatters()
         )
 
-        # Log creation
-        logger.info(f"Created `{self.__class__.__name__}` with {len(self)} rows.")
 
     @unmarked()
     def __repr__(self):

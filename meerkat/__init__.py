@@ -43,6 +43,7 @@ from meerkat.datasets import get
 from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.complete import complete
 from meerkat.ops.concat import concat
+from meerkat.engines import (BaseEngine, ChatCompletion, TextCompletion)
 from meerkat.ops.cond import (
     _abs,
     _all,
@@ -208,6 +209,10 @@ __all__ = [
     "from_arrow",
     "from_huggingface",
     "read",
+    # <<<< Engines >>>>
+    "BaseEngine",
+    "ChatCompletion",
+    "TextCompletion",
     # <<<< Formatters >>>>
     "BaseFormatter",
     "FormatterGroup",
