@@ -20,7 +20,8 @@ ColorCode = Union[str, Tuple[int, int, int]]
 
 
 class SelectInterface(EventInterface):
-    coordinates: Tuple[int, int]  # (x, y), not (row, col)
+    x: float
+    y: float
     click_type: Literal["single", "double", "right"]
 
 
@@ -38,6 +39,7 @@ class ImageAnnotator(Component):
     categories: Optional[Union[List, Dict[Hashable, ColorCode]]] = None
 
     segmentations: Optional[Sequence[Tuple[Segmentation, str]]] = None
+    points: Optional[Sequence[Dict]] = None
 
     opacity: float = 0.85
 

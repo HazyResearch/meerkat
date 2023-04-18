@@ -4,15 +4,32 @@
  -->
 <script lang="ts">
 	import Toolbar from '$lib/shared/common/Toolbar.svelte';
+	import { onMount } from 'svelte';
 	import { Palette } from 'svelte-bootstrap-icons';
+	import { uniqueId } from 'underscore';
 
 	export let data: string;
 	export let categories: object;
 	export let segmentations: Array<object>;
 	export let opacity: number = 0.85;
-	export let toolbar: Array<string> = ["segmentation", "select"];
+	export let toolbar: Array<string> = ['segmentation', 'select'];
+
+	const baseImageId = uniqueId('image-');
+	let baseImageElement: HTMLImageElement;
+
+	onMount(() => {
+		console.log("mounting", baseImageId, document.getElementById(baseImageId));
+		baseImageElement = document.getElementById(baseImageId);
+	});
+
+	let points = [
+		{ x: 0, y: 0 },
+		{ x: 150, y: 300 },
+		{ x: 200, y: 250 }
+	];
 
 	$: labels = [...new Set(segmentations.map((arr) => arr[1]))];
+	$: displayPoints = convertToDisplayPoints(points, baseImageElement);
 
 	let activeCategories: Array<string> = [];
 	let temporaryActiveCategory: string | null = null;
@@ -54,19 +71,92 @@
 
 	// Color picker logic
 	function handleColorChange(label: string, hexColor: string) {
-		console.log(label, hexColor);
 		categories[label] = hex2rgba(hexColor);
 	}
+
+	function convertImageCoordinatesToClickCoordinates(xImage: number, yImage: number) {
+		const imageRect = baseImageElement.getBoundingClientRect();
+
+		// Larger values means the image is scaled down more.
+		// The larger ratio indicates the biggest resize that was
+		// applied to the image.
+		const heightRatio = baseImageElement.naturalHeight / imageRect.height;
+		const widthRatio = baseImageElement.naturalWidth / imageRect.width;
+		const ratio = Math.max(heightRatio, widthRatio);
+
+		// The shape of the displayed image.
+		// We assume the image is displayed with `contain` bounds.
+		// This means the image will be scaled (preserving aspect ratio) to fit in the container.
+		const imageHeight = baseImageElement.naturalHeight / ratio;
+		const imageWidth = baseImageElement.naturalWidth / ratio;
+		// padding should never be less than 0.
+		const padTop = (imageRect.height - imageHeight) / 2;
+		const padLeft = (imageRect.width - imageWidth) / 2;
+
+		// The coordinates of the click relative to original image shape.
+		const x = xImage / ratio + padLeft;
+		const y = yImage / ratio + padTop;
+		return [x, y];
+	}
+
+	function convertToDisplayPoints(points: Array<{ x: number; y: number }>, imageElement: HTMLImageElement) {
+		if ((imageElement === null) || (imageElement === undefined)) {
+			return [];
+		}
+		return points.map((point) => {
+			const [x, y] = convertImageCoordinatesToClickCoordinates(point.x, point.y);
+			return { x, y };
+		});
+	}
+
+	function convertClickCoordinatesToImageCoordinates(event) {
+		const image = event.target;
+		const imageRect = image.getBoundingClientRect();
+		const x = event.offsetX;
+		const y = event.offsetY;
+
+		// Larger values means the image is scaled down more.
+		// The larger ratio indicates the biggest resize that was
+		// applied to the image.
+		const heightRatio = image.naturalHeight / imageRect.height;
+		const widthRatio = image.naturalWidth / imageRect.width;
+		const ratio = Math.max(heightRatio, widthRatio);
+
+		// The shape of the displayed image.
+		// We assume the image is displayed with `contain` bounds.
+		// This means the image will be scaled (preserving aspect ratio) to fit in the container.
+		const imageHeight = image.naturalHeight / ratio;
+		const imageWidth = image.naturalWidth / ratio;
+		// padding should never be less than 0.
+		const padTop = (imageRect.height - imageHeight) / 2;
+		const padLeft = (imageRect.width - imageWidth) / 2;
+
+		// The coordinates of the click relative to original image shape.
+		const xImage = (x - padLeft) * ratio;
+		const yImage = (y - padTop) * ratio;
+
+		return [xImage, yImage];
+	}
+
+	// Handle selecting a point on the image.
+	function handleSelect(event: PointerEvent) {
+		const out = convertClickCoordinatesToImageCoordinates(event);
+		points = [...points, { x: out[0], y: out[1] }];
+	}
+
 </script>
 
 <div class="flex flex-col gap-y-2 bg-white w-full h-full">
 	<!-- Display -->
 	<div class="image-container">
 		<!-- svelte-ignore a11y-missing-attribute -->
-		<img src={data} />
+		<img id={baseImageId} src={data} on:click={handleSelect} />
+
+		<!-- Segmentations -->
 		{#each segmentations ? segmentations : [] as [seg, label]}
 			<!-- svelte-ignore a11y-missing-attribute -->
 			<img
+				on:click={handleSelect}
 				class="mask"
 				class:visible={activeCategories.includes(label) || label == temporaryActiveCategory}
 				class:invisible={!activeCategories.includes(label) &&
@@ -74,6 +164,15 @@
 					temporaryActiveCategory != label}
 				src={seg}
 			/>
+		{/each}
+
+		<!-- Points -->
+		{#each displayPoints as point}
+			<div style="position: absolute; left: ${point.x}px; top: ${point.y}px;">
+				<div
+					style="width: 10px; height: 10px; background-color: red; border-radius: 50%; border: 2px solid #000000;"
+				/>
+			</div>
 		{/each}
 	</div>
 
@@ -131,6 +230,7 @@
 		flex-grow: 1;
 		width: 100%;
 		overflow: hidden;
+		background-color: #000000;
 	}
 	.image-container img {
 		position: absolute;
@@ -140,6 +240,16 @@
 		height: 100%;
 		object-fit: contain;
 	}
+
+	.image-container div {
+		position: absolute;
+		top: 0;
+		left: 0;
+		/* width: 100%;
+		height: 100%;
+		object-fit: contain; */
+	}
+
 
 	.image-container:hover .mask {
 		opacity: 0.3;

@@ -10,8 +10,6 @@
 	export let onClick: Endpoint = () => {};
 	export let classes: string = '';
 
-	console.log('here');
-	console.log(onClick);
 	let status: string = 'waiting';
 
 	const DELAY = 3000;
