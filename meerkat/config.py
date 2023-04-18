@@ -50,9 +50,11 @@ class DisplayConfig:
 
     show_audio: bool = True
 
+
 @dataclass
 class EnginesConfig:
     openai_api_key: str = None
+    openai_organization: str = None
     anthropic_api_key: str = None
 
 

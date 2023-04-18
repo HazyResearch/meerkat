@@ -327,6 +327,7 @@ class OpenAITextCompletion(TextCompletion, OpenAIMixin):
     def __init__(
         self,
         key: Optional[str] = None,
+        organization: Optional[str] = None,
         model: Optional[str] = "text-davinci-003",
         temperature: Optional[float] = 0.0,
         max_tokens: Optional[int] = 20,
@@ -337,6 +338,7 @@ class OpenAITextCompletion(TextCompletion, OpenAIMixin):
     ):
         super().__init__(
             key=key,
+            organization=organization,
             model=model,
             temperature=temperature,
             max_tokens=max_tokens,
