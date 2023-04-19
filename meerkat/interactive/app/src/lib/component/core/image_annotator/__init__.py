@@ -54,6 +54,7 @@ class ImageAnnotator(Component):
         *,
         categories=None,
         segmentations=None,
+        points=None,
         opacity: float = 0.85,
         on_select: Endpoint[SelectInterface] = None,
     ):
@@ -66,10 +67,14 @@ class ImageAnnotator(Component):
             opacity: The initial opacity of the segmentation masks.
             on_select: An endpoint to call when the user clicks on the image.
         """
+        if points is None:
+            points = []
+
         super().__init__(
             data=data,
             categories=categories,
             segmentations=segmentations,
+            points=points,
             opacity=opacity,
             on_select=on_select,
         )

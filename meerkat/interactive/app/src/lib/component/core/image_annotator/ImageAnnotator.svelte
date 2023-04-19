@@ -4,6 +4,7 @@
  -->
 <script lang="ts">
 	import Toolbar from '$lib/shared/common/Toolbar.svelte';
+	import { KeyCode } from 'monaco-editor';
 	import { onMount } from 'svelte';
 	import { Palette } from 'svelte-bootstrap-icons';
 	import { uniqueId } from 'underscore';
@@ -13,23 +14,20 @@
 	export let segmentations: Array<object>;
 	export let opacity: number = 0.85;
 	export let toolbar: Array<string> = ['segmentation', 'select'];
+	export let points: Array<{ x: number; y: number; color?: number | string }> = [];
+	export let pointSize: number = 10;
+	export let selectedCategory: string | null = null;
 
 	const baseImageId = uniqueId('image-');
-	let baseImageElement: HTMLImageElement;
-
-	onMount(() => {
-		console.log("mounting", baseImageId, document.getElementById(baseImageId));
-		baseImageElement = document.getElementById(baseImageId);
-	});
-
-	let points = [
-		{ x: 0, y: 0 },
-		{ x: 150, y: 300 },
-		{ x: 200, y: 250 }
-	];
+	let baseImageElement: HTMLImageElement | null = null;
 
 	$: labels = [...new Set(segmentations.map((arr) => arr[1]))];
-	$: displayPoints = convertToDisplayPoints(points, baseImageElement);
+
+	// Coordinates for the points are relative to the image's bounding box.
+	let imageRectHeight = baseImageElement?.height;
+	let imageRectWidth = baseImageElement?.width;
+	$: displayPoints = baseImageElement ? convertToDisplayPoints(points, baseImageElement?.getBoundingClientRect()) : [];
+	let selectedPoints: Array<object> = [];
 
 	let activeCategories: Array<string> = [];
 	let temporaryActiveCategory: string | null = null;
@@ -74,9 +72,21 @@
 		categories[label] = hex2rgba(hexColor);
 	}
 
-	function convertImageCoordinatesToClickCoordinates(xImage: number, yImage: number) {
-		const imageRect = baseImageElement.getBoundingClientRect();
+	function convertToDisplayPoints(points: Array<{ x: number; y: number }>, imageRect: DOMRect) {
+		const out = points.map((point) => {
+			let clickCoordinates = convertImageCoordinatesToClickCoordinates(point.x, point.y, imageRect)
+			clickCoordinates["point"] = point;
+			return clickCoordinates;
+		});
+		console.log(out);
+		return out;
+	}
 
+	function convertImageCoordinatesToClickCoordinates(
+		xImage: number,
+		yImage: number,
+		imageRect: DOMRect
+	) {
 		// Larger values means the image is scaled down more.
 		// The larger ratio indicates the biggest resize that was
 		// applied to the image.
@@ -96,24 +106,15 @@
 		// The coordinates of the click relative to original image shape.
 		const x = xImage / ratio + padLeft;
 		const y = yImage / ratio + padTop;
-		return [x, y];
+		return {"x": x, "y": y}
 	}
 
-	function convertToDisplayPoints(points: Array<{ x: number; y: number }>, imageElement: HTMLImageElement) {
-		if ((imageElement === null) || (imageElement === undefined)) {
-			return [];
-		}
-		return points.map((point) => {
-			const [x, y] = convertImageCoordinatesToClickCoordinates(point.x, point.y);
-			return { x, y };
-		});
-	}
-
-	function convertClickCoordinatesToImageCoordinates(event) {
-		const image = event.target;
+	function convertClickCoordinatesToImageCoordinates(
+		x: number,
+		y: number,
+		image: HTMLImageElement
+	) {
 		const imageRect = image.getBoundingClientRect();
-		const x = event.offsetX;
-		const y = event.offsetY;
 
 		// Larger values means the image is scaled down more.
 		// The larger ratio indicates the biggest resize that was
@@ -135,14 +136,60 @@
 		const xImage = (x - padLeft) * ratio;
 		const yImage = (y - padTop) * ratio;
 
-		return [xImage, yImage];
+		return {"x": xImage, "y": yImage}
 	}
 
 	// Handle selecting a point on the image.
 	function handleSelect(event: PointerEvent) {
-		const out = convertClickCoordinatesToImageCoordinates(event);
-		points = [...points, { x: out[0], y: out[1] }];
+		const imageCoordinates = convertClickCoordinatesToImageCoordinates(
+			event.offsetX,
+			event.offsetY,
+			event.target
+		);
+		console.log(points)
+		points = [...points, imageCoordinates];
 	}
+
+	function handleSelectPoint(point) {
+		if (selectedPoints.includes(point)) {
+			selectedPoints = selectedPoints.filter((p) => p !== point);
+		} else {
+			selectedPoints = [...selectedPoints, point];
+		}
+	}
+
+	function handleKeydownPoint(event: KeyboardEvent) {
+		if (event.code === "Backspace" || event.code === "Delete") {
+			points = points.filter((point) => !selectedPoints.includes(point));
+			selectedPoints = [];
+		}
+
+		if (event.code === "KeyA" && event.ctrlKey) {
+			selectedPoints = points;
+		}
+	}
+
+	onMount(() => {
+		console.log('mounting', baseImageId, document.getElementById(baseImageId));
+		baseImageElement = document.getElementById(baseImageId);
+		imageRectHeight = baseImageElement.height;
+		imageRectWidth = baseImageElement.width;
+
+		// be smarter about this.
+		points = [...points];
+
+		const observer = new ResizeObserver((entries) => {
+			for (let entry of entries) {
+				if (entry.target === baseImageElement) {
+					imageRectHeight = baseImageElement.height;
+					imageRectWidth = baseImageElement.width;
+					points = [...points];
+					console.log('image dimensions', imageRectHeight, imageRectWidth);
+				}
+			}
+		});
+		observer.observe(baseImageElement);
+	});
 
 </script>
 
@@ -157,7 +204,7 @@
 			<!-- svelte-ignore a11y-missing-attribute -->
 			<img
 				on:click={handleSelect}
-				class="mask"
+				class="mask cursor-pointer"
 				class:visible={activeCategories.includes(label) || label == temporaryActiveCategory}
 				class:invisible={!activeCategories.includes(label) &&
 					temporaryActiveCategory != null &&
@@ -167,13 +214,19 @@
 		{/each}
 
 		<!-- Points -->
+		<div on:keydown={handleKeydownPoint}  tabindex="0">
 		{#each displayPoints as point}
-			<div style="position: absolute; left: ${point.x}px; top: ${point.y}px;">
+			<div
+				style="position: absolute; left: {point.x - pointSize / 2}px; top: {point.y -
+					pointSize / 2}px;"
+				on:click={handleSelectPoint(point.point)}
+			>
 				<div
-					style="width: 10px; height: 10px; background-color: red; border-radius: 50%; border: 2px solid #000000;"
+					style="width: {pointSize}px; height: {pointSize}px; background-color: red; border-radius: 50%; border: 2px solid {selectedPoints.includes(point.point) ? 'blue' : 'black'};"
 				/>
 			</div>
 		{/each}
+	</div>
 	</div>
 
 	<!-- Add toolbar for opacity, etc. -->
@@ -240,16 +293,6 @@
 		height: 100%;
 		object-fit: contain;
 	}
-
-	.image-container div {
-		position: absolute;
-		top: 0;
-		left: 0;
-		/* width: 100%;
-		height: 100%;
-		object-fit: contain; */
-	}
-
 
 	.image-container:hover .mask {
 		opacity: 0.3;

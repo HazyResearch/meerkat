@@ -31,7 +31,7 @@
 </script>
 
 <div
-	class={'w-fit bg-slate-100 py-1 px-2 rounded-md flex items-center justify-center text-slate-600 hover:bg-slate-200' +
+	class={'bg-slate-100 py-1 px-2 flex items-center justify-center text-slate-600 hover:bg-slate-200' +
 		classes}
 >
 	<button on:click={dispatchClick}>
