@@ -19,6 +19,12 @@
 		FullscreenExit,
 		ChevronLeft,
 		ChevronRight,
+		Palette,
+		PaletteFill,
+		Eye,
+		EyeSlash,
+		EyeFill,
+		EyeSlashFill,
 	} from 'svelte-bootstrap-icons';
 
 	export let name: string = 'Globe2';
@@ -42,6 +48,12 @@
 		FullscreenExit: FullscreenExit,
 		ChevronLeft: ChevronLeft,
 		ChevronRight: ChevronRight,
+		Palette: Palette,
+		PaletteFill: PaletteFill,
+		Eye: Eye,
+		EyeSlash: EyeSlash,
+		EyeFill: EyeFill,
+		EyeSlashFill: EyeSlashFill,
 	};
 </script>
 
