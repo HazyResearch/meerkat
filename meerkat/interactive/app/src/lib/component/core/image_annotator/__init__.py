@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image as PILImage
 
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.endpoint import Endpoint
+from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph.reactivity import reactive
 from meerkat.interactive.graph.store import Store
@@ -23,6 +23,10 @@ class SelectInterface(EventInterface):
     x: float
     y: float
     click_type: Literal["single", "double", "right"]
+
+
+class AddCategoryInterface(EventInterface):
+    category: str
 
 
 class ColorChangeEvent(EventInterface):
@@ -47,6 +51,8 @@ class ImageAnnotator(Component):
     # boxes: Bounding boxes to draw on the image.
     # polygons: Polygons to draw on the image.
     on_select: Endpoint[SelectInterface] = None
+    on_add_category: EndpointProperty[AddCategoryInterface] = None
+    selected_category: str = ""
 
     def __init__(
         self,
@@ -57,6 +63,7 @@ class ImageAnnotator(Component):
         points=None,
         opacity: float = 0.85,
         on_select: Endpoint[SelectInterface] = None,
+        selected_category: str = "",
     ):
         """
         Args:
@@ -76,7 +83,9 @@ class ImageAnnotator(Component):
             segmentations=segmentations,
             points=points,
             opacity=opacity,
+            selected_category=selected_category,
             on_select=on_select,
+            on_add_category=None,
         )
         self.data = self.prepare_data(self.data)
         if self.categories is None:
@@ -86,6 +95,9 @@ class ImageAnnotator(Component):
         self.segmentations = colorize_segmentations(self.segmentations, self.categories)
         # At some point get rid of this and see if we can pass colorized segmentations.
         self.segmentations = encode_segmentations(self.segmentations)
+
+        # Initialize endpoints
+        self.on_add_category = self._add_category.partial(self)
 
     @reactive()
     def prepare_data(self, data):
@@ -116,6 +128,12 @@ class ImageAnnotator(Component):
                 categories[k] = np.asarray(tuple(categories[k]) + (255,))
 
         return categories
+
+    @endpoint()
+    def _add_category(self, category):
+        if category not in self.categories:
+            self.categories[category] = generate_random_colors(1)[0]
+            self.categories.set(self.categories)
 
     # @endpoint()
     # def on_color_change(self, category: Hashable, color: ColorCode):

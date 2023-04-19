@@ -4,10 +4,12 @@
  -->
 <script lang="ts">
 	import Toolbar from '$lib/shared/common/Toolbar.svelte';
+	import type { Endpoint } from '$lib/utils/types';
 	import { KeyCode } from 'monaco-editor';
-	import { onMount } from 'svelte';
-	import { Palette } from 'svelte-bootstrap-icons';
+	import { createEventDispatcher, onMount } from 'svelte';
+	import { Eye, EyeSlash, Palette, Plus } from 'svelte-bootstrap-icons';
 	import { uniqueId } from 'underscore';
+	import { dispatch } from '$lib/utils/api';
 
 	export let data: string;
 	export let categories: object;
@@ -18,15 +20,20 @@
 	export let pointSize: number = 10;
 	export let selectedCategory: string | null = null;
 
+	export let onAddCategory: Endpoint = null;
+	console.log("add category", onAddCategory)
+
 	const baseImageId = uniqueId('image-');
 	let baseImageElement: HTMLImageElement | null = null;
 
-	$: labels = [...new Set(segmentations.map((arr) => arr[1]))];
+	$: labels = Object.keys(categories).length > 10 ? [...new Set(segmentations.map((arr) => arr[1]))] : [...Object.keys(categories)];
 
 	// Coordinates for the points are relative to the image's bounding box.
 	let imageRectHeight = baseImageElement?.height;
 	let imageRectWidth = baseImageElement?.width;
-	$: displayPoints = baseImageElement ? convertToDisplayPoints(points, baseImageElement?.getBoundingClientRect()) : [];
+	$: displayPoints = baseImageElement
+		? convertToDisplayPoints(points, baseImageElement?.getBoundingClientRect())
+		: [];
 	let selectedPoints: Array<object> = [];
 
 	let activeCategories: Array<string> = [];
@@ -43,6 +50,26 @@
 		} else {
 			activeCategories = [...activeCategories, label];
 		}
+	}
+
+	let showNewCategoryTextbox: boolean = false;
+	function addNewCategory(e) {
+		const text = e.target.value;
+		if ((text === null) || (text == undefined) || (text === '')) {
+			return;
+		}
+		let promise = dispatch(onAddCategory.endpointId, {
+			detail: { category: text }
+		});
+		promise
+			.then(() => {
+				selectedCategory = text;
+			})
+			.catch((error: TypeError) => {
+				console.log("error", error)
+			});
+		e.target.value = '';
+		showNewCategoryTextbox = false;
 	}
 
 	function getHexColor(color: Array<number>, isActive: boolean | null) {
@@ -72,10 +99,18 @@
 		categories[label] = hex2rgba(hexColor);
 	}
 
+	function handleSelectedCategory(label: string) {
+		if (selectedCategory === label) {
+			selectedCategory = null;
+		} else {
+			selectedCategory = label;
+		}
+	}
+
 	function convertToDisplayPoints(points: Array<{ x: number; y: number }>, imageRect: DOMRect) {
 		const out = points.map((point) => {
-			let clickCoordinates = convertImageCoordinatesToClickCoordinates(point.x, point.y, imageRect)
-			clickCoordinates["point"] = point;
+			let clickCoordinates = convertImageCoordinatesToClickCoordinates(point.x, point.y, imageRect);
+			clickCoordinates['point'] = point;
 			return clickCoordinates;
 		});
 		console.log(out);
@@ -106,7 +141,7 @@
 		// The coordinates of the click relative to original image shape.
 		const x = xImage / ratio + padLeft;
 		const y = yImage / ratio + padTop;
-		return {"x": x, "y": y}
+		return { x: x, y: y };
 	}
 
 	function convertClickCoordinatesToImageCoordinates(
@@ -136,7 +171,7 @@
 		const xImage = (x - padLeft) * ratio;
 		const yImage = (y - padTop) * ratio;
 
-		return {"x": xImage, "y": yImage}
+		return { x: xImage, y: yImage };
 	}
 
 	// Handle selecting a point on the image.
@@ -146,7 +181,7 @@
 			event.offsetY,
 			event.target
 		);
-		console.log(points)
+		console.log(points);
 		points = [...points, imageCoordinates];
 	}
 
@@ -159,12 +194,12 @@
 	}
 
 	function handleKeydownPoint(event: KeyboardEvent) {
-		if (event.code === "Backspace" || event.code === "Delete") {
+		if (event.code === 'Backspace' || event.code === 'Delete') {
 			points = points.filter((point) => !selectedPoints.includes(point));
 			selectedPoints = [];
 		}
 
-		if (event.code === "KeyA" && event.ctrlKey) {
+		if (event.code === 'KeyA' && event.ctrlKey) {
 			selectedPoints = points;
 		}
 	}
@@ -190,7 +225,6 @@
 		});
 		observer.observe(baseImageElement);
 	});
-
 </script>
 
 <div class="flex flex-col gap-y-2 bg-white w-full h-full">
@@ -214,19 +248,23 @@
 		{/each}
 
 		<!-- Points -->
-		<div on:keydown={handleKeydownPoint}  tabindex="0">
-		{#each displayPoints as point}
-			<div
-				style="position: absolute; left: {point.x - pointSize / 2}px; top: {point.y -
-					pointSize / 2}px;"
-				on:click={handleSelectPoint(point.point)}
-			>
+		<div on:keydown={handleKeydownPoint} tabindex="0">
+			{#each displayPoints as point}
 				<div
-					style="width: {pointSize}px; height: {pointSize}px; background-color: red; border-radius: 50%; border: 2px solid {selectedPoints.includes(point.point) ? 'blue' : 'black'};"
-				/>
-			</div>
-		{/each}
-	</div>
+					style="position: absolute; left: {point.x - pointSize / 2}px; top: {point.y -
+						pointSize / 2}px;"
+					on:click={handleSelectPoint(point.point)}
+				>
+					<div
+						style="width: {pointSize}px; height: {pointSize}px; background-color: red; border-radius: 50%; border: 2px solid {selectedPoints.includes(
+							point.point
+						)
+							? 'blue'
+							: 'black'};"
+					/>
+				</div>
+			{/each}
+		</div>
 	</div>
 
 	<!-- Add toolbar for opacity, etc. -->
@@ -244,17 +282,25 @@
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- TODO: color the button based on key -->
 			<div
-				class="w-fit py-1 px-2 flex items-center text-slate-600 rounded-md cursor-pointer bg-[{getHexColor(
+				class="w-fit py-1 px-2 flex items-center text-slate-600 rounded-md gap-x-2 cursor-pointer bg-[{getHexColor(
 					categories[label],
-					activeCategories.includes(label) || label == temporaryActiveCategory
+					selectedCategory === label
 				)}] legend-item"
 				on:mouseover={() => handleCategoryMouseover(label)}
 				on:focus={() => handleCategoryMouseover(label)}
 				on:mouseout={() => handleCategoryMouseout()}
 				on:blur={() => handleCategoryMouseout()}
-				on:click={() => handleCategoryClicked(label)}
 			>
-				{label}
+				<div on:click={() => handleCategoryClicked(label)}>
+					{#if activeCategories.includes(label)}
+						<Eye fill="black" />
+					{:else}
+						<EyeSlash fill="black" />
+					{/if}
+				</div>
+				<div on:click={() => handleSelectedCategory(label)}>
+					{label}
+				</div>
 				<input
 					type="color"
 					on:change={(e) => handleColorChange(label, e.target.value)}
@@ -263,6 +309,33 @@
 				/>
 			</div>
 		{/each}
+
+		<!-- Add new label button -->
+		<div
+			class="w-fit py-1 px-2 flex items-center text-slate-600 rounded-md gap-x-2 cursor-pointer"
+		>
+			<button
+				on:click={() => {
+					showNewCategoryTextbox = true;
+				}}
+			>
+				<div>
+					<Plus fill="black" />
+				</div>
+			</button>
+			{#if showNewCategoryTextbox}
+				<input
+					type="text"
+					on:keydown={(e) => {
+						if (e.code === 'Enter') {
+							addNewCategory(e);
+						}
+					}}
+					on:blur={(e) => addNewCategory(e)}
+					placeholder="New category"
+				/>
+			{/if}
+		</div>
 	</div>
 </div>
 
@@ -294,9 +367,9 @@
 		object-fit: contain;
 	}
 
-	.image-container:hover .mask {
+	/* .image-container:hover .mask {
 		opacity: 0.3;
-	}
+	} */
 
 	.mask {
 		opacity: 0;
