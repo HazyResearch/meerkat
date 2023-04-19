@@ -26,7 +26,7 @@ class ImageFormatter(BaseFormatter):
         self.max_size = max_size
         self.classes = classes
 
-    def encode(self, cell: PILImage, skip_copy: bool = False) -> str:
+    def encode(self, cell: PILImage, skip_copy: bool = False, mode: str = None) -> str:
         """Encodes an image as a base64 string.
 
         Args:
@@ -40,9 +40,11 @@ class ImageFormatter(BaseFormatter):
             cell = cell.cpu().numpy()
 
         if isinstance(cell, np.ndarray):
-            cell = PILImage.fromarray(cell)
+            cell = PILImage.fromarray(cell, mode=mode)
             # We can skip copying if we are constructing the image from a numpy array.
             skip_copy = True
+
+        ftype = "png" if mode == "RGBA" else "jpeg"
 
         with BytesIO() as buffer:
             if self.max_size:
@@ -51,9 +53,9 @@ class ImageFormatter(BaseFormatter):
                 if not skip_copy:
                     cell = cell.copy()
                 cell.thumbnail(self.max_size)
-            cell.save(buffer, "jpeg")
-            return "data:image/jpeg;base64,{im_base_64}".format(
-                im_base_64=base64.b64encode(buffer.getvalue()).decode()
+            cell.save(buffer, ftype)
+            return "data:image/{ftype};base64,{im_base_64}".format(
+                ftype=ftype, im_base_64=base64.b64encode(buffer.getvalue()).decode()
             )
 
     @property

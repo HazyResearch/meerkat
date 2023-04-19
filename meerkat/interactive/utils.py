@@ -15,6 +15,7 @@ print = reactive(rich.print)
 
 def get_custom_json_encoder() -> Dict[Type, Callable]:
     from meerkat.columns.abstract import Column
+    from meerkat.interactive.endpoint import Endpoint
     from meerkat.interactive.graph.store import Store
 
     custom_encoder = {
@@ -27,6 +28,7 @@ def get_custom_json_encoder() -> Dict[Type, Callable]:
         np.bool_: lambda v: bool(v),
         np.bool8: lambda v: bool(v),
         Store: lambda v: v.to_json(),
+        Endpoint: lambda v: v.to_json(),
     }
 
     if is_torch_available():

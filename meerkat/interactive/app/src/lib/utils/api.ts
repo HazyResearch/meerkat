@@ -106,7 +106,8 @@ export const fetchChunk = async ({
         result.posidxs,
         result.rows,
         result.fullLength,
-        result.primaryKey
+        result.primaryKey,
+        df.refId,
     );
 }
 

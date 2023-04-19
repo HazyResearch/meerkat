@@ -186,6 +186,9 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             endpointId=self.id,
         )
 
+    def to_json(self):
+        return {"endpointId": self._self_id}
+
     def run(self, *args, **kwargs) -> Any:
         """Actually run the endpoint function `fn`.
 

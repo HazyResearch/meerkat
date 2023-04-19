@@ -7,6 +7,8 @@
 	export let props: any;
 	export let slots: any = [];
 
+	console.log("props", props)
+
 	let component: ComponentType;
 	onMount(async () => {
 		// If the library is Meerkat, then we can load the component
@@ -14,8 +16,6 @@
 		if (name in components) {
 			component = components[name];
 			return;
-		} else {
-			console.log(`Component ${name} was not imported and added to the Components context.`);
 		}
 	});
 	$:{
