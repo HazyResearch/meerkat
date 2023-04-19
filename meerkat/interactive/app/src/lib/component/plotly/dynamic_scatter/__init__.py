@@ -1,10 +1,11 @@
 from typing import List, Union
 import json
+import ibis
 
 from meerkat import env
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph import Store
-from meerkat.dataframe import DataFrame
+from meerkat.ibis import IbisDataFrame
 from meerkat.interactive.graph import reactive
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
@@ -44,7 +45,6 @@ class DynamicScatter(Component):
 
     filtered_df: DataFrame = None
 
-
     @requires("plotly.express")
     def __init__(
         self,
@@ -72,54 +72,72 @@ class DynamicScatter(Component):
         if df.primary_key_name is None:
             raise ValueError("Dataframe must have a primary key")
 
-        fig_df = df if len(df) <= max_points else df.sample(max_points)
+        full_size = len(df)
 
         @reactive()
         def get_layout(df: DataFrame, x: str, y: str, color: str):
-            fig = px.scatter(df.to_pandas(), x=x, y=y, color=color, **kwargs)
+            if isinstance(df, IbisDataFrame):
+                fig_df = DataFrame.from_pandas(
+                    df.expr.order_by(ibis.random())
+                    .limit(max_points)[x, y, color]
+                    .execute()
+                )
+            else:
+                fig_df = df if len(df) <= max_points else df.sample(max_points)
+            fig = px.scatter(fig_df.to_pandas(), x=x, y=y, color=color, **kwargs)
             return json.dumps(json.loads(fig.to_json())["layout"])
+
         layout = get_layout(df, x=x, y=y, color=color)
 
-        axis_range = Store({
-            "x0": None, 
-            "x1": None, 
-            "y0": None,
-            "y1": None
-        })
+        axis_range = Store({"x0": None, "x1": None, "y0": None, "y1": None})
 
         @endpoint()
         def on_relayout(axis_range: Store[dict], x_range, y_range):
-            axis_range.set({
-                "x0": x_range[0],
-                "x1": x_range[1],
-                "y0": y_range[0],
-                "y1": y_range[1]
-            })
+            axis_range.set(
+                {"x0": x_range[0], "x1": x_range[1], "y0": y_range[0], "y1": y_range[1]}
+            )
 
         @reactive()
         def filter_df(df: DataFrame, axis_range: dict, x: str, y: str):
-            df = df.view()
+
+            is_ibis = isinstance(df, IbisDataFrame)
+            if is_ibis:
+                df = df.expr
+            else:
+                df = df.view()
+
             if axis_range["x0"] is not None:
-                df = df[(axis_range["x0"]  < df[x])]
+                df = df[axis_range["x0"] < df[x]]
             if axis_range["x1"] is not None:
                 df = df[df[x] < axis_range["x1"]]
             if axis_range["y0"] is not None:
-                df = df[(axis_range["y0"] < df[y])]
+                df = df[axis_range["y0"] < df[y]]
             if axis_range["y1"] is not None:
-                df = df[df[y] < axis_range["y1"]]            
+                df = df[df[y] < axis_range["y1"]]
+            if is_ibis:
+                df = IbisDataFrame(df)
             return df
-        
+
         @reactive()
         def sample_df(df: DataFrame):
-            df = df.view()
-            if len(df) > max_points:
-                df = df.sample(max_points)
+            is_ibis = isinstance(df, IbisDataFrame)
+            if is_ibis:
+                df = DataFrame.from_pandas(
+                    df.expr.order_by(ibis.random())
+                    .limit(max_points)[x, y, color, df.primary_key_name]
+                    .execute()
+                )
+            else:
+                df = df.view()
+                if len(df) > max_points:
+                    df = df.sample(max_points)
             return df
-        
+
         @reactive()
         def compute_plotly(df: DataFrame, x: str, y: str, color: str):
             fig = px.scatter(df.to_pandas(), x=x, y=y, color=color, **kwargs)
             return json.dumps(json.loads(fig.to_json())["data"])
+
         df.mark()
         filtered_df = filter_df(df=df, axis_range=axis_range, x=x, y=y)
         sampled_df = sample_df(df=filtered_df)

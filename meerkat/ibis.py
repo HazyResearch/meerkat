@@ -55,6 +55,18 @@ class IbisDataFrame(DataFrame):
     def __len__(self) -> int:
         out = self.expr.count().execute()
         return out
+
+    @property
+    def nrows(self):
+        """Number of rows in the DataFrame."""
+        if self.ncols == 0:
+            return 0
+        return self.expr.count().execute()
+
+    @property
+    def ncols(self):
+        """Number of rows in the DataFrame."""
+        return len(self.data.columns)
     
     def _get_loc(self, keyidx, materialize: bool = False):
         if self.primary_key_name is None:
@@ -198,6 +210,27 @@ class IbisColumn(Column):
     @lru_cache(maxsize=1)
     def full_length(self):
         return self.expr.count().execute()
+
+    def _get_default_formatters(self):
+        # can't implement this as a class level property because then it will treat
+        # the formatter as a method
+        from meerkat.interactive.formatter import (
+            BooleanFormatterGroup,
+            NumberFormatterGroup,
+            TextFormatterGroup,
+        )
+
+        dtype = self.expr.schema().types[0]
+        if isinstance(dtype, ibis.expr.datatypes.String):
+            return TextFormatterGroup()
+        elif isinstance(dtype, ibis.expr.datatypes.Boolean):
+            return BooleanFormatterGroup()
+        elif isinstance(dtype, ibis.expr.datatypes.Integer):
+            return NumberFormatterGroup(dtype="int")
+        elif isinstance(dtype, ibis.expr.datatypes.Floating):
+            return NumberFormatterGroup(dtype="float")
+        
+        return super()._get_default_formatters() 
     
     def _get(self, index, materialize: bool = True):
         if self._is_batch_index(index):
