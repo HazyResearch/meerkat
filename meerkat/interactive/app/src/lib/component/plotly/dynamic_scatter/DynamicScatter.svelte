@@ -13,7 +13,6 @@
     export let layout: string;
 	export let onRelayout: Endpoint;
 	export let selected: Array<number> = [];
-    console.log(filteredDf)
 
     const open_row_modal = (posidx: number) => {
 		openModal(RowModal, {
