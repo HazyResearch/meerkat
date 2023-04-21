@@ -5,11 +5,12 @@
 <script lang="ts">
 	import Toolbar from '$lib/shared/common/Toolbar.svelte';
 	import type { Endpoint } from '$lib/utils/types';
-	import { KeyCode } from 'monaco-editor';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { Eye, EyeSlash, Palette, Plus } from 'svelte-bootstrap-icons';
 	import { uniqueId } from 'underscore';
 	import { dispatch } from '$lib/utils/api';
+	import {convertImageCoordinatesToClickCoordinates, convertClickCoordinatesToImageCoordinates} from '$lib/utils/coordinates';
+	import PointLayer from './PointLayer.svelte';
 
 	export let data: string;
 	export let categories: object;
@@ -109,7 +110,7 @@
 
 	function convertToDisplayPoints(points: Array<{ x: number; y: number }>, imageRect: DOMRect) {
 		const out = points.map((point) => {
-			let clickCoordinates = convertImageCoordinatesToClickCoordinates(point.x, point.y, imageRect);
+			let clickCoordinates = convertImageCoordinatesToClickCoordinates(point, baseImageElement);
 			clickCoordinates['point'] = point;
 			return clickCoordinates;
 		});
@@ -117,91 +118,14 @@
 		return out;
 	}
 
-	function convertImageCoordinatesToClickCoordinates(
-		xImage: number,
-		yImage: number,
-		imageRect: DOMRect
-	) {
-		// Larger values means the image is scaled down more.
-		// The larger ratio indicates the biggest resize that was
-		// applied to the image.
-		const heightRatio = baseImageElement.naturalHeight / imageRect.height;
-		const widthRatio = baseImageElement.naturalWidth / imageRect.width;
-		const ratio = Math.max(heightRatio, widthRatio);
-
-		// The shape of the displayed image.
-		// We assume the image is displayed with `contain` bounds.
-		// This means the image will be scaled (preserving aspect ratio) to fit in the container.
-		const imageHeight = baseImageElement.naturalHeight / ratio;
-		const imageWidth = baseImageElement.naturalWidth / ratio;
-		// padding should never be less than 0.
-		const padTop = (imageRect.height - imageHeight) / 2;
-		const padLeft = (imageRect.width - imageWidth) / 2;
-
-		// The coordinates of the click relative to original image shape.
-		const x = xImage / ratio + padLeft;
-		const y = yImage / ratio + padTop;
-		return { x: x, y: y };
-	}
-
-	function convertClickCoordinatesToImageCoordinates(
-		x: number,
-		y: number,
-		image: HTMLImageElement
-	) {
-		const imageRect = image.getBoundingClientRect();
-
-		// Larger values means the image is scaled down more.
-		// The larger ratio indicates the biggest resize that was
-		// applied to the image.
-		const heightRatio = image.naturalHeight / imageRect.height;
-		const widthRatio = image.naturalWidth / imageRect.width;
-		const ratio = Math.max(heightRatio, widthRatio);
-
-		// The shape of the displayed image.
-		// We assume the image is displayed with `contain` bounds.
-		// This means the image will be scaled (preserving aspect ratio) to fit in the container.
-		const imageHeight = image.naturalHeight / ratio;
-		const imageWidth = image.naturalWidth / ratio;
-		// padding should never be less than 0.
-		const padTop = (imageRect.height - imageHeight) / 2;
-		const padLeft = (imageRect.width - imageWidth) / 2;
-
-		// The coordinates of the click relative to original image shape.
-		const xImage = (x - padLeft) * ratio;
-		const yImage = (y - padTop) * ratio;
-
-		return { x: xImage, y: yImage };
-	}
-
 	// Handle selecting a point on the image.
 	function handleSelect(event: PointerEvent) {
 		const imageCoordinates = convertClickCoordinatesToImageCoordinates(
-			event.offsetX,
-			event.offsetY,
+			{x: event.offsetX, y: event.offsetY},
 			event.target
 		);
 		console.log(points);
 		points = [...points, imageCoordinates];
-	}
-
-	function handleSelectPoint(point) {
-		if (selectedPoints.includes(point)) {
-			selectedPoints = selectedPoints.filter((p) => p !== point);
-		} else {
-			selectedPoints = [...selectedPoints, point];
-		}
-	}
-
-	function handleKeydownPoint(event: KeyboardEvent) {
-		if (event.code === 'Backspace' || event.code === 'Delete') {
-			points = points.filter((point) => !selectedPoints.includes(point));
-			selectedPoints = [];
-		}
-
-		if (event.code === 'KeyA' && event.ctrlKey) {
-			selectedPoints = points;
-		}
 	}
 
 	onMount(() => {
@@ -248,7 +172,12 @@
 		{/each}
 
 		<!-- Points -->
-		<div on:keydown={handleKeydownPoint} tabindex="0">
+		<PointLayer
+			bind:points={points}
+			bind:image={baseImageElement}
+			bind:pointSize={pointSize}
+		/>
+		<!-- <div on:keydown={handleKeydownPoint} tabindex="0">
 			{#each displayPoints as point}
 				<div
 					style="position: absolute; left: {point.x - pointSize / 2}px; top: {point.y -
@@ -264,7 +193,7 @@
 					/>
 				</div>
 			{/each}
-		</div>
+		</div> -->
 	</div>
 
 	<!-- Add toolbar for opacity, etc. -->
