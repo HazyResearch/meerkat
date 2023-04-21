@@ -41,14 +41,25 @@
 			data = 'NaN';
 		}
 	}
+
+	function validator(node, value: any) {
+		return {
+			update(value: any) {
+				data = value === null || typeof +value !== 'number' ? prevData : +value;
+				prevData = data;
+			}
+		};
+	}
 </script>
 
 {#if editable}
+	<!-- type="number" -->
 	<input
 		class="input w-full"
 		on:change={() => {
 			cellEdit(dtype === 'string' ? data : +data);
 		}}
+		use:validator={data}
 		bind:value={data}
 	/>
 {:else}
