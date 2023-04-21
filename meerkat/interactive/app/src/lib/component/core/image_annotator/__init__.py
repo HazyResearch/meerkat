@@ -69,13 +69,21 @@ class ImageAnnotator(Component):
         Args:
             data: The base image.
                 Strings must be base64 encoded or a filepath to the image.
-            categories: A list of categories or a dictionary mapping
+            categories: The categories in the image. These categories will be used
+                for all annotations. Can either be a list of category names, a
+                dictionary mapping category names to colors, or a DataFrame
+                with two columns ("name" and "color").
             segmentations: A list of (mask, category) tuples.
             opacity: The initial opacity of the segmentation masks.
             on_select: An endpoint to call when the user clicks on the image.
         """
         if points is None:
             points = []
+
+        if categories is None:
+            categories = [category for _, category in self.segmentations]
+        if isinstance(categories, (tuple, list)):
+            categories = dict(zip(categories, generate_random_colors(len(categories))))
 
         super().__init__(
             data=data,
@@ -88,16 +96,16 @@ class ImageAnnotator(Component):
             on_add_category=None,
         )
         self.data = self.prepare_data(self.data)
-        if self.categories is None:
-            self.categories = [category for _, category in self.segmentations]
 
-        self.categories = self.prepare_categories(self.categories)
-        self.segmentations = colorize_segmentations(self.segmentations, self.categories)
+        categories = self.prepare_categories(self.categories)
+
+        self.segmentations = colorize_segmentations(self.segmentations, categories)
         # At some point get rid of this and see if we can pass colorized segmentations.
         self.segmentations = encode_segmentations(self.segmentations)
 
         # Initialize endpoints
         self.on_add_category = self._add_category.partial(self)
+        # self.on_clear_annotations = self.clear_annotations.partial(self)
 
     @reactive()
     def prepare_data(self, data):
@@ -111,8 +119,6 @@ class ImageAnnotator(Component):
 
     @reactive()
     def prepare_categories(self, categories):
-        if isinstance(categories, (Tuple, List)):
-            return dict(zip(categories, generate_random_colors(len(categories))))
 
         # Convert hex colors (if necessary).
         # This line also creates a shallow copy of the dictionary,
@@ -134,6 +140,10 @@ class ImageAnnotator(Component):
         if category not in self.categories:
             self.categories[category] = generate_random_colors(1)[0]
             self.categories.set(self.categories)
+
+    def clear_annotations(self, annotation_type: Optional[str] = None):
+        self.points.set([])
+        self.segmentations.set([])
 
     # @endpoint()
     # def on_color_change(self, category: Hashable, color: ColorCode):

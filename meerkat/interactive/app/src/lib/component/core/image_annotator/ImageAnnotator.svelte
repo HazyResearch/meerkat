@@ -102,7 +102,7 @@
 
 	function handleSelectedCategory(label: string) {
 		if (selectedCategory === label) {
-			selectedCategory = null;
+			selectedCategory = "";  // we should be able to set this to null
 		} else {
 			selectedCategory = label;
 		}
