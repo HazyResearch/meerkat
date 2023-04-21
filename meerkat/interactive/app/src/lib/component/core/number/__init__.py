@@ -9,3 +9,4 @@ class Number(Component):
     precision: int = 3
     percentage: bool = False
     classes: str = ""
+    editable: bool = False

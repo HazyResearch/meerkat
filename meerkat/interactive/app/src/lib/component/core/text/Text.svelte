@@ -8,17 +8,16 @@
 	const cellEdit: CallableFunction = getContext('cellEdit');
 </script>
 
-
-
 {#if editable}
 	<input
 		class="input w-full"
-		on:change={() => {cellEdit(data);}}
+		on:change={() => {
+			cellEdit(data);
+		}}
 		bind:value={data}
 	/>
 {:else}
 	<div class={classes}>
 		{data}
 	</div>
-
 {/if}
