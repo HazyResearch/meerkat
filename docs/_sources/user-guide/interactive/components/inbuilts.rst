@@ -27,6 +27,7 @@ core
    meerkat.interactive.app.src.lib.component.core.Header
    meerkat.interactive.app.src.lib.component.core.Icon
    meerkat.interactive.app.src.lib.component.core.Image
+   meerkat.interactive.app.src.lib.component.core.ImageAnnotator
    meerkat.interactive.app.src.lib.component.core.Json
    meerkat.interactive.app.src.lib.component.core.Markdown
    meerkat.interactive.app.src.lib.component.core.Match

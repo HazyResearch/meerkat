@@ -644,6 +644,11 @@
         </a>
        </li>
        <li class="toctree-l4">
+        <a class="reference internal" href="../../user-guide/apidocs/generated/meerkat.interactive.app.src.lib.component.core.ImageAnnotator.html">
+         meerkat.interactive.app.src.lib.component.core.ImageAnnotator
+        </a>
+       </li>
+       <li class="toctree-l4">
         <a class="reference internal" href="../../user-guide/apidocs/generated/meerkat.interactive.app.src.lib.component.core.Json.html">
          meerkat.interactive.app.src.lib.component.core.Json
         </a>
@@ -2310,7 +2315,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "898abe5dd49a4f7da09f3e9e305917c3"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "44c23bf53f4646758e68f146698a1902"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -2517,7 +2522,7 @@ Using the <a class="reference external" href="https://seaborn.pydata.org/install
   warnings.warn(
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7fb7cafc94f0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7f55f59fadf0&gt;
 </pre></div>
 </div>
 <img alt="../../_images/7e234957b14e939fce17327c18d898143278432b13bb3e39e1316f507cea4bbb.png" src="../../_images/7e234957b14e939fce17327c18d898143278432b13bb3e39e1316f507cea4bbb.png" />
@@ -2556,31 +2561,13 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/44.7M [00:00&lt;?, ?B/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  3%|▎         | 1.13M/44.7M [00:00&lt;00:03, 11.8MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 27%|██▋       | 12.1M/44.7M [00:00&lt;00:00, 127MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  7%|▋         | 3.10M/44.7M [00:00&lt;00:02, 16.7MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 57%|█████▋    | 25.5M/44.7M [00:00&lt;00:00, 135MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 13%|█▎        | 5.83M/44.7M [00:00&lt;00:01, 22.0MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 21%|██▏       | 9.56M/44.7M [00:00&lt;00:01, 28.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 33%|███▎      | 14.6M/44.7M [00:00&lt;00:00, 37.2MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 48%|████▊     | 21.4M/44.7M [00:00&lt;00:00, 48.2MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 69%|██████▉   | 31.0M/44.7M [00:00&lt;00:00, 65.2MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 95%|█████████▍| 42.2M/44.7M [00:00&lt;00:00, 81.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 44.7M/44.7M [00:00&lt;00:00, 56.5MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 44.7M/44.7M [00:00&lt;00:00, 183MB/s]
 </pre></div>
 </div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
@@ -2702,23 +2689,23 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <span class="g g-Whitespace">    </span><span class="mi">194</span>     <span class="p">)</span>
 <span class="g g-Whitespace">    </span><span class="mi">196</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">table</span><span class="p">()</span><span class="o">.</span><span class="n">_ipython_display_</span><span class="p">()</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/core/frame.py:3128,</span> in <span class="ni">DataFrame.to_html</span><span class="nt">(self, buf, columns, col_space, header, index, na_rep, formatters, float_format, sparsify, index_names, justify, max_rows, max_cols, show_dimensions, decimal, bold_rows, classes, escape, notebook, border, table_id, render_links, encoding)</span>
-<span class="g g-Whitespace">   </span><span class="mi">3108</span> <span class="n">formatter</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">DataFrameFormatter</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">3109</span>     <span class="bp">self</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3110</span>     <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/core/frame.py:3129,</span> in <span class="ni">DataFrame.to_html</span><span class="nt">(self, buf, columns, col_space, header, index, na_rep, formatters, float_format, sparsify, index_names, justify, max_rows, max_cols, show_dimensions, decimal, bold_rows, classes, escape, notebook, border, table_id, render_links, encoding)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3109</span> <span class="n">formatter</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">DataFrameFormatter</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">3110</span>     <span class="bp">self</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3111</span>     <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
    <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">3125</span>     <span class="n">show_dimensions</span><span class="o">=</span><span class="n">show_dimensions</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3126</span> <span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">3127</span> <span class="c1"># TODO: a generic formatter wld b in DataFrameFormatter</span>
-<span class="ne">-&gt; </span><span class="mi">3128</span> <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">DataFrameRenderer</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">3129</span>     <span class="n">buf</span><span class="o">=</span><span class="n">buf</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3130</span>     <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3131</span>     <span class="n">notebook</span><span class="o">=</span><span class="n">notebook</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3132</span>     <span class="n">border</span><span class="o">=</span><span class="n">border</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3133</span>     <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3134</span>     <span class="n">table_id</span><span class="o">=</span><span class="n">table_id</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3135</span>     <span class="n">render_links</span><span class="o">=</span><span class="n">render_links</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">3136</span> <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3126</span>     <span class="n">show_dimensions</span><span class="o">=</span><span class="n">show_dimensions</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3127</span> <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3128</span> <span class="c1"># TODO: a generic formatter wld b in DataFrameFormatter</span>
+<span class="ne">-&gt; </span><span class="mi">3129</span> <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">DataFrameRenderer</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">3130</span>     <span class="n">buf</span><span class="o">=</span><span class="n">buf</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3131</span>     <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3132</span>     <span class="n">notebook</span><span class="o">=</span><span class="n">notebook</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3133</span>     <span class="n">border</span><span class="o">=</span><span class="n">border</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3134</span>     <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3135</span>     <span class="n">table_id</span><span class="o">=</span><span class="n">table_id</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3136</span>     <span class="n">render_links</span><span class="o">=</span><span class="n">render_links</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">3137</span> <span class="p">)</span>
 
 <span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/formats/format.py:1108,</span> in <span class="ni">DataFrameRenderer.to_html</span><span class="nt">(self, buf, encoding, classes, notebook, border, table_id, render_links)</span>
 <span class="g g-Whitespace">   </span><span class="mi">1099</span> <span class="n">Klass</span> <span class="o">=</span> <span class="n">NotebookFormatter</span> <span class="k">if</span> <span class="n">notebook</span> <span class="k">else</span> <span class="n">HTMLFormatter</span>
