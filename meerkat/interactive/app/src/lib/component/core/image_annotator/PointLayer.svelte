@@ -1,16 +1,25 @@
 <script lang="ts">
-	import { convertImageCoordinatesToClickCoordinates } from "$lib/utils/coordinates";
+	import { convertClickCoordinatesToImageCoordinates, convertImageCoordinatesToClickCoordinates } from "$lib/utils/coordinates";
 
     export let points: Array<{ x: number; y: number; color?: number | string }> = [];
 	export let pointSize: number = 10;
     export let image: HTMLImageElement | null;
+    export let isActive: boolean = true;
+    export let canvas: HTMLCanvasElement;
 
     let selectedPoints: Array<object> = [];
 	$: displayPoints = image
 		? convertToDisplayPoints(points, image)
 		: [];
-    $: console.log("display points", displayPoints)
     
+    function manageEventListeners(canvas, isActive: boolean) {
+		if (!canvas) return;
+		if (isActive) {
+			canvas.addEventListener('click', addPoint);
+		} else {
+			canvas.removeEventListener('click', addPoint);
+		}
+	}
 
     function convertToDisplayPoints(points: Array<{ x: number; y: number }>, _image: HTMLImageElement) {
 		const out = points.map((point) => {
@@ -18,7 +27,6 @@
 			clickCoordinates['point'] = point;
 			return clickCoordinates;
 		});
-		console.log(out);
 		return out;
 	}
 
@@ -40,9 +48,19 @@
             selectedPoints = [...selectedPoints, point];
         }
     }
+
+    // Handle selecting a point on the image.
+	function addPoint(event: PointerEvent) {
+		const imageCoordinates = convertClickCoordinatesToImageCoordinates(
+			{ x: event.offsetX, y: event.offsetY },
+			image
+		);
+		points = [...points, imageCoordinates];
+	}
+    
+    $: manageEventListeners(canvas, isActive);
 </script>
 
-<!-- Points -->
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 <div on:keydown={handleKeydown} tabindex="0">
     {#each displayPoints as point}

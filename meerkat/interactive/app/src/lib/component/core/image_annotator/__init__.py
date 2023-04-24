@@ -1,12 +1,12 @@
 import base64
 import io
-from typing import Dict, Hashable, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Hashable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from PIL import Image as PILImage
 
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
+from meerkat.interactive.endpoint import EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph.reactivity import reactive
 from meerkat.interactive.graph.store import Store
@@ -34,6 +34,14 @@ class ColorChangeEvent(EventInterface):
     color: str  # the hex code
 
 
+class AddBoxInterface(EventInterface):
+    box: Any
+
+
+class AddPointInterface(EventInterface):
+    point: Tuple[float, float]
+
+
 Segmentation = Union[np.ndarray, str]
 BoundingBox = Union[np.ndarray, Tuple[float]]
 
@@ -44,15 +52,18 @@ class ImageAnnotator(Component):
 
     segmentations: Optional[Sequence[Tuple[Segmentation, str]]] = None
     points: Optional[Sequence[Dict]] = None
+    boxes: Optional[Sequence[Dict]] = None
 
     opacity: float = 0.85
+
+    selected_category: str = ""
 
     # TODO: Parameters to add
     # boxes: Bounding boxes to draw on the image.
     # polygons: Polygons to draw on the image.
-    on_select: Endpoint[SelectInterface] = None
     on_add_category: EndpointProperty[AddCategoryInterface] = None
-    selected_category: str = ""
+    on_add_box: EndpointProperty[AddBoxInterface] = None
+    on_add_point: EndpointProperty[AddPointInterface] = None
 
     def __init__(
         self,
@@ -61,9 +72,12 @@ class ImageAnnotator(Component):
         categories=None,
         segmentations=None,
         points=None,
+        boxes=None,
         opacity: float = 0.85,
-        on_select: Endpoint[SelectInterface] = None,
         selected_category: str = "",
+        on_add_category: EndpointProperty[AddCategoryInterface] = None,
+        on_add_box: EndpointProperty[AddBoxInterface] = None,
+        on_add_point: EndpointProperty[AddPointInterface] = None,
     ):
         """
         Args:
@@ -79,6 +93,8 @@ class ImageAnnotator(Component):
         """
         if points is None:
             points = []
+        if boxes is None:
+            boxes = []
 
         if categories is None:
             categories = [category for _, category in self.segmentations]
@@ -90,10 +106,12 @@ class ImageAnnotator(Component):
             categories=categories,
             segmentations=segmentations,
             points=points,
+            boxes=boxes,
             opacity=opacity,
             selected_category=selected_category,
-            on_select=on_select,
-            on_add_category=None,
+            on_add_category=on_add_category,
+            on_add_box=on_add_box,
+            on_add_point=on_add_point,
         )
         self.data = self.prepare_data(self.data)
 

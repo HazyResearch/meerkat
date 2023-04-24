@@ -6,36 +6,59 @@
 	import Toolbar from '$lib/shared/common/Toolbar.svelte';
 	import type { Endpoint } from '$lib/utils/types';
 	import { createEventDispatcher, onMount } from 'svelte';
-	import { Eye, EyeSlash, Palette, Plus } from 'svelte-bootstrap-icons';
+	import {
+		Eye,
+		EyeSlash,
+		Palette,
+		Plus,
+		BoundingBoxCircles,
+		Cursor,
+		HandIndex
+	} from 'svelte-bootstrap-icons';
 	import { uniqueId } from 'underscore';
 	import { dispatch } from '$lib/utils/api';
-	import {convertImageCoordinatesToClickCoordinates, convertClickCoordinatesToImageCoordinates} from '$lib/utils/coordinates';
+	import {
+		convertImageCoordinatesToClickCoordinates,
+		convertClickCoordinatesToImageCoordinates
+	} from '$lib/utils/coordinates';
 	import PointLayer from './PointLayer.svelte';
+	import BoxLayer from './BoxLayer.svelte';
+	import type { Box } from '$lib/utils/annotations';
+	import Button from '../button/Button.svelte';
 
 	export let data: string;
 	export let categories: object;
 	export let segmentations: Array<object>;
+	export let boxes: Array<Box> = [];
 	export let opacity: number = 0.85;
-	export let toolbar: Array<string> = ['segmentation', 'select'];
+	export let toolbar: Array<string> = ['segmentation', 'point', 'box'];
 	export let points: Array<{ x: number; y: number; color?: number | string }> = [];
 	export let pointSize: number = 10;
-	export let selectedCategory: string | null = null;
+	export let selectedCategory: string | null = '';
+	export let selectedTool: string = '';
 
 	export let onAddCategory: Endpoint = null;
-	console.log("add category", onAddCategory)
+	export let onAddBox: Endpoint = null;
+	export let onAddPoint: Endpoint = null;
 
 	const baseImageId = uniqueId('image-');
-	let baseImageElement: HTMLImageElement | null = null;
+	const canvasId = uniqueId('canvas-');
 
-	$: labels = Object.keys(categories).length > 10 ? [...new Set(segmentations.map((arr) => arr[1]))] : [...Object.keys(categories)];
+	$: console.log("all the boxes", boxes)
+
+	let baseImageElement: HTMLImageElement | null = null;
+	let canvasElement: HTMLCanvasElement | null = null;
+	$: showCanvas = selectedTool === 'box' || selectedTool === 'point';
+
+	$: labels =
+		Object.keys(categories).length > 10
+			? [...new Set(segmentations.map((arr) => arr[1]))]
+			: [...Object.keys(categories)];
 
 	// Coordinates for the points are relative to the image's bounding box.
+	// TODO: delete this
 	let imageRectHeight = baseImageElement?.height;
 	let imageRectWidth = baseImageElement?.width;
-	$: displayPoints = baseImageElement
-		? convertToDisplayPoints(points, baseImageElement?.getBoundingClientRect())
-		: [];
-	let selectedPoints: Array<object> = [];
 
 	let activeCategories: Array<string> = [];
 	let temporaryActiveCategory: string | null = null;
@@ -56,19 +79,16 @@
 	let showNewCategoryTextbox: boolean = false;
 	function addNewCategory(e) {
 		const text = e.target.value;
-		if ((text === null) || (text == undefined) || (text === '')) {
+		if (text === null || text == undefined || text === '') {
 			return;
 		}
-		let promise = dispatch(onAddCategory.endpointId, {
+		const promise = dispatch(onAddCategory.endpointId, {
 			detail: { category: text }
 		});
-		promise
-			.then(() => {
-				selectedCategory = text;
-			})
-			.catch((error: TypeError) => {
-				console.log("error", error)
-			});
+		promise.then(() => {
+			selectedCategory = text;
+			activeCategories = [...activeCategories, text];
+		});
 		e.target.value = '';
 		showNewCategoryTextbox = false;
 	}
@@ -102,48 +122,41 @@
 
 	function handleSelectedCategory(label: string) {
 		if (selectedCategory === label) {
-			selectedCategory = "";  // we should be able to set this to null
+			selectedCategory = ''; // we should be able to set this to null
 		} else {
 			selectedCategory = label;
 		}
 	}
 
-	function convertToDisplayPoints(points: Array<{ x: number; y: number }>, imageRect: DOMRect) {
-		const out = points.map((point) => {
-			let clickCoordinates = convertImageCoordinatesToClickCoordinates(point, baseImageElement);
-			clickCoordinates['point'] = point;
-			return clickCoordinates;
-		});
-		console.log(out);
-		return out;
-	}
-
-	// Handle selecting a point on the image.
-	function handleSelect(event: PointerEvent) {
-		const imageCoordinates = convertClickCoordinatesToImageCoordinates(
-			{x: event.offsetX, y: event.offsetY},
-			event.target
-		);
-		console.log(points);
-		points = [...points, imageCoordinates];
+	function selectTool(tool: string) {
+		if (selectedTool === tool) {
+			selectedTool = '';
+		} else {
+			selectedTool = tool;
+		}
 	}
 
 	onMount(() => {
-		console.log('mounting', baseImageId, document.getElementById(baseImageId));
 		baseImageElement = document.getElementById(baseImageId);
+		canvasElement = document.getElementById(canvasId);
 		imageRectHeight = baseImageElement.height;
 		imageRectWidth = baseImageElement.width;
+		canvasElement.height = imageRectHeight;
+		canvasElement.width = imageRectWidth;
 
 		// be smarter about this.
-		points = [...points];
+		// points = [...points];
 
 		const observer = new ResizeObserver((entries) => {
 			for (let entry of entries) {
 				if (entry.target === baseImageElement) {
 					imageRectHeight = baseImageElement.height;
 					imageRectWidth = baseImageElement.width;
-					points = [...points];
-					console.log('image dimensions', imageRectHeight, imageRectWidth);
+					baseImageElement = entry.target;
+
+					// Setting canvas properties.
+					canvasElement.height = imageRectHeight;
+					canvasElement.width = imageRectWidth;
 				}
 			}
 		});
@@ -155,13 +168,14 @@
 	<!-- Display -->
 	<div class="image-container">
 		<!-- svelte-ignore a11y-missing-attribute -->
-		<img id={baseImageId} src={data} on:click={handleSelect} />
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<img id={baseImageId} src={data} />
 
 		<!-- Segmentations -->
 		{#each segmentations ? segmentations : [] as [seg, label]}
 			<!-- svelte-ignore a11y-missing-attribute -->
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<img
-				on:click={handleSelect}
 				class="mask cursor-pointer"
 				class:visible={activeCategories.includes(label) || label == temporaryActiveCategory}
 				class:invisible={!activeCategories.includes(label) &&
@@ -171,39 +185,68 @@
 			/>
 		{/each}
 
+		<!-- Box -->
+		<BoxLayer
+			bind:boxes
+			bind:categories
+			bind:image={baseImageElement}
+			bind:canvas={canvasElement}
+			bind:selectedCategory
+			isActive={selectedTool == 'box'}
+		/>
+
 		<!-- Points -->
 		<PointLayer
-			bind:points={points}
+			bind:points
 			bind:image={baseImageElement}
-			bind:pointSize={pointSize}
+			bind:pointSize
+			bind:canvas={canvasElement}
+			isActive={selectedTool == 'point'}
 		/>
-		<!-- <div on:keydown={handleKeydownPoint} tabindex="0">
-			{#each displayPoints as point}
-				<div
-					style="position: absolute; left: {point.x - pointSize / 2}px; top: {point.y -
-						pointSize / 2}px;"
-					on:click={handleSelectPoint(point.point)}
-				>
-					<div
-						style="width: {pointSize}px; height: {pointSize}px; background-color: red; border-radius: 50%; border: 2px solid {selectedPoints.includes(
-							point.point
-						)
-							? 'blue'
-							: 'black'};"
-					/>
-				</div>
-			{/each}
-		</div> -->
+
+		<canvas
+			id={canvasId}
+			bind:this={canvasElement}
+			style={showCanvas ? '' : 'display: none;'}
+			width="200"
+			height="200"
+		/>
 	</div>
 
 	<!-- Add toolbar for opacity, etc. -->
-	<!-- <div>
-		<Toolbar isToolbarActive={true} classes="px-3" align="bottom" pin={true}>
-			<button class="" on:click={() => {}}>
-				<Palette width={24} height={24} fill="black" />
-			</button>
-		</Toolbar>
-	</div> -->
+	<div class="flex self-center gap-x-2 mx-2 bg-slate-100 w-fit p-1 rounded-md">
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div
+			class="flex p-1 hover:bg-[#BDE1F4] rounded-md {selectedTool == 'select'
+				? 'bg-[#BDE1F4]'
+				: ''}"
+			on:click={() => {
+				selectTool('select');
+			}}
+		>
+			<Cursor width={24} height={24} fill="black" />
+		</div>
+
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div
+			class="flex p-1 hover:bg-[#BDE1F4] rounded-md {selectedTool == 'point' ? 'bg-[#BDE1F4]' : ''}"
+			on:click={() => {
+				selectTool('point');
+			}}
+		>
+			<HandIndex width={24} height={24} fill="black" />
+		</div>
+
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div
+			class="flex p-1 hover:bg-[#BDE1F4] rounded-md {selectedTool == 'box' ? 'bg-[#BDE1F4]' : ''}"
+			on:click={() => {
+				selectTool('box');
+			}}
+		>
+			<BoundingBoxCircles width={24} height={24} fill="black" />
+		</div>
+	</div>
 
 	<!-- Legend -->
 	<div class="flex flex-row flex-wrap content-center justify-center gap-2 m-2">
@@ -240,9 +283,7 @@
 		{/each}
 
 		<!-- Add new label button -->
-		<div
-			class="w-fit py-1 px-2 flex items-center text-slate-600 rounded-md gap-x-2 cursor-pointer"
-		>
+		<div class="w-fit py-1 px-2 flex items-center text-slate-600 rounded-md gap-x-2 cursor-pointer">
 			<button
 				on:click={() => {
 					showNewCategoryTextbox = true;
@@ -294,6 +335,14 @@
 		width: 100%;
 		height: 100%;
 		object-fit: contain;
+	}
+
+	.image-container canvas {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
 	}
 
 	/* .image-container:hover .mask {
