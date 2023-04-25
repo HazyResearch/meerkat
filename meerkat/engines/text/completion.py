@@ -169,6 +169,17 @@ class TextCompletion(BaseEngine):
     def run(self, prompt: str) -> str:
         """Run the engine on a prompt and return the completion."""
         self.prompt = prompt
+        cached_run = self.on_run_start()
+        if cached_run:
+            self.response = cached_run
+            self.result = result = cached_run.output
+            self.on_run_end(
+                cost=0.0,
+                input_tokens=cached_run.input_tokens,
+                output_tokens=cached_run.output_tokens,
+            )
+            return result
+
         self.response = self.engine(prompt=self.format_prompt(prompt))
         self.result = result = self.parse_response(self.response)
         self.on_run_end()
@@ -180,22 +191,37 @@ class TextCompletion(BaseEngine):
     def set_errand_run_id(self, errand_run_id: str):
         self._errand_run_id = errand_run_id
 
-    def on_run_end(self):
+    def on_run_start(self):
+        """Run before the engine has been run."""
+        if self._logger is None:
+            return
+
+        # Check if the query is already in the cache.
+        run = self._logger.retrieve_engine_run(
+            input=self.prompt,
+            engine=f"{self.name}/{self._model}",
+        )
+
+        return run
+
+    def on_run_end(self, **kwargs):
         """Run after the engine has been run."""
         if self._logger is None:
             return
 
-        self._logger.log_engine_run(
-            errand_run_id=self._errand_run_id
+        kwargs = {
+            "errand_run_id": self._errand_run_id
             if hasattr(self, "_errand_run_id")
             else None,
-            input=self.prompt,
-            output=self.result,
-            engine=f"{self.name}/{self._model}",
-            cost=0,
-            input_tokens=0,
-            output_tokens=0,
-        )
+            "input": self.prompt,
+            "output": self.result,
+            "engine": f"{self.name}/{self._model}",
+            "cost": 0,
+            "input_tokens": 0,
+            "output_tokens": 0,
+        }
+        kwargs.update(**kwargs)
+        self._logger.log_engine_run(**kwargs)
 
     def parse_response(self, response) -> str:
         """Parse the response from the engine."""
@@ -361,7 +387,7 @@ class OpenAITextCompletion(TextCompletion, OpenAIMixin):
                 " Please install it with `pip install openai`."
             )
 
-    def on_run_end(self):
+    def on_run_end(self, **kwargs):
         """Run after the engine has been run."""
         if self._logger is None:
             return

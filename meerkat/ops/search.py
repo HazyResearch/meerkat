@@ -11,6 +11,19 @@ if TYPE_CHECKING:
     import torch
 
 
+# def search(
+#     data: DataFrame,
+#     query: np.ndarray,
+#     by: str = None,
+#     k: int = None,
+# ) -> DataFrame:
+#     """
+#     To achieve this we will need to implement index. k
+
+
+#     """
+
+
 def search(
     data: DataFrame,
     query: np.ndarray,
@@ -32,6 +45,10 @@ def search(
 
     Return:
         DataFrame: A sorted view of DataFrame.
+    
+    Examples
+    ---------
+    df.search("asdjfkdfl", "")
     """
     by = data[by]
 

@@ -1,9 +1,10 @@
 """Postgres cache."""
+import datetime
 import logging
 import threading
 import uuid
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from meerkat import DataFrame
 
@@ -33,6 +34,7 @@ class EngineRun(Base):
     cost = Column(Float)
     input_tokens = Column(Integer)
     output_tokens = Column(Integer)
+    created_at = Column(String)
 
 
 class ErrandRun(Base):
@@ -184,6 +186,29 @@ class SQLAlchemyWatchLogger(WatchLogger):
         session.commit()
         return errand_run.id
 
+    def retrieve_engine_run(
+        self,
+        input: str,
+        engine: str,
+    ) -> Optional[EngineRun]:
+        """Retrieve the most recent engine run for a given input and engine."""
+        # Query the `engine_runs` table to see if the engine run is already there
+        # If not, return None
+        session = self.session
+        response = (
+            session.query(EngineRun)
+            .filter_by(
+                input=input,
+                engine=engine,
+            )
+            .order_by(EngineRun.created_at.desc())
+            .first()
+        )
+        if response is not None:
+            return response
+        else:
+            return None
+
     def log_engine_run(
         self,
         errand_run_id: str,
@@ -206,6 +231,7 @@ class SQLAlchemyWatchLogger(WatchLogger):
                 cost=cost,
                 input_tokens=input_tokens,
                 output_tokens=output_tokens,
+                created_at=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             )
         )
         session.commit()

@@ -54,8 +54,15 @@ class DatasetBuilder(ABC):
         if self.download_mode in ["force", "extract"] or (
             self.download_mode == "reuse" and not self.is_downloaded()
         ):
-            self.download()
-            self.dump_download_meta()
+            try:
+                self.download()
+                self.dump_download_meta()
+            except Exception as e:
+                raise ValueError(
+                    f"Failed to download dataset {self.name} to {self.dataset_dir}."
+                    f"Error: {e}"
+                    f"Try setting `download_mode='force'` to force re-download."
+                )
 
         if not self.is_downloaded():
             raise ValueError(
