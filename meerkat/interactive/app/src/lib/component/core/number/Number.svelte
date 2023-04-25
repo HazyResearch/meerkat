@@ -10,14 +10,12 @@
 
 	const cellEdit: CallableFunction = getContext('cellEdit');
 
-	let prevData: any = data;
-	let dtypeBefore: string = dtype;
+	let valid = true;
 
 	if (dtype === 'auto') {
 		// The + operator converts a string or number to a number if possible
-		// if (typeof +data === 'number') {
-		if (typeof data === 'number') {
-			// data = +data;
+		if (typeof +data === 'number') {
+			data = +data;
 			if (Number.isInteger(data)) {
 				dtype = 'int';
 			} else {
@@ -29,38 +27,22 @@
 	}
 
 	if (dtype === 'float') {
-		if (typeof data === 'string') {
-			data = +data;
-		}
 		if (percentage) {
 			data = (data * 100).toPrecision(precision) + '%';
 		} else if (!isNaN(data)) {
-			console.log(data, typeof data, dtypeBefore);
 			data = data.toPrecision(precision).toString();
 		} else {
 			data = 'NaN';
 		}
 	}
-
-	function validator(node, value: any) {
-		return {
-			update(value: any) {
-				data = value === null || typeof +value !== 'number' ? prevData : +value;
-				prevData = data;
-			}
-		};
-	}
 </script>
 
 {#if editable}
-	<!-- type="number" -->
 	<input
-		class="input w-full"
-		on:change={() => {
-			cellEdit(dtype === 'string' ? data : +data);
-		}}
-		use:validator={data}
+		class={'input w-full' + (valid ? '' : ' outline-red-500')}
 		bind:value={data}
+		on:input={() => (valid = data === '' || data === 'NaN' || !isNaN(+data))}
+		on:change={() => cellEdit(dtype === 'string' ? data : +data)}
 	/>
 {:else}
 	<div class={classes}>
