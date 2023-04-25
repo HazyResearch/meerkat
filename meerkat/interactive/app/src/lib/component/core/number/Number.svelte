@@ -43,7 +43,7 @@
 		class={'input w-full' + (invalid && ' outline-red-500')}
 		class:invalid={showInvalid}
 		bind:value={data}
-		on:input={() => (invalid = data !== '' && data !== 'NaN' && isNaN(+data))}
+		on:input={() => (invalid = data !== '' && data !== 'NaN' && isNaN(data))}
 		on:change={() => {
 			if (invalid) {
 				showInvalid = true;
