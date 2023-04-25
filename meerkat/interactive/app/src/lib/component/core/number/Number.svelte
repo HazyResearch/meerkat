@@ -49,7 +49,7 @@
 				showInvalid = true;
 				setTimeout(() => (showInvalid = false), 1000);
 			} else {
-				cellEdit(dtype === 'string' ? data : +data);
+				cellEdit(data === '' ? 0 : dtype === 'string' ? data : +data);
 			}
 		}}
 	/>
