@@ -12,6 +12,7 @@ from .filter import Filter
 from .gallery import Gallery
 from .icon import Icon
 from .image import Image
+from .image_annotator import ImageAnnotator
 from .json import Json
 from .markdown import Caption, Header, Markdown, Subheader, Title
 from .match import Match
@@ -50,6 +51,7 @@ __all__ = [
     "Gallery",
     "Header",
     "Image",
+    "ImageAnnotator",
     "Icon",
     "Json",
     "Markdown",

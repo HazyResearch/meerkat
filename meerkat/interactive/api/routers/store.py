@@ -7,7 +7,7 @@ from fastapi.encoders import jsonable_encoder
 from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.interactive.graph import Store, trigger
 from meerkat.interactive.modification import StoreModification
-from meerkat.interactive.utils import get_custom_json_encoder
+from meerkat.interactive.utils import get_custom_json_encoder, is_equal
 from meerkat.state import state
 from meerkat.tools.lazy_loader import LazyLoader
 
@@ -35,7 +35,8 @@ def update(store: Store, value=Endpoint.EmbeddedBody()):
 
     # Check if this request would actually change the value of the store
     # current_store_value = store_modification.node
-    if store == value:
+    # TODO: Verify this works for nested stores.
+    if is_equal(store.value, value):
         logger.debug("Store value did not change. Skipping trigger.")
         return []
 

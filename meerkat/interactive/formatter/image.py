@@ -1,7 +1,7 @@
 import base64
 import os
 from io import BytesIO
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 from PIL import Image as PILImage
@@ -21,10 +21,13 @@ class ImageFormatter(BaseFormatter):
     component_class = Image
     data_prop: str = "data"
 
-    def __init__(self, max_size: Tuple[int] = None, classes: str = ""):
+    def __init__(
+        self, max_size: Tuple[int] = None, classes: str = "", mode: Optional[str] = None
+    ):
         super().__init__()
         self.max_size = max_size
         self.classes = classes
+        self.mode = mode
 
     def encode(self, cell: PILImage, skip_copy: bool = False, mode: str = None) -> str:
         """Encodes an image as a base64 string.
@@ -36,6 +39,9 @@ class ImageFormatter(BaseFormatter):
                 or is loaded dynamically (e.g. DeferredColumn).
                 This may save time for large images.
         """
+        if mode is None:
+            mode = self.mode
+
         if env.package_available("torch") and isinstance(cell, torch.Tensor):
             cell = cell.cpu().numpy()
 
@@ -80,17 +86,22 @@ class ImageFormatter(BaseFormatter):
 class ImageFormatterGroup(FormatterGroup):
     formatter_class: type = ImageFormatter
 
-    def __init__(self, classes: str = ""):
+    def __init__(self, classes: str = "", mode: Optional[str] = None):
         super().__init__(
             icon=IconFormatter(name="Image"),
-            base=self.formatter_class(classes=classes),
-            tiny=self.formatter_class(max_size=[32, 32], classes=classes),
-            small=self.formatter_class(max_size=[64, 64], classes=classes),
-            thumbnail=self.formatter_class(max_size=[256, 256], classes=classes),
+            base=self.formatter_class(classes=classes, mode=mode),
+            tiny=self.formatter_class(max_size=[32, 32], classes=classes, mode=mode),
+            small=self.formatter_class(max_size=[64, 64], classes=classes, mode=mode),
+            thumbnail=self.formatter_class(
+                max_size=[256, 256], classes=classes, mode=mode
+            ),
             gallery=self.formatter_class(
-                max_size=[512, 512], classes="h-full w-full" + " " + classes
+                max_size=[512, 512], classes="h-full w-full" + " " + classes, mode=mode
             ),
         )
+
+    # TODO: Add support for displaying numpy arrays and torch tensors as images.
+    # This breaks currently with html rendering.
 
 
 class DeferredImageFormatter(ImageFormatter):
