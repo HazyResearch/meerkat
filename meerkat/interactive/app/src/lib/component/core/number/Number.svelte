@@ -10,7 +10,8 @@
 
 	const cellEdit: CallableFunction = getContext('cellEdit');
 
-	let valid = true;
+	let invalid = false;
+	let showInvalid = false;
 
 	if (dtype === 'auto') {
 		// The + operator converts a string or number to a number if possible
@@ -39,13 +40,42 @@
 
 {#if editable}
 	<input
-		class={'input w-full' + (valid ? '' : ' outline-red-500')}
+		class={'input w-full' + (invalid && ' outline-red-500')}
+		class:invalid={showInvalid}
 		bind:value={data}
-		on:input={() => (valid = data === '' || data === 'NaN' || !isNaN(+data))}
-		on:change={() => cellEdit(dtype === 'string' ? data : +data)}
+		on:input={() => (invalid = data !== '' && data !== 'NaN' && isNaN(+data))}
+		on:change={() => {
+			if (invalid) {
+				showInvalid = true;
+				setTimeout(() => (showInvalid = false), 1000);
+			} else {
+				cellEdit(dtype === 'string' ? data : +data);
+			}
+		}}
 	/>
 {:else}
 	<div class={classes}>
 		{data}
 	</div>
 {/if}
+
+<style>
+	@keyframes shake {
+		0% {
+			margin-left: 0rem;
+		}
+		25% {
+			margin-left: 0.5rem;
+		}
+		75% {
+			margin-left: -0.5rem;
+		}
+		100% {
+			margin-left: 0rem;
+		}
+	}
+
+	.invalid {
+		animation: shake 0.2s ease-in-out 0s 2;
+	}
+</style>
