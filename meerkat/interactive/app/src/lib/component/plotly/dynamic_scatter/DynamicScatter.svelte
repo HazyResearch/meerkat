@@ -18,6 +18,7 @@
 		openModal(RowModal, {
 			df: filteredDf,
 			posidx: posidx,
+			mainColumn: 'full_text'
 		});
 	};
 

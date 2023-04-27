@@ -55,6 +55,7 @@ export { default as Text } from './component/core/text/Text.svelte';
 export { default as Textbox } from './component/core/textbox/Textbox.svelte';
 export { default as Toggle } from './component/core/toggle/Toggle.svelte';
 export { default as Vega } from './component/core/vega/Vega.svelte';
+export { default as ImageAnnotator } from './component/core/image_annotator/ImageAnnotator.svelte';
 /** Plotly Components */
 export { default as Area } from './component/plotly/area/Area.svelte';
 export { default as Bar } from './component/plotly/bar/Bar.svelte';
@@ -65,6 +66,7 @@ export { default as ChoroplethMapbox } from './component/plotly/choropleth_mapbo
 export { default as DensityContour } from './component/plotly/density_contour/DensityContour.svelte';
 export { default as DensityHeatmap } from './component/plotly/density_heatmap/DensityHeatmap.svelte';
 export { default as DensityMapbox } from './component/plotly/density_mapbox/DensityMapbox.svelte';
+export { default as DynamicScatter } from './component/plotly/dynamic_scatter/DynamicScatter.svelte';
 export { default as ECDF } from './component/plotly/ecdf/ECDF.svelte';
 export { default as Funnel } from './component/plotly/funnel/Funnel.svelte';
 export { default as FunnelArea } from './component/plotly/funnel_area/FunnelArea.svelte';

@@ -1,14 +1,14 @@
-from typing import List, Union
 import json
+from typing import List
+
 import ibis
 
 from meerkat import env
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import Store
 from meerkat.ibis import IbisDataFrame
-from meerkat.interactive.graph import reactive
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
+from meerkat.interactive.graph import Store, reactive
 from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.tools.utils import classproperty, requires
 
@@ -72,7 +72,7 @@ class DynamicScatter(Component):
         if df.primary_key_name is None:
             raise ValueError("Dataframe must have a primary key")
 
-        full_size = len(df)
+        full_size = len(df)  # noqa: F841
 
         @reactive()
         def get_layout(df: DataFrame, x: str, y: str, color: str):
@@ -99,7 +99,6 @@ class DynamicScatter(Component):
 
         @reactive()
         def filter_df(df: DataFrame, axis_range: dict, x: str, y: str):
-
             is_ibis = isinstance(df, IbisDataFrame)
             if is_ibis:
                 df = df.expr

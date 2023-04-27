@@ -5,6 +5,8 @@
     // Whether to keep the toolbar always active (i.e. pinned).
     export let pin: boolean = false;
 	export let isToolbarActive: boolean = false;
+    export let zIndex: number = 20;
+    export let isAbsolutePosition = true;
 
     if (pin) {
         isToolbarActive = true;
@@ -16,11 +18,17 @@
     } else {
         outerClasses = 'flex-col h-full justify-center ';
     }
+    if (isAbsolutePosition) {
+        outerClasses += 'absolute ';
+    }
+    if (zIndex > 0) {
+        outerClasses += `z-index-${zIndex} `;
+    }
     console.log("classes", classes);
 </script>
 
 <div
-	class={'toolbar  z-index-20 ' + outerClasses + ` ${align}-1 align-top`}
+	class={'toolbar ' + outerClasses + ` ${align}-1 align-top`}
 	on:mouseenter={pin ? ()=>{} : () => (isToolbarActive = true)}
 	on:mouseleave={pin ? ()=>{} : () => (isToolbarActive = false)}
     on:wheel|preventDefault
@@ -35,7 +43,6 @@
 
 <style>
 	.toolbar {
-		position: absolute;
 		padding: 0.1rem;
 		height: 10%;
         justify-content: flex-end;

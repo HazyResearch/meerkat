@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Type
+from typing import Callable, Dict, Mapping, Type
 
 import numpy as np
 import pandas as pd
@@ -34,3 +34,40 @@ def get_custom_json_encoder() -> Dict[Type, Callable]:
     if is_torch_available():
         custom_encoder[torch.Tensor] = lambda v: v.tolist()
     return custom_encoder
+
+
+def is_equal(a, b):
+    """Recursively check equality of two objects.
+
+    This also verifies that the types of the objects are the same.
+
+    Args:
+        a: The first object.
+        b: The second object.
+
+    Returns:
+        True if the objects are equal, False otherwise.
+    """
+    if isinstance(a, np.ndarray) or isinstance(b, np.ndarray):
+        return isinstance(a, type(b)) and isinstance(b, type(a)) and np.all(a, b)
+    elif isinstance(a, pd.Series) or isinstance(b, pd.Series):
+        return isinstance(a, type(b)) and isinstance(b, type(a)) and np.all(a == b)
+    elif isinstance(a, (list, tuple)) or isinstance(b, (list, tuple)):
+        return (
+            isinstance(a, type(b))
+            and isinstance(b, type(a))
+            and len(a) == len(b)
+            and all(is_equal(_a, _b) for _a, _b in zip(a, b))
+        )
+    elif isinstance(a, Mapping) or isinstance(b, Mapping):
+        a_keys = a.keys()
+        b_keys = b.keys()
+        return (
+            isinstance(a, type(b))
+            and isinstance(b, type(a))
+            and len(a) == len(b)
+            and a_keys == b_keys
+            and all(is_equal(a[k], b[k]) for k in a_keys)
+        )
+    else:
+        return a == b
