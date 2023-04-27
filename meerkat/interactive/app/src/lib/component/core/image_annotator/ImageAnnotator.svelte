@@ -185,11 +185,11 @@
 </script>
 
 <div class="flex flex-col gap-y-2 bg-white w-full h-full">
-	{#if isLoading}
+	<!-- {#if isLoading}
 		<div class="flex justify-center items-center h-full">
 			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
 		</div>
-	{:else}
+	{:else} -->
 		<!-- Display -->
 		<div class="image-container" on:wheel={handleScroll}>
 			<!-- svelte-ignore a11y-missing-attribute -->
@@ -237,7 +237,7 @@
 				height="200"
 			/>
 		</div>
-	{/if}
+	<!-- {/if} -->
 
 	<!-- Add toolbar for opacity, etc. -->
 	<div class="flex self-center gap-x-2 mx-2 bg-slate-100 w-fit p-1 rounded-md">
