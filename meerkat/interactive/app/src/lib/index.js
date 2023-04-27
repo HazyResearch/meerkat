@@ -55,6 +55,7 @@ export { default as Text } from './component/core/text/Text.svelte';
 export { default as Textbox } from './component/core/textbox/Textbox.svelte';
 export { default as Toggle } from './component/core/toggle/Toggle.svelte';
 export { default as Vega } from './component/core/vega/Vega.svelte';
+export { default as ImageAnnotator } from './component/core/image_annotator/ImageAnnotator.svelte';
 /** Plotly Components */
 export { default as Area } from './component/plotly/area/Area.svelte';
 export { default as Bar } from './component/plotly/bar/Bar.svelte';
