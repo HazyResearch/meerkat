@@ -24,6 +24,7 @@ model_type = "vit_b"
 sam_checkpoint = os.path.expanduser(
     "~/.cache/segment_anything/models/sam_vit_b_01ec64.pth"
 )
+# torch.backends.mps.is_available()
 device = "mps"
 
 sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
@@ -191,7 +192,9 @@ def update_annotations(idx: int, ann_type: str, annotations: List[str]):
 # Build the dataframe.
 files = [
     # "https://kulapartners.com/wp-content/uploads/2017/06/multiple-personas-hero.jpg",
+    "https://www.mercurynews.com/wp-content/uploads/2022/01/BNG-L-WARRIORS-0122-28.jpg?w=1024",
     "https://3acf3052-cdn.agilitycms.cloud/images/service/KNEE%20SAGITTAL.jpg",
+    "https://www.meddean.luc.edu/lumen/meded/medicine/pulmonar/cxr/atlas/images/71bl.jpg",
     # "https://www.mercurynews.com/wp-content/uploads/2022/01/BNG-L-WARRIORS-0122-28.jpg?w=1024"
 ]
 images = mk.DataFrame({"image": mk.files(files, type="image")})
@@ -251,7 +254,7 @@ component = mk.gui.html.gridcols3(
             on_click=increment.partial(idx=idx, annotator=annotator),
         ),
     ],
-    classes="h-screen grid-cols-[auto_6fr_auto]",
+    classes="h-screen grid-cols-[1fr_10fr_1fr]",
 )
 
 page = mk.gui.Page(component, id="SAM")

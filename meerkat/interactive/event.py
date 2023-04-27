@@ -16,3 +16,11 @@ class EventInterface:
     """
 
     pass
+
+
+class OnScrollInterface(EventInterface):
+    """Defines the interface for a scroll event."""
+
+    delta_x: float
+    delta_y: float
+    delta_z: float

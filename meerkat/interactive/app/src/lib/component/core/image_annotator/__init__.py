@@ -7,7 +7,7 @@ from PIL import Image as PILImage
 
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import EndpointProperty, endpoint
-from meerkat.interactive.event import EventInterface
+from meerkat.interactive.event import EventInterface, OnScrollInterface
 from meerkat.interactive.graph.reactivity import reactive
 from meerkat.interactive.graph.store import Store
 
@@ -64,6 +64,7 @@ class ImageAnnotator(Component):
     on_add_category: EndpointProperty[AddCategoryInterface] = None
     on_add_box: EndpointProperty[AddBoxInterface] = None
     on_add_point: EndpointProperty[AddPointInterface] = None
+    on_scroll: EndpointProperty[OnScrollInterface] = None
 
     def __init__(
         self,
@@ -78,6 +79,7 @@ class ImageAnnotator(Component):
         on_add_category: EndpointProperty[AddCategoryInterface] = None,
         on_add_box: EndpointProperty[AddBoxInterface] = None,
         on_add_point: EndpointProperty[AddPointInterface] = None,
+        on_scroll: EndpointProperty[OnScrollInterface] = None,
     ):
         """
         Args:
@@ -112,6 +114,7 @@ class ImageAnnotator(Component):
             on_add_category=on_add_category,
             on_add_box=on_add_box,
             on_add_point=on_add_point,
+            on_scroll=on_scroll,
         )
         self.data = self.prepare_data(self.data)
 

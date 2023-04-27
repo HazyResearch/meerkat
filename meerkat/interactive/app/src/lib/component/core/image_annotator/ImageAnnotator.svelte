@@ -25,6 +25,7 @@
 	import BoxLayer from './BoxLayer.svelte';
 	import type { Box } from '$lib/utils/annotations';
 	import Button from '../button/Button.svelte';
+	import { BarLoader } from 'svelte-loading-spinners';
 
 	export let data: string;
 	export let categories: object;
@@ -40,6 +41,9 @@
 	export let onAddCategory: Endpoint = null;
 	export let onAddBox: Endpoint = null;
 	export let onAddPoint: Endpoint = null;
+	export let onScroll: Endpoint = null;
+
+	let isLoading: boolean = false;
 
 	const baseImageId = uniqueId('image-');
 	const canvasId = uniqueId('canvas-');
@@ -136,6 +140,22 @@
 		}
 	}
 
+	function handleScroll(e: WheelEvent) {
+		if (onScroll) {
+			const promise = dispatch(onScroll.endpointId, {
+				detail: {
+					delta_x: e.deltaX,
+					delta_y: e.deltaY,
+					delta_z: e.deltaZ
+				}
+			});
+			promise.then(() => {
+				isLoading = false;
+			});
+			isLoading = true;
+		}
+	}
+
 	onMount(() => {
 		baseImageElement = document.getElementById(baseImageId);
 		canvasElement = document.getElementById(canvasId);
@@ -165,53 +185,59 @@
 </script>
 
 <div class="flex flex-col gap-y-2 bg-white w-full h-full">
-	<!-- Display -->
-	<div class="image-container">
-		<!-- svelte-ignore a11y-missing-attribute -->
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<img id={baseImageId} src={data} />
-
-		<!-- Segmentations -->
-		{#each segmentations ? segmentations : [] as [seg, label]}
+	{#if isLoading}
+		<div class="flex justify-center items-center h-full">
+			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
+		</div>
+	{:else}
+		<!-- Display -->
+		<div class="image-container" on:wheel={handleScroll}>
 			<!-- svelte-ignore a11y-missing-attribute -->
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<img
-				class="mask cursor-pointer"
-				class:visible={activeCategories.includes(label) || label == temporaryActiveCategory}
-				class:invisible={!activeCategories.includes(label) &&
-					temporaryActiveCategory != null &&
-					temporaryActiveCategory != label}
-				src={seg}
+			<img id={baseImageId} src={data} />
+
+			<!-- Segmentations -->
+			{#each segmentations ? segmentations : [] as [seg, label]}
+				<!-- svelte-ignore a11y-missing-attribute -->
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<img
+					class="mask cursor-pointer"
+					class:visible={activeCategories.includes(label) || label == temporaryActiveCategory}
+					class:invisible={!activeCategories.includes(label) &&
+						temporaryActiveCategory != null &&
+						temporaryActiveCategory != label}
+					src={seg}
+				/>
+			{/each}
+
+			<!-- Box -->
+			<BoxLayer
+				bind:boxes
+				bind:categories
+				bind:image={baseImageElement}
+				bind:canvas={canvasElement}
+				bind:selectedCategory
+				isActive={selectedTool == 'box'}
 			/>
-		{/each}
 
-		<!-- Box -->
-		<BoxLayer
-			bind:boxes
-			bind:categories
-			bind:image={baseImageElement}
-			bind:canvas={canvasElement}
-			bind:selectedCategory
-			isActive={selectedTool == 'box'}
-		/>
+			<!-- Points -->
+			<PointLayer
+				bind:points
+				bind:image={baseImageElement}
+				bind:pointSize
+				bind:canvas={canvasElement}
+				isActive={selectedTool == 'point'}
+			/>
 
-		<!-- Points -->
-		<PointLayer
-			bind:points
-			bind:image={baseImageElement}
-			bind:pointSize
-			bind:canvas={canvasElement}
-			isActive={selectedTool == 'point'}
-		/>
-
-		<canvas
-			id={canvasId}
-			bind:this={canvasElement}
-			style={showCanvas ? '' : 'display: none;'}
-			width="200"
-			height="200"
-		/>
-	</div>
+			<canvas
+				id={canvasId}
+				bind:this={canvasElement}
+				style={showCanvas ? '' : 'display: none;'}
+				width="200"
+				height="200"
+			/>
+		</div>
+	{/if}
 
 	<!-- Add toolbar for opacity, etc. -->
 	<div class="flex self-center gap-x-2 mx-2 bg-slate-100 w-fit p-1 rounded-md">
