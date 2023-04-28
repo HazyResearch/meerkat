@@ -151,7 +151,7 @@ jobs:
                 with:
                     path: ~/.cache/pip
                     key: ${{ runner.os }}-pip
-    
+
             -   name: Install Dependencies
                 run: |
                     pip install -e ".[all]"
