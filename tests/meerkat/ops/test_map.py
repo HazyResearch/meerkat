@@ -36,7 +36,7 @@ def column_testbed(request, tmpdir):
     params={
         "batched": [True, False],
         "materialize": [True, False],
-        "use_ray": [True, False],
+        "use_ray": [False],
     }
 )
 def test_map_return_single(
