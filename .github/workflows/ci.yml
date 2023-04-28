@@ -157,7 +157,11 @@ jobs:
                     key: ${{ runner.os }}-pip
     
             -   name: Install Dependencies
+                # Pinning the ipython version because for some reason it's being upgraded
+                # even for python 3.8.
+                # TODO: Figure out why this is the case.
                 run: |
+                    pip install ipython==8.12
                     pip install -e ".[all]"
                     
             -   name: Test with pytest
