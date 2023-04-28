@@ -19,6 +19,15 @@ ver_path = convert_path("meerkat/version.py")
 with open(ver_path) as ver_file:
     exec(ver_file.read(), main_ns)
 
+# Restrict ipython version based on the python version.
+# https://github.com/ipython/ipython/issues/14053
+# TODO: Remove this once the wheel is pushed up.
+if sys.version_info[0] == 3 and sys.version_info[1] <= 8:
+    ipython_requirement = "IPython<8.13.0"
+else:
+    # python >= 3.9
+    ipython_requirement = "IPython"
+
 
 # Package meta-data.
 NAME = "meerkat-ml"
@@ -52,7 +61,7 @@ REQUIRED = [
     "progressbar>=2.5",
     "fvcore",
     "ipywidgets>=7.0.0",
-    "IPython",
+    ipython_requirement,
     "fastapi",
     "uvicorn",
     "rich",
