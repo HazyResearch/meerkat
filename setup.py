@@ -330,6 +330,8 @@ class BumpVersionCommand(Command):
             self._undo()
             raise RuntimeError("Failed to push commit to origin.")
 
+        os.system(f"git checkout {self.base_branch}")
+        os.system(f"git branch -D {self.version_branch}")
         sys.exit()
 
 
