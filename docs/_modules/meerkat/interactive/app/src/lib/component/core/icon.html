@@ -1875,12 +1875,16 @@ title="Open an issue"
               <div>
                 
   <h1>Source code for meerkat.interactive.app.src.lib.component.core.icon</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">meerkat.interactive.app.src.lib.component.abstract</span> <span class="kn">import</span> <span class="n">Component</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">meerkat.interactive.app.src.lib.component.abstract</span> <span class="kn">import</span> <span class="n">Component</span>
 
 
 <div class="viewcode-block" id="Icon"><a class="viewcode-back" href="../../../../../../../../user-guide/apidocs/generated/meerkat.interactive.app.src.lib.component.core.Icon.html#meerkat.interactive.app.src.lib.component.core.Icon">[docs]</a><span class="k">class</span> <span class="nc">Icon</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
     <span class="n">data</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Globe2&quot;</span></div>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Globe2&quot;</span>
+    <span class="n">fill</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span></div>
 </pre></div>
 
               </div>

@@ -59,5 +59,7 @@
       ~Icon.wrapper_import_style
       ~Icon.data
       ~Icon.name
+      ~Icon.fill
+      ~Icon.size
    
    
