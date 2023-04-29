@@ -277,11 +277,11 @@ class BumpVersionCommand(Command):
     def run(self):
         self.status("Checking current branch is 'main'")
         self.base_branch = current_branch = get_git_branch()
-        # if current_branch != "main":
-        #     raise RuntimeError(
-        #         "You can only bump the version from the 'main' branch. "
-        #         "You are currently on the '{}' branch.".format(current_branch)
-        #     )
+        if current_branch != "main":
+            raise RuntimeError(
+                "You can only bump the version from the 'main' branch. "
+                "You are currently on the '{}' branch.".format(current_branch)
+            )
 
         self.status("Pulling latest changes from origin")
         err_code = os.system("git pull")
