@@ -240,6 +240,7 @@ class BumpVersionCommand(Command):
     user_options = [
         ("version=", "v", "the new version number"),
     ]
+    updated_files = ["meerkat/version.py", "meerkat/interactive/app/package.json"]
 
     @staticmethod
     def status(s):
@@ -267,8 +268,8 @@ class BumpVersionCommand(Command):
             )
 
     def _undo(self):
-        os.system("git restore --staged meerkat/version.py")
-        os.system("git checkout -- meerkat/version.py")
+        os.system(f"git restore --staged {' '.join(updated_files)}")
+        os.system(f"git checkout -- {' '.join(updated_files)}")
 
         # Return to the original branch
         os.system(f"git checkout {self.base_branch}")
@@ -308,8 +309,8 @@ class BumpVersionCommand(Command):
         #     self._undo()
         #     raise RuntimeError("Failed to update version.")
 
-        self.status("Adding meerkat/version.py to git")
-        err_code = os.system("git add meerkat/version.py")
+        self.status(f"Adding {', '.join(updated_files)} to git")
+        err_code = os.system(f"git add {' '.join(updated_files)}")
         if err_code != 0:
             self._undo()
             raise RuntimeError("Failed to add file to git.")
