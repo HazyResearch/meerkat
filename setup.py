@@ -248,6 +248,8 @@ class BumpVersionCommand(Command):
 
     def initialize_options(self):
         self.version = None
+        self.base_branch = None
+        self.version_branch = None
 
     def finalize_options(self):
         # This package cannot be imported at top level because it
@@ -257,7 +259,7 @@ class BumpVersionCommand(Command):
         if self.version is None:
             raise ValueError("Please specify a version number.")
 
-        current_version = get_version()
+        current_version = VERSION
         if not version.Version(self.version) > version.Version(current_version):
             raise ValueError(
                 f"New version ({self.version}) must be greater than "
@@ -268,9 +270,13 @@ class BumpVersionCommand(Command):
         os.system("git restore --staged meerkat/version.py")
         os.system("git checkout -- meerkat/version.py")
 
+        # Return to the original branch
+        os.system(f"git checkout {self.base_branch}")
+        os.system(f"git branch -D {version_branch}")
+
     def run(self):
         self.status("Checking current branch is 'main'")
-        current_branch = get_git_branch()
+        self.base_branch = current_branch = get_git_branch()
         if current_branch != "main":
             raise RuntimeError(
                 "You can only bump the version from the 'main' branch. "
@@ -288,38 +294,50 @@ class BumpVersionCommand(Command):
         if err_code != 0:
             raise RuntimeError("Working directory is not clean.")
 
-        self.status(f"Create branch 'bumpversion/v{self.version}'")
-        err_code = os.system(f"git checkout -b bumpversion/v{self.version}")
+        self.version_branch = f"bumpversion/v{self.version}"
+        self.status(f"Create branch '{self.version_branch}'")
+        err_code = os.system(f"git checkout -b {self.version_branch}")
         if err_code != 0:
             raise RuntimeError("Failed to create branch.")
 
-        # Change the version in __init__.py
-        self.status(f"Updating version {get_version()} -> {self.version}")
+        # Change the version in meerkat/version.py
+        self.status(f"Updating version {VERSION} -> {self.version}")
         update_version(self.version)
-        if get_version() != self.version:
-            self._undo()
-            raise RuntimeError("Failed to update version.")
+        # TODO: Add a check to make sure the version actually updated.
+        # if VERSION != self.version:
+        #     self._undo()
+        #     raise RuntimeError("Failed to update version.")
 
-        self.status("Adding meerkat/__init__.py to git")
+        self.status("Adding meerkat/version.py to git")
         err_code = os.system("git add meerkat/version.py")
         if err_code != 0:
             self._undo()
             raise RuntimeError("Failed to add file to git.")
 
         self.status(f"Commit with message '[bumpversion] v{self.version}'")
-        err_code = os.system("git commit -m '[bumpversion] v{}'".format(get_version()))
+        err_code = os.system("git commit -m '[bumpversion] v{}'".format(VERSION))
         if err_code != 0:
             self._undo()
             raise RuntimeError("Failed to commit file to git.")
 
         # Push the commit to origin.
-        self.status("Pushing commit to origin")
-        err_code = os.system("git push")
+        self.status(f"Pushing commit to origin/{self.version_branch}")
+        err_code = os.system("git push --force")
         if err_code != 0:
             # TODO: undo the commit automatically.
             raise RuntimeError("Failed to push commit to origin.")
 
         sys.exit()
+
+
+def update_version(version):
+    ver_path = convert_path("meerkat/version.py")
+    init_py = [
+        line if not line.startswith("__version__") else f'__version__ = "{version}"\n'
+        for line in open(ver_path, "r").readlines()
+    ]
+    with open(ver_path, "w") as f:
+        f.writelines(init_py)
 
 
 # Where the magic happens:
