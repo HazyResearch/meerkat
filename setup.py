@@ -322,7 +322,9 @@ class BumpVersionCommand(Command):
 
         # Push the commit to origin.
         self.status(f"Pushing commit to origin/{self.version_branch}")
-        err_code = os.system("git push --force")
+        err_code = os.system(
+            f"git push --force --set-upstream origin {self.version_branch}"
+        )
         if err_code != 0:
             # TODO: undo the commit automatically.
             self._undo()
