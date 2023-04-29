@@ -340,6 +340,18 @@ def update_version(version):
         f.writelines(init_py)
 
 
+def get_git_branch():
+    """Return the name of the current branch."""
+    proc = subprocess.Popen(["git branch"], stdout=subprocess.PIPE, shell=True)
+    (out, err) = proc.communicate()
+    if err is not None:
+        raise RuntimeError(f"Error finding git branch: {err}")
+    out = out.decode("utf-8").split("\n")
+    current_branch = [line for line in out if line.startswith("*")][0]
+    current_branch = current_branch.replace("*", "").strip()
+    return current_branch
+
+
 # Where the magic happens:
 setup(
     name=NAME,
