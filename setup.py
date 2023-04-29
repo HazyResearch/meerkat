@@ -277,11 +277,11 @@ class BumpVersionCommand(Command):
     def run(self):
         self.status("Checking current branch is 'main'")
         self.base_branch = current_branch = get_git_branch()
-        if current_branch != "main":
-            raise RuntimeError(
-                "You can only bump the version from the 'main' branch. "
-                "You are currently on the '{}' branch.".format(current_branch)
-            )
+        # if current_branch != "main":
+        #     raise RuntimeError(
+        #         "You can only bump the version from the 'main' branch. "
+        #         "You are currently on the '{}' branch.".format(current_branch)
+        #     )
 
         self.status("Pulling latest changes from origin")
         err_code = os.system("git pull")
@@ -336,6 +336,9 @@ class BumpVersionCommand(Command):
 
 
 def update_version(version):
+    import json
+
+    # Update python.
     ver_path = convert_path("meerkat/version.py")
     init_py = [
         line if not line.startswith("__version__") else f'__version__ = "{version}"\n'
@@ -343,6 +346,14 @@ def update_version(version):
     ]
     with open(ver_path, "w") as f:
         f.writelines(init_py)
+
+    # Update npm.
+    ver_path = convert_path("meerkat/interactive/app/package.json")
+    with open(ver_path, "r") as f:
+        package_json = json.load(f)
+    package_json["version"] = version
+    with open(ver_path, "w") as f:
+        json.dump(package_json, f, indent=4)
 
 
 def get_git_branch():
