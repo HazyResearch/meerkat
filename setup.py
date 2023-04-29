@@ -272,7 +272,7 @@ class BumpVersionCommand(Command):
 
         # Return to the original branch
         os.system(f"git checkout {self.base_branch}")
-        os.system(f"git branch -D {version_branch}")
+        os.system(f"git branch -D {self.version_branch}")
 
     def run(self):
         self.status("Checking current branch is 'main'")
