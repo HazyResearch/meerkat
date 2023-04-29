@@ -325,6 +325,7 @@ class BumpVersionCommand(Command):
         err_code = os.system("git push --force")
         if err_code != 0:
             # TODO: undo the commit automatically.
+            self._undo()
             raise RuntimeError("Failed to push commit to origin.")
 
         sys.exit()
