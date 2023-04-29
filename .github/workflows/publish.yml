@@ -45,7 +45,7 @@ jobs:
       
       - name: Build
         run: |
-          python setup.py sdist bdist_wheel --universal
+          python setup.py upload --skip-upload
           twine check dist/*
 
       - name: Publish distribution 📦 to PyPI
