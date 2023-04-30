@@ -259,6 +259,7 @@ class BumpVersionCommand(Command):
         self.updated_files = [
             "meerkat/version.py",
             "meerkat/interactive/app/package.json",
+            "meerkat/interactive/app/package-lock.json",
         ]
 
     def finalize_options(self):
