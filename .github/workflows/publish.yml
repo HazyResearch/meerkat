@@ -91,11 +91,18 @@ jobs:
       - name: Verify version
         run: echo ${{ env.MEERKAT_VERSION }}
 
-      - name: package-version-to-git-tag
-        uses: pkgdeps/git-tag-action@v2
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          github_repo: ${{ github.repository }}
-          version: ${{ env.MEERKAT_VERSION }}
-          git_tag_prefix: "v"
-          git_commit_sha: ${{ github.sha }}
+          custom_tag: ${{ env.MEERKAT_VERSION }}
+
+      # - name: package-version-to-git-tag
+      #   uses: pkgdeps/git-tag-action@v2
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     github_repo: ${{ github.repository }}
+      #     version: ${{ env.MEERKAT_VERSION }}
+      #     git_tag_prefix: "v"
+      #     git_commit_sha: ${{ github.sha }}
