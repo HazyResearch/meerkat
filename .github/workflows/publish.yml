@@ -49,10 +49,10 @@ jobs:
       - name: Print commit message
         run: echo "Commit MSG = ${commitmsg}"
 
-      # - name: Install Dependencies
-      #   run: |
-      #     python -m pip install --upgrade pip
-      #     pip install -e ".[all]"
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[all]"
       
       # - name: Npm install and build examples
       #   # No need to build here, since we will build in the next step.
@@ -85,10 +85,24 @@ jobs:
 
       - name: Get version
         run: |
-          export MEERKAT_VERSION=$(grep -o '".*"' meerkat/version.py | sed 's/"//g') 
-          echo $MEERKAT_VERSION
-          git tag $mkVersion
-          git push --tags
+          export MEERKAT_VERSION=$(grep -o '".*"' meerkat/version.py | sed 's/"//g')
+          echo "MEERKAT_VERSION=${MEERKAT_VERSION}" >> $GITHUB_ENV
 
+      - name: Verify version
+        run: echo ${{ env.MEERKAT_VERSION }}
+
+      # - name: package-version-to-git-tag
+      #   uses: pkgdeps/git-tag-action@v2
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     github_repo: ${{ github.repository }}
+      #     version: ${{ env.MEERKAT_VERSION }}
+      #     git_tag_prefix: "v"
+
+      # - name: Tag commit
+      #   run: |
+      #     mkVersion=v`python -c "import meerkat; print(meerkat.version.__version__)"`
+      #     git tag $mkVersion
+      #     git push --tags
 
         
