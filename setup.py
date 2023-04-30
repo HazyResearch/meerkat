@@ -318,6 +318,12 @@ class BumpVersionCommand(Command):
         #     self._undo()
         #     raise RuntimeError("Failed to update version.")
 
+        self.status(f"npm install to bump package-lock.json")
+        err_code = os.system("mk install")
+        if err_code != 0:
+            self._undo()
+            raise RuntimeError("Failed to install package.json.")
+
         self.status(f"Adding {', '.join(self.updated_files)} to git")
         err_code = os.system(f"git add {' '.join(self.updated_files)}")
         if err_code != 0:
