@@ -50,8 +50,9 @@ jobs:
         run: |
           cd meerkat/interactive/app
           npm i
+          python -m meerkat.interactive.svelte
+          npm run build
           cd ../../../
-          mk build
 
       - name: Build
         run: |
