@@ -3,8 +3,6 @@ name: Publish Python 🐍 distributions 📦 to PyPI
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -13,9 +11,9 @@ jobs:
   pypi-publish:
     # Only run publishing when the commit message contains [bumpversion]
     # Auto-generated branches will be bumpversion/<version>, so we also check for that.
-    # if: |
-    #   contains(github.event.head_commit.message, '[bumpversion]') ||
-    #   contains(github.event.head_commit.message, 'bumpversion/')
+    if: |
+      contains(github.event.head_commit.message, '[bumpversion]') ||
+      contains(github.event.head_commit.message, 'bumpversion/')
     runs-on: ubuntu-latest
     environment: 
       name: pypi
@@ -60,8 +58,8 @@ jobs:
           python setup.py upload --skip-upload
           twine check dist/*
 
-      # - name: Publish distribution 📦 to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #     password: ${{ secrets.PYPI_API_TOKEN }}
-      #     verbose: true
+      - name: Publish distribution 📦 to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          verbose: true
