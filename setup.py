@@ -208,6 +208,7 @@ class UploadCommand(Command):
             local_dir=local_repo_dir,
             clone_from="meerkat-ml/component-static-builds",
             repo_type="dataset",
+            token=os.environ.get("HF_TOKEN", True),
         )
         shutil.move(
             components_build_targz,
