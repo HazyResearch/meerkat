@@ -10,16 +10,17 @@ on:
 jobs:
   publish:
     # Only run publishing when the commit message contains [bumpversion]
-    # Auto-generated branches will be bumpversion/<version>, so we also check for that.
+    # Auto-generated branches will be [bB]umpversion/<version>, so we also check for that.
     if: |
       contains(github.event.head_commit.message, '[bumpversion]') ||
-      contains(github.event.head_commit.message, 'bumpversion/')
+      contains(github.event.head_commit.message, 'bumpversion/') ||
+      contains(github.event.head_commit.message, 'Bumpversion/')
     runs-on: ubuntu-latest
     environment: 
       name: pypi
       url: https://pypi.org/p/meerkat-ml
-    permissions:
-      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+    # TODO: Make permissions more restrictive
+    permissions: write-all
     env:
       commitmsg: ${{ github.event.head_commit.message }}
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -52,11 +53,11 @@ jobs:
           pip install -e ".[all]"
       
       - name: Npm install and build examples
+        # No need to build here, since we will build in the next step.
         run: |
           cd meerkat/interactive/app
           npm i
           python -m meerkat.interactive.svelte
-          npm run build
           cd ../../../
 
       - name: Build PyPI
@@ -80,11 +81,17 @@ jobs:
           password: ${{ secrets.PYPI_API_TOKEN }}
           verbose: true
 
-      - name: Tag commit
+      - name: Get version
         run: |
-          mkVersion=v`python -c "import meerkat; print(meerkat.version.__version__)"`
-          git tag $mkVersion
-          git push --tags
+          export MEERKAT_VERSION=$(grep -o '".*"' meerkat/version.py | sed 's/"//g')
+          echo "MEERKAT_VERSION=${MEERKAT_VERSION}" >> $GITHUB_ENV
+
+      - name: Verify version
+        run: echo ${{ env.MEERKAT_VERSION }}
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.1
         with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-        
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: ${{ env.MEERKAT_VERSION }}
