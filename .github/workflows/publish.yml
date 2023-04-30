@@ -81,7 +81,7 @@ jobs:
           verbose: true
 
       - name: Tag commit
-        run:
+        run: |
           mkVersion=v`python -c "import meerkat; print(meerkat.version.__version__)"`
           git tag $mkVersion
           git push --tags
