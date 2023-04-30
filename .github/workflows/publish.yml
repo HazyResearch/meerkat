@@ -85,6 +85,5 @@ jobs:
           mkVersion=v`python -c "import meerkat; print(meerkat.version.__version__)"`
           git tag $mkVersion
           git push --tags
-        with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+
         
