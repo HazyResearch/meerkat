@@ -234,6 +234,149 @@ class UploadCommand(Command):
         sys.exit()
 
 
+class BumpVersionCommand(Command):
+    """
+    To use: python setup.py bumpversion -v <version>
+
+    This command will push the new version directly and tag it.
+    """
+
+    description = "Installs the foo."
+    user_options = [
+        ("version=", "v", "the new version number"),
+    ]
+
+    @staticmethod
+    def status(s):
+        """Prints things in bold."""
+        print("\033[1m{0}\033[0m".format(s))
+
+    def initialize_options(self):
+        self.version = None
+        self.base_branch = None
+        self.version_branch = None
+        self.updated_files = [
+            "meerkat/version.py",
+            "meerkat/interactive/app/package.json",
+        ]
+
+    def finalize_options(self):
+        # This package cannot be imported at top level because it
+        # is not recognized by Github Actions.
+        from packaging import version
+
+        if self.version is None:
+            raise ValueError("Please specify a version number.")
+
+        current_version = VERSION
+        if not version.Version(self.version) > version.Version(current_version):
+            raise ValueError(
+                f"New version ({self.version}) must be greater than "
+                f"current version ({current_version})."
+            )
+
+    def _undo(self):
+        os.system(f"git restore --staged {' '.join(self.updated_files)}")
+        os.system(f"git checkout -- {' '.join(self.updated_files)}")
+
+        # Return to the original branch
+        os.system(f"git checkout {self.base_branch}")
+        os.system(f"git branch -D {self.version_branch}")
+
+    def run(self):
+        self.status("Checking current branch is 'main'")
+        self.base_branch = current_branch = get_git_branch()
+        # if current_branch != "main":
+        #     raise RuntimeError(
+        #         "You can only bump the version from the 'main' branch. "
+        #         "You are currently on the '{}' branch.".format(current_branch)
+        #     )
+
+        self.status("Pulling latest changes from origin")
+        err_code = os.system("git pull")
+        if err_code != 0:
+            raise RuntimeError("Failed to pull from origin/main.")
+
+        self.status("Checking working directory is clean")
+        err_code = os.system("git diff --exit-code")
+        err_code += os.system("git diff --cached --exit-code")
+        if err_code != 0:
+            raise RuntimeError("Working directory is not clean.")
+
+        self.version_branch = f"bumpversion/v{self.version}"
+        self.status(f"Create branch '{self.version_branch}'")
+        err_code = os.system(f"git checkout -b {self.version_branch}")
+        if err_code != 0:
+            raise RuntimeError("Failed to create branch.")
+
+        # Change the version in meerkat/version.py
+        self.status(f"Updating version {VERSION} -> {self.version}")
+        update_version(self.version)
+        # TODO: Add a check to make sure the version actually updated.
+        # if VERSION != self.version:
+        #     self._undo()
+        #     raise RuntimeError("Failed to update version.")
+
+        self.status(f"Adding {', '.join(self.updated_files)} to git")
+        err_code = os.system(f"git add {' '.join(self.updated_files)}")
+        if err_code != 0:
+            self._undo()
+            raise RuntimeError("Failed to add file to git.")
+
+        self.status(f"Commit with message '[bumpversion] v{self.version}'")
+        err_code = os.system("git commit -m '[bumpversion] v{}'".format(VERSION))
+        if err_code != 0:
+            self._undo()
+            raise RuntimeError("Failed to commit file to git.")
+
+        # Push the commit to origin.
+        self.status(f"Pushing commit to origin/{self.version_branch}")
+        err_code = os.system(
+            f"git push --force --set-upstream origin {self.version_branch}"
+        )
+        if err_code != 0:
+            # TODO: undo the commit automatically.
+            self._undo()
+            raise RuntimeError("Failed to push commit to origin.")
+
+        os.system(f"git checkout {self.base_branch}")
+        os.system(f"git branch -D {self.version_branch}")
+        sys.exit()
+
+
+def update_version(version):
+    import json
+
+    # Update python.
+    ver_path = convert_path("meerkat/version.py")
+    init_py = [
+        line if not line.startswith("__version__") else f'__version__ = "{version}"\n'
+        for line in open(ver_path, "r").readlines()
+    ]
+    with open(ver_path, "w") as f:
+        f.writelines(init_py)
+
+    # Update npm.
+    ver_path = convert_path("meerkat/interactive/app/package.json")
+    with open(ver_path, "r") as f:
+        package_json = json.load(f)
+    package_json["version"] = version
+    with open(ver_path, "w") as f:
+        json.dump(package_json, f, indent=4)
+
+
+def get_git_branch():
+    """Return the name of the current branch."""
+    proc = subprocess.Popen(["git branch"], stdout=subprocess.PIPE, shell=True)
+    (out, err) = proc.communicate()
+    if err is not None:
+        raise RuntimeError(f"Error finding git branch: {err}")
+    out = out.decode("utf-8").split("\n")
+    current_branch = [line for line in out if line.startswith("*")][0]
+    current_branch = current_branch.replace("*", "").strip()
+    return current_branch
+
+
 # Where the magic happens:
 setup(
     name=NAME,
@@ -266,7 +409,5 @@ setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
     # $ setup.py publish support.
-    cmdclass={
-        "upload": UploadCommand,
-    },
+    cmdclass={"upload": UploadCommand, "bumpversion": BumpVersionCommand},
 )
