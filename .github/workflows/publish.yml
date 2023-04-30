@@ -98,3 +98,4 @@ jobs:
           github_repo: ${{ github.repository }}
           version: ${{ env.MEERKAT_VERSION }}
           git_tag_prefix: "v"
+          git_commit_sha: ${{ github.sha }}
