@@ -2,7 +2,7 @@ name: Publish Python 🐍 distributions 📦 to PyPI
 
 on:
   push:
-    branches: [ test-autobuild ]
+    branches: [ main ]
   
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
