@@ -148,7 +148,8 @@ class UploadCommand(Command):
     """Support setup.py upload."""
 
     description = "Build and publish the package."
-    user_options = []
+    user_options = [("skip-upload", "u", "skip git tagging and pypi upload")]
+    boolean_options = ["skip-upload"]
 
     @staticmethod
     def status(s):
@@ -156,10 +157,10 @@ class UploadCommand(Command):
         print("\033[1m{0}\033[0m".format(s))
 
     def initialize_options(self):
-        pass
+        self.skip_upload = False
 
     def finalize_options(self):
-        pass
+        self.skip_upload = bool(self.skip_upload)
 
     def run(self):
         from huggingface_hub.repository import Repository
@@ -207,6 +208,7 @@ class UploadCommand(Command):
             local_dir=local_repo_dir,
             clone_from="meerkat-ml/component-static-builds",
             repo_type="dataset",
+            token=os.environ.get("HF_TOKEN", True),
         )
         shutil.move(
             components_build_targz,
@@ -218,6 +220,10 @@ class UploadCommand(Command):
         # Build the source and wheel.
         self.status("Building Source and Wheel (universal) distribution…")
         os.system("{0} setup.py sdist bdist_wheel --universal".format(sys.executable))
+
+        if self.skip_upload:
+            self.status("Skipping git tagging and pypi upload")
+            sys.exit()
 
         self.status("Uploading the package to PyPI via Twine…")
         os.system("twine upload dist/*")
