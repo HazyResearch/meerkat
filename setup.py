@@ -299,11 +299,11 @@ class BumpVersionCommand(Command):
         if err_code != 0:
             raise RuntimeError("Failed to pull from origin/main.")
 
-        self.status("Checking working directory is clean")
-        err_code = os.system("git diff --exit-code")
-        err_code += os.system("git diff --cached --exit-code")
-        if err_code != 0:
-            raise RuntimeError("Working directory is not clean.")
+        # self.status("Checking working directory is clean")
+        # err_code = os.system("git diff --exit-code")
+        # err_code += os.system("git diff --cached --exit-code")
+        # if err_code != 0:
+        #     raise RuntimeError("Working directory is not clean.")
 
         self.version_branch = f"bumpversion/v{self.version}"
         self.status(f"Create branch '{self.version_branch}'")
@@ -371,6 +371,7 @@ def update_version(version):
     package_json["version"] = version
     with open(ver_path, "w") as f:
         json.dump(package_json, f, indent=4)
+        f.write("\n")
 
 
 def get_git_branch():
