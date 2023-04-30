@@ -46,11 +46,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[all]"
       
-      - name: Npm install
+      - name: Npm install and build examples
         run: |
           cd meerkat/interactive/app
           npm i
           cd ../../../
+          mk build
 
       - name: Build
         run: |
