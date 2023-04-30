@@ -103,4 +103,10 @@ jobs:
       #     version: ${{ env.MEERKAT_VERSION }}
       #     git_tag_prefix: "v"
 
+      # - name: Tag commit
+      #   run: |
+      #     mkVersion=v`python -c "import meerkat; print(meerkat.version.__version__)"`
+      #     git tag $mkVersion
+      #     git push --tags
+
         
