@@ -73,6 +73,6 @@ File [0;32m~/work/meerkat/meerkat/meerkat/interactive/startup.py:371[0m, in [
 [1;32m    379[0m )
 [1;32m    380[0m extract_tar_file(build_file, download_dir[38;5;241m=[39mMEERKAT_INTERNAL_APP_BUILD_DIR)
 
-[0;31mValueError[0m: Could not find a build for version 0.4.10a1. Please check the the url for a list of versions: https://huggingface.co/datasets/meerkat-ml/component-static-builds
-ValueError: Could not find a build for version 0.4.10a1. Please check the the url for a list of versions: https://huggingface.co/datasets/meerkat-ml/component-static-builds
+[0;31mValueError[0m: Could not find a build for version 0.4.10a2. Please check the the url for a list of versions: https://huggingface.co/datasets/meerkat-ml/component-static-builds
+ValueError: Could not find a build for version 0.4.10a2. Please check the the url for a list of versions: https://huggingface.co/datasets/meerkat-ml/component-static-builds
 

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Tutorial 1: Data Frames (Wrangling an Image Dataset) &#8212; 🔮 v0.4.10a1</title>
+    <title>Tutorial 1: Data Frames (Wrangling an Image Dataset) &#8212; 🔮 v0.4.10a2</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -87,7 +87,7 @@
       <img src="../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
       
       
-      <h1 class="site-logo" id="site-title">🔮 v0.4.10a1</h1>
+      <h1 class="site-logo" id="site-title">🔮 v0.4.10a2</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
@@ -2315,7 +2315,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "49c78f33f16d41d1afa3d404b7dfa2d1"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "23f48d6adad94aa38057a9d95bb812f0"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -2522,7 +2522,7 @@ Using the <a class="reference external" href="https://seaborn.pydata.org/install
   warnings.warn(
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7f015b309550&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7fa5aafff910&gt;
 </pre></div>
 </div>
 <img alt="../../_images/7e234957b14e939fce17327c18d898143278432b13bb3e39e1316f507cea4bbb.png" src="../../_images/7e234957b14e939fce17327c18d898143278432b13bb3e39e1316f507cea4bbb.png" />
@@ -2561,19 +2561,13 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/44.7M [00:00&lt;?, ?B/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  6%|▌         | 2.70M/44.7M [00:00&lt;00:01, 27.8MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 45%|████▌     | 20.3M/44.7M [00:00&lt;00:00, 212MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 18%|█▊        | 8.09M/44.7M [00:00&lt;00:00, 44.3MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 92%|█████████▏| 41.2M/44.7M [00:00&lt;00:00, 217MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 36%|███▌      | 16.2M/44.7M [00:00&lt;00:00, 62.6MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 63%|██████▎   | 28.2M/44.7M [00:00&lt;00:00, 87.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 44.7M/44.7M [00:00&lt;00:00, 94.2MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 44.7M/44.7M [00:00&lt;00:00, 216MB/s]
 </pre></div>
 </div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
