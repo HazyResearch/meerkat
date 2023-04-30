@@ -3,6 +3,8 @@ name: Publish Python 🐍 distributions 📦 to PyPI
 on:
   push:
     branches: [ tt-autobuild ]
+  pull_request:
+    branches: [ tt-autobuild ]
   
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -10,10 +12,11 @@ on:
 jobs:
   publish:
     # Only run publishing when the commit message contains [bumpversion]
-    # Auto-generated branches will be bumpversion/<version>, so we also check for that.
+    # Auto-generated branches will be [bB]umpversion/<version>, so we also check for that.
     if: |
       contains(github.event.head_commit.message, '[bumpversion]') ||
-      contains(github.event.head_commit.message, 'bumpversion/')
+      contains(github.event.head_commit.message, 'bumpversion/') ||
+      contains(github.event.head_commit.message, 'Bumpversion/')
     runs-on: ubuntu-latest
     environment: 
       name: pypi
@@ -46,44 +49,58 @@ jobs:
       - name: Print commit message
         run: echo "Commit MSG = ${commitmsg}"
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[all]"
+      # - name: Install Dependencies
+      #   run: |
+      #     python -m pip install --upgrade pip
+      #     pip install -e ".[all]"
       
-      - name: Npm install and build examples
-        run: |
-          cd meerkat/interactive/app
-          npm i
-          python -m meerkat.interactive.svelte
-          npm run build
-          cd ../../../
+      # - name: Npm install and build examples
+      #   # No need to build here, since we will build in the next step.
+      #   run: |
+      #     cd meerkat/interactive/app
+      #     npm i
+      #     python -m meerkat.interactive.svelte
+      #     cd ../../../
 
-      - name: Build PyPI
-        run: |
-          python setup.py upload --skip-upload
-          twine check dist/*
+      # - name: Build PyPI
+      #   run: |
+      #     python setup.py upload --skip-upload
+      #     twine check dist/*
 
-      - name: Publish distribution to npm
+      # - name: Publish distribution to npm
+      #   run: |
+      #     cd meerkat/interactive/app
+      #     npm ci
+      #     npm run package
+      #     npm publish package/
+      #     cd ../../../
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # - name: Publish distribution 📦 to PyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+      #   with:
+      #     password: ${{ secrets.PYPI_API_TOKEN }}
+      #     verbose: true
+
+      - name: Get version
         run: |
-          cd meerkat/interactive/app
-          npm ci
-          npm run package
-          npm publish package/
-          cd ../../../
+          export MEERKAT_VERSION=v`python -c "import meerkat; print(meerkat.version.__version__)"`
+          echo $MEERKAT_VERSION
+
+      - name: Verify version
+        run: |
+          echo "MEERKAT_VERSION: ${MEERKAT_VERSION}"
+          echo "MK_VERSION: ${MK_VERSION}"
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          MK_VERSION: ${{ env.MEERKAT_VERSION }}
 
-      - name: Publish distribution 📦 to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          verbose: true
-
-      - name: Tag commit
-        run: |
-          mkVersion=v`python -c "import meerkat; print(meerkat.version.__version__)"`
-          git tag $mkVersion
-          git push --tags
+      # - name: package-version-to-git-tag
+      #   uses: pkgdeps/git-tag-action@v2
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     github_repo: ${{ github.repository }}
+      #     version: ${{ env.MEERKAT_VERSION }}
+      #     git_tag_prefix: "v"
 
         
