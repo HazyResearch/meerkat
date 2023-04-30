@@ -287,11 +287,11 @@ class BumpVersionCommand(Command):
     def run(self):
         self.status("Checking current branch is 'main'")
         self.base_branch = current_branch = get_git_branch()
-        # if current_branch != "main":
-        #     raise RuntimeError(
-        #         "You can only bump the version from the 'main' branch. "
-        #         "You are currently on the '{}' branch.".format(current_branch)
-        #     )
+        if current_branch != "main":
+            raise RuntimeError(
+                "You can only bump the version from the 'main' branch. "
+                "You are currently on the '{}' branch.".format(current_branch)
+            )
 
         self.status("Pulling latest changes from origin")
         err_code = os.system("git pull")
@@ -317,6 +317,12 @@ class BumpVersionCommand(Command):
         # if VERSION != self.version:
         #     self._undo()
         #     raise RuntimeError("Failed to update version.")
+
+        self.status(f"npm install to bump package-lock.json")
+        err_code = os.system("mk install")
+        if err_code != 0:
+            self._undo()
+            raise RuntimeError("Failed to update package-lock.json.")
 
         self.status(f"Adding {', '.join(self.updated_files)} to git")
         err_code = os.system(f"git add {' '.join(self.updated_files)}")
