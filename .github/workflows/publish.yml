@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  pypi-publish:
+  publish:
     # Only run publishing when the commit message contains [bumpversion]
     # Auto-generated branches will be bumpversion/<version>, so we also check for that.
     if: |
@@ -32,6 +32,12 @@ jobs:
         with:
           python-version: "3.10"
 
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+
       - uses: actions/cache@v2
         with:
           path: ~/.cache/pip
@@ -53,13 +59,32 @@ jobs:
           npm run build
           cd ../../../
 
-      - name: Build
+      - name: Build PyPI
         run: |
           python setup.py upload --skip-upload
           twine check dist/*
+
+      - name: Publish distribution to npm
+        run: |
+          cd meerkat/interactive/app
+          npm ci
+          npm run package
+          npm publish package/
+          cd ../../../
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
           verbose: true
+
+      - name: Tag commit
+        run:
+          mkVersion=v`python -c "import meerkat; print(meerkat.version.__version__)"`
+          git tag $mkVersion
+          git push --tags
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        
