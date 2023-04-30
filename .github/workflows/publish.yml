@@ -2,7 +2,7 @@ name: Publish Python 🐍 distributions 📦 to PyPI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ test-autobuild ]
   
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -81,7 +81,7 @@ jobs:
           verbose: true
 
       - name: Tag commit
-        run:
+        run: |
           mkVersion=v`python -c "import meerkat; print(meerkat.version.__version__)"`
           git tag $mkVersion
           git push --tags
