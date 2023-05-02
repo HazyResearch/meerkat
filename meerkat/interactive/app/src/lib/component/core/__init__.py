@@ -14,6 +14,7 @@ from .icon import Icon
 from .image import Image
 from .image_annotator import ImageAnnotator
 from .json import Json
+from .labelstudio import LabelStudio
 from .markdown import Caption, Header, Markdown, Subheader, Title
 from .match import Match
 from .multiselect import MultiSelect
@@ -54,6 +55,7 @@ __all__ = [
     "ImageAnnotator",
     "Icon",
     "Json",
+    "LabelStudio",
     "Markdown",
     "Match",
     "MultiSelect",
