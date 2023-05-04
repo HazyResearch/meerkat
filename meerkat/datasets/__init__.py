@@ -6,6 +6,7 @@ from .celeba import celeba
 from .coco import coco
 from .expw import expw
 from .fer import fer
+from .gtsdb import gtsdb
 from .imagenet import imagenet
 from .imagenette import imagenette
 from .lra import pathfinder
@@ -17,6 +18,7 @@ from .pascal import pascal
 from .registry import datasets
 from .rfw import rfw
 from .siim_cxr import siim_cxr
+from .stsd import stsd
 from .torchaudio import yesno
 
 __all__ = [
@@ -35,6 +37,8 @@ __all__ = [
     "yesno",
     "siim_cxr",
     "pathfinder",
+    "gtsdb",
+    "stsd",
 ]
 
 DOWNLOAD_MODES = ["force", "extract", "reuse", "skip"]
