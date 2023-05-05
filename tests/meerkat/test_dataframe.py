@@ -929,6 +929,8 @@ def test_from_jsonl():
             data_to_compare = df_new[k]._data
         if k == "d":
             assert data_to_compare == data[k]
+        elif k == "b":
+            assert list(data_to_compare) == data[k]
         else:
             assert (data_to_compare == np.array(data[k])).all()
     temp_f.close()
