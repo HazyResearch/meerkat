@@ -252,6 +252,31 @@ def install(
         app.run_dev()
 
 
+@cli.command()
+def build(
+    package_manager: PackageManager = typer.Option(
+        "npm", show_choices=True, help="Package manager to use"
+    )
+):
+    """Build app folder for both the internal meerkat folder and custom project."""
+    from meerkat.interactive.svelte import SvelteWriter
+
+    writer = SvelteWriter()
+
+    if writer.appdir != MEERKAT_INTERNAL_APP_DIR:
+        # Build wrappers for internal meerkat folder.
+        from meerkat.interactive.svelte import SvelteWriter
+
+        mk_writer = SvelteWriter()
+        mk_writer.app = App(
+            appdir=MEERKAT_INTERNAL_APP_DIR, package_manager=package_manager
+        )
+        mk_writer.run()
+        mk_writer.app.run_build()
+
+    writer.app.run_build()
+
+
 # Find all .py files in MEERKAT_DEMO_DIR, OR .py files
 # in subdirectories of MEERKAT_DEMO_DIR that start with "main_"
 demos = []

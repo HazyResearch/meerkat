@@ -929,6 +929,8 @@ def test_from_jsonl():
             data_to_compare = df_new[k]._data
         if k == "d":
             assert data_to_compare == data[k]
+        elif k == "b":
+            assert list(data_to_compare) == data[k]
         else:
             assert (data_to_compare == np.array(data[k])).all()
     temp_f.close()
@@ -1107,7 +1109,7 @@ def test_json_io(testbed, tmpdir):
             assert name not in df2
         else:
             assert name in df2
-            if col.to_numpy().dtype == np.object:
+            if col.to_numpy().dtype == "object":
                 assert np.all(df2[name].to_numpy() == col.to_numpy())
             else:
                 assert np.allclose(df2[name].to_numpy(), col.to_numpy())
