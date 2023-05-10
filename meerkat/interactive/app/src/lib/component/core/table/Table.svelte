@@ -62,7 +62,7 @@
 		console.log('here');
 		chunk.set(newChunk);
 		if (rowHeights.length === 0) {
-			rowHeights = Array($chunk.keyidxs.length).fill(20); // same as text-sm
+			rowHeights = Array($chunk.keyidxs.length).fill(22); // same as text-sm + 2
 		}
 	});
 
@@ -160,21 +160,25 @@
 	}
 </script>
 
-<!-- FIXME: Figure out how to do h-full -->
-<div class={'rounded-b-md overflow-hidden border-slate-300 ' + classes}>
-	<!-- Table -->
+<!-- Subtract 15px for scrollbar -->
+<div
+	class={'rounded-b-md border-slate-300 w-fit ' + classes}
+	style="max-width:calc(100vw - 15px); max-height:calc(100vh - 15px)"
+>
+	<!-- Table (max-height subtracts 32px for height of footer)-->
 	<div
-		class={`grid overflow-x-scroll text-sm bg-slate-100 ` + classes}
+		class={`grid overflow-x-scroll overflow-y-scroll text-sm border border-slate-300`}
 		style={`grid-template-rows: 1fr ${rowHeights.join(rowUnit + ' ')}${rowUnit}; ` +
-			`grid-template-columns: 1fr ${columnWidths.join(columnUnit + ' ')}${columnUnit};`}
+			`grid-template-columns: min-content ${columnWidths.join(columnUnit + ' ')}${columnUnit};` +
+			'max-height:calc(100vh - 32px)'}
 	>
 		<!-- Header row -->
 
 		<!-- Empty cell for posidx column -->
-		<div class="header-cell sticky top-0" />
+		<div class="header-cell top-0 left-0 z-10" style={`grid-column:1 / 2; grid-row:1 / 2;`} />
 
 		{#each $schema.columns as column, col_index}
-			<div class="header-cell sticky top-0 flex" style={`grid-column:${col_index + 2} / span 1`}>
+			<div class="header-cell sticky top-0 z-10 flex" style={`grid-column:${col_index + 2} / span 1`}>
 				<!-- Column icon and name -->
 				<div class="flex items-center gap-1 px-0.5 overflow-hidden">
 					<div class="w-5 mr-0.5">
@@ -195,14 +199,13 @@
 
 				<!-- Column resizer -->
 				<div
-					class="absolute flex items-center opacity-0 hover:opacity-100 h-full w-2.5 -right-1.5 cursor-col-resize"
+					class="absolute flex items-center opacity-0 hover:opacity-100 h-full w-1 right-0 cursor-col-resize"
 					on:mousedown|preventDefault={resizeMethods.mousedown('x', col_index)}
 					on:dblclick|preventDefault={() => {
 						columnWidths[col_index] = 100;
 					}}
 				>
 					<div class="flex justify-between h-5 w-full">
-						<div class="bg-slate-700 rounded-md" style="width: 3px;" />
 						<div class="bg-slate-700 rounded-md" style="width: 3px;" />
 					</div>
 				</div>
@@ -213,7 +216,7 @@
 
 		{#each zip($chunk.keyidxs, $chunk.posidxs) as [keyidx, posidx], rowi}
 			<!-- First column shows the poxidx (row number) -->
-			<div class="header-cell sticky left-0" style={`grid-column: 1 / 2`}>
+			<div class="header-cell sticky left-0 z-1" style={`grid-column: 1 / 2`}>
 				<button
 					class="w-7 text-center"
 					class:text-violet-600={selected.includes(keyidx)}
@@ -228,14 +231,13 @@
 
 				<!-- Row resizer -->
 				<div
-					class="absolute flex justify-center opacity-0 hover:opacity-100 h-2.5 w-full -bottom-1.5 cursor-row-resize"
+					class="absolute flex justify-center opacity-0 hover:opacity-100 h-1 w-full bottom-0 cursor-row-resize"
 					on:mousedown|preventDefault={resizeMethods.mousedown('y', posidx)}
 					on:dblclick|preventDefault={() => {
 						rowHeights[posidx] = 20;
 					}}
 				>
 					<div class="flex flex-col justify-between w-5 h-full">
-						<div class="bg-slate-700 rounded-md" style="height: 3px;" />
 						<div class="bg-slate-700 rounded-md" style="height: 3px;" />
 					</div>
 				</div>
@@ -266,7 +268,7 @@
 
 	<!-- Footer -->
 	<div
-		class="fixed bottom-0 w-full flex justify-between h-8 z-10 bg-slate-100 px-5 rounded-b-sm border-t border-t-slate-300"
+		class="flex justify-between h-8 z-10 bg-slate-100 px-5 rounded-b-sm border-t border-t-slate-300"
 	>
 		<div class="px-2 flex space-x-1 items-center">
 			{#if selected.length > 0}
@@ -289,6 +291,6 @@
 
 <style>
 	.header-cell {
-		@apply border border-slate-300 font-mono text-slate-800;
+		@apply border border-slate-300 font-mono bg-slate-100 text-slate-800;
 	}
 </style>
