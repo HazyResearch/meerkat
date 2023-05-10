@@ -47,6 +47,9 @@
 		formatter: 'icon'
 	}).then((newSchema) => {
 		schema.set(newSchema);
+		if (columnWidths.length === 0) {
+			columnWidths = Array($schema.columns.length).fill(100);
+		}
 	});
 
 	$: fetchChunk({
@@ -59,25 +62,23 @@
 		chunk.set(newChunk);
 	});
 
-	export let columnWidths = Array.apply(null, Array($schema.columns.length)).map((x, i) => 256);
+	let columnWidths: Array<number> = [];
 	let columnUnit: string = 'px';
 
 	let resizeProps = {
 		colBeingResized: -1,
 		x: 0,
-		wLeft: 0,
-		wRight: 0,
+		width: 0,
 		dx: 0
 	};
 
 	let resizeMethods = {
 		mousedown(colIndex: number) {
 			return (e: MouseEvent) => {
-				// Update all the resize props
+				// Store the current state in the resize props
 				resizeProps.colBeingResized = colIndex;
 				resizeProps.x = e.clientX;
-				resizeProps.wLeft = columnWidths[colIndex];
-				resizeProps.wRight = columnWidths[colIndex + 1];
+				resizeProps.width = columnWidths[colIndex];
 
 				// Attach listeners for events
 				window.addEventListener('mousemove', resizeMethods.mousemove);
@@ -92,9 +93,9 @@
 			resizeProps.dx = e.clientX - resizeProps.x;
 
 			// Update the width of column
-			if (resizeProps.wLeft + resizeProps.dx > 164 && resizeProps.wRight - resizeProps.dx > 164) {
-				columnWidths[resizeProps.colBeingResized] = resizeProps.wLeft + resizeProps.dx;
-				columnWidths[resizeProps.colBeingResized + 1] = resizeProps.wRight - resizeProps.dx;
+			const newWidth = resizeProps.width + resizeProps.dx;
+			if (newWidth > 5) {
+				columnWidths[resizeProps.colBeingResized] = newWidth;
 			}
 		},
 
@@ -104,193 +105,162 @@
 		}
 	};
 
-	let tableWidth: number;
-	onMount(async () => {
-		columnWidths = Array.apply(null, Array($schema.columns.length)).map(
-			(x, i) => tableWidth / $schema.columns.length
-		);
-		columnUnit = 'px';
-	});
+	function onRowClick(e, keyidx) {
+		let dispatchSelect = true;
+		if (e.shiftKey) {
+			if (selected.length === 0) {
+				selected.push(keyidx);
+				dispatchSelect = false;
+			} else {
+				let lastIdx = selected[selected.length - 1];
+				let lasti = $chunk.keyidxs.indexOf(lastIdx);
+				let i = $chunk.keyidxs.indexOf(keyidx);
+				if (i > lasti) {
+					for (let j = lasti; j <= i; j++) {
+						if (!selected.includes($chunk.keyidxs[j])) {
+							selected.push($chunk.keyidxs[j]);
+						}
+					}
+				} else {
+					for (let j = lasti; j >= i; j--) {
+						if (!selected.includes($chunk.keyidxs[j])) {
+							selected.push($chunk.keyidxs[j]);
+						}
+					}
+				}
+			}
+		} else if (e.altKey) {
+			selected = [];
+			selected.push(keyidx);
+		} else {
+			if (selected.includes(keyidx)) {
+				selected = without(selected, keyidx);
+			} else if (!selected.includes(keyidx)) {
+				if (singleSelect) {
+					selected.pop();
+				}
+				selected.push(keyidx);
+			}
+		}
+		selected = selected;
+		if (dispatchSelect) {
+			console.log('dispatching onSelect', selected);
+			dispatch(onSelect.endpointId, { detail: { selected: selected } });
+		}
+	}
 </script>
 
 <!-- FIXME: Figure out how to do h-full -->
-<div
-	class={'flex-1 w-full bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md overflow-hidden border-slate-300 ' +
-		classes}
->
-	<div class="auto-table table-fixed overflow-x-scroll text-sm h-full">
-		<div class="table-header-group">
-			<div class="table-row sticky top-0 bg-slate-100">
-				<!-- bind:clientWidth={tableWidth} -->
-				<div class="table-cell border border-slate-300 font-mono text-slate-800" />
-				{#each $schema.columns as column, col_index}
-					<div
-						class="table-cell border border-slate-300 font-mono text-slate-800 pl-1"
-						style="width:{columnWidths[col_index]}{columnUnit}"
-					>
-						<slot id="header-cell">
-							<div class="flex items-center gap-1 px-0.5">
-								{#if column.name === $schema.primaryKey}
-									<!-- Show a key icon for the primary key-->
-									<KeyFill class="text-violet-600" />
-								{:else}
-									<Cell
-										data={''}
-										cellComponent={column.cellComponent}
-										cellProps={column.cellProps}
-										cellDataProp={column.cellDataProp}
-									/>
-								{/if}
+<div class={'rounded-b-md overflow-hidden border-slate-300 ' + classes}>
+	<!-- Table -->
+	<div
+		class={`grid grid-rows-[1fr_auto] overflow-x-scroll text-sm bg-slate-100 ` + classes}
+		style={`grid-template-columns: 1fr ${columnWidths.join(columnUnit + " ")}${columnUnit};`}
+	>
+		<!-- Header row -->
 
-								<div class="">{column.name}</div>
-							</div>
-						</slot>
-						<div class="resizer rounded-md" on:mousedown={resizeMethods.mousedown(col_index)} />
-					</div>
-				{/each}
-			</div>
-		</div>
+		<!-- Empty cell for posidx column -->
+		<div class="header-cell sticky top-0" />
 
-		<div class="table-row-group border-collapse">
-			{#each zip($chunk.keyidxs, $chunk.posidxs) as [keyidx, posidx], rowi}
-				<div class="table-row items-center">
-					<div class="table-cell border border-slate-300 font-mono text-slate-800 bg-slate-100">
-						<button
-							class="w-7 text-center"
-							class:text-violet-600={selected.includes(keyidx)}
-							class:bg-slate-200={selected.includes(keyidx)}
-							on:dblclick={(e) => {
-								open_row_modal(posidx);
-							}}
-							on:click={(e) => {
-								let dispatchSelect = true;
-								if (e.shiftKey) {
-									if (selected.length === 0) {
-										selected.push(keyidx);
-										dispatchSelect = false;
-									} else {
-										let lastIdx = selected[selected.length - 1];
-										let lasti = $chunk.keyidxs.indexOf(lastIdx);
-										let i = $chunk.keyidxs.indexOf(keyidx);
-										if (i > lasti) {
-											for (let j = lasti; j <= i; j++) {
-												if (!selected.includes($chunk.keyidxs[j])) {
-													selected.push($chunk.keyidxs[j]);
-												}
-											}
-										} else {
-											for (let j = lasti; j >= i; j--) {
-												if (!selected.includes($chunk.keyidxs[j])) {
-													selected.push($chunk.keyidxs[j]);
-												}
-											}
-										}
-									}
-								} else if (e.altKey) {
-									selected = [];
-									selected.push(keyidx);
-								} else {
-									if (selected.includes(keyidx)) {
-										selected = without(selected, keyidx);
-									} else if (!selected.includes(keyidx)) {
-										if (singleSelect) {
-											selected.pop();
-										}
-										selected.push(keyidx);
-									}
-								}
-								selected = selected;
-								if (dispatchSelect) {
-									console.log('dispatching onSelect', selected);
-									dispatch(onSelect.endpointId, { detail: { selected: selected } });
-								}
-							}}
-						>
-							{posidx}
-						</button>
-					</div>
-					{#each $chunk.columnInfos as col}
-						<div class="table-cell border-t border-l border-slate-200 hover:opacity-80 bg-white px-1">
+		{#each $schema.columns as column, col_index}
+			<div
+				class="header-cell sticky top-0 flex"
+				style={`grid-column:${col_index + 2} / span 1`}
+			>
+				<!-- Column icon and name -->
+				<div class="flex items-center gap-1 px-0.5 overflow-hidden">
+					<div class="w-5 mr-0.5">
+						{#if column.name === $schema.primaryKey}
+							<!-- Show a key icon for the primary key-->
+							<KeyFill class="text-violet-600" />
+						{:else}
 							<Cell
-								{...$chunk.getCell(rowi, col.name)}
-								editable={true}
-								on:edit={(e) => {
-									console.log(keyidx);
-									dispatch(onEdit.endpointId, {
-										detail: {
-											column: col.name,
-											keyidx: keyidx,
-											posidx: posidx,
-											value: e.detail.value
-										}
-									});
-								}}
+								data={''}
+								cellComponent={column.cellComponent}
+								cellProps={column.cellProps}
+								cellDataProp={column.cellDataProp}
 							/>
-						</div>
-					{/each}
+						{/if}
+					</div>
+					<div class="">{column.name}</div>
+				</div>
+				<!-- Column resizer -->
+				<div
+					class="absolute flex justify-between opacity-0 hover:opacity-100 w-2.5 top-1/2 -right-1.5"
+					style="height: calc(100% - 20px); transform:translateY(-50%); cursor:col-resize;"
+					on:mousedown|preventDefault={resizeMethods.mousedown(col_index)}
+					on:dblclick|preventDefault={() => {
+						columnWidths[col_index] = 100;
+					}}
+				>
+					<div class="bg-slate-700 rounded-md" style="width: 3px;" />
+					<div class="bg-slate-700 rounded-md" style="width: 3px;" />
+				</div>
+			</div>
+		{/each}
+
+		<!-- Data rows -->
+
+		{#each zip($chunk.keyidxs, $chunk.posidxs) as [keyidx, posidx], rowi}
+			<!-- First column shows the poxidx (row number) -->
+			<div class="header-cell" style={`grid-column: 1 / 2`}>
+				<button
+					class="w-7 text-center"
+					class:text-violet-600={selected.includes(keyidx)}
+					class:bg-slate-200={selected.includes(keyidx)}
+					on:dblclick={(e) => {
+						open_row_modal(posidx);
+					}}
+					on:click={(e) => onRowClick(e, keyidx)}
+				>
+					{posidx}
+				</button>
+			</div>
+
+			<!-- Data columns -->
+			{#each $chunk.columnInfos as col}
+				<div class="border-t border-l border-slate-200 hover:opacity-80 bg-white pl-1">
+					<Cell
+						{...$chunk.getCell(rowi, col.name)}
+						editable={true}
+						on:edit={(e) => {
+							console.log(keyidx);
+							dispatch(onEdit.endpointId, {
+								detail: {
+									column: col.name,
+									keyidx: keyidx,
+									posidx: posidx,
+									value: e.detail.value
+								}
+							});
+						}}
+					/>
 				</div>
 			{/each}
-		</div>
+		{/each}
 	</div>
-	<div class="grid grid-cols-3 h-8 z-10 bg-slate-100 px-5 rounded-b-sm border-t border-t-slate-300">
-		<!-- Left header section -->
-		<div class="flex justify-self-start items-center">
-			<div class="self-center px-2 flex space-x-1 items-center">
-				{#if selected.length > 0}
-					{#if selected.length === 1}
-						<Check class="text-violet-600" />
-					{:else}
-						<CheckAll class="text-violet-600" />
-					{/if}
-					<div class="text-violet-600 font-mono text-sm ">{selected.length} Selected</div>
+
+	<!-- Footer -->
+	<div
+		class="fixed bottom-0 w-full flex justify-between h-8 z-10 bg-slate-100 px-5 rounded-b-sm border-t border-t-slate-300"
+	>
+		<div class="px-2 flex space-x-1 items-center">
+			{#if selected.length > 0}
+				{#if selected.length === 1}
+					<Check class="text-violet-600" />
+				{:else}
+					<CheckAll class="text-violet-600" />
 				{/if}
-			</div>
+				<div class="text-violet-600 font-mono text-sm ">{selected.length} Selected</div>
+			{/if}
 		</div>
 
-		<!-- Middle header section -->
-		<div class="self-center justify-self-center">
-			<!-- <button
-				class="font-bold font-mono text-xl text-slate-600 self-center justify-self-center"
-				on:click={() => {
-					dropdownOpen = !dropdownOpen;
-				}}
-			>
-				{mainColumn}
-			</button>
-			<Dropdown open={dropdownOpen} class="w-fit">
-				{#each schema.columns as col}
-					<DropdownItem
-						on:click={() => {
-							mainColumn = col.name;
-							dropdownOpen = false;
-						}}
-					>
-						<div class="text-slate-600 font-mono">
-							<span class="font-bold">{col.name}</span>
-						</div>
-					</DropdownItem>
-				{/each}
-			</Dropdown> -->
-		</div>
-
-		<!-- Right header section -->
-		<div class="flex self-center justify-self-end items-center">
-			<Pagination bind:page bind:perPage totalItems={$schema.nrows} dropdownPlacement={'top'} />
-		</div>
+		<Pagination bind:page bind:perPage totalItems={$schema.nrows} dropdownPlacement={'top'} />
 	</div>
 </div>
 
 <style>
-	.table-header-group .table-cell {
-		@apply sticky top-0; /* sticky-top */
-		@apply resize-x [overflow:hidden];
-	}
-
-	.table-row-group .table-row {
-		@apply overflow-y-scroll;
-	}
-
-	.table-row-group .table-cell {
-		@apply text-left;
+	.header-cell {
+		@apply border border-slate-300 font-mono text-slate-800;
 	}
 </style>
