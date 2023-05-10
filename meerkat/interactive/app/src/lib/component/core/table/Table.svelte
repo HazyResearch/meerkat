@@ -23,6 +23,7 @@
 	export let onSelect: Endpoint;
 
 	export let classes: string = 'h-fit';
+	let wrap: string = 'clip'; // 'wrap' | 'clip' (add 'overflow' later)
 
 	// Setup row modal
 	const open_row_modal = (posidx: number) => {
@@ -60,25 +61,32 @@
 	}).then((newChunk) => {
 		console.log('here');
 		chunk.set(newChunk);
+		if (rowHeights.length === 0) {
+			rowHeights = Array($chunk.keyidxs.length).fill(20); // same as text-sm
+		}
 	});
 
 	let columnWidths: Array<number> = [];
 	let columnUnit: string = 'px';
+	let rowHeights: Array<number> = [];
+	let rowUnit: string = 'px';
 
 	let resizeProps = {
-		colBeingResized: -1,
-		x: 0,
-		width: 0,
-		dx: 0
+		direction: 'x',
+		idxBeingResized: -1,
+		mouseStart: 0,
+		sizeStart: 0,
+		offset: 0
 	};
 
 	let resizeMethods = {
-		mousedown(colIndex: number) {
+		mousedown(direction: string, idx: number) {
 			return (e: MouseEvent) => {
 				// Store the current state in the resize props
-				resizeProps.colBeingResized = colIndex;
-				resizeProps.x = e.clientX;
-				resizeProps.width = columnWidths[colIndex];
+				resizeProps.direction = direction;
+				resizeProps.idxBeingResized = idx;
+				resizeProps.mouseStart = direction === 'x' ? e.clientX : e.clientY;
+				resizeProps.sizeStart = direction === 'x' ? columnWidths[idx] : rowHeights[idx];
 
 				// Attach listeners for events
 				window.addEventListener('mousemove', resizeMethods.mousemove);
@@ -87,15 +95,17 @@
 		},
 
 		mousemove(e: MouseEvent) {
-			if (resizeProps.colBeingResized === -1) return;
+			if (resizeProps.idxBeingResized === -1) return;
 
 			// Determine how far the mouse has been moved
-			resizeProps.dx = e.clientX - resizeProps.x;
+			resizeProps.offset =
+				(resizeProps.direction === 'x' ? e.clientX : e.clientY) - resizeProps.mouseStart;
 
-			// Update the width of column
-			const newWidth = resizeProps.width + resizeProps.dx;
-			if (newWidth > 5) {
-				columnWidths[resizeProps.colBeingResized] = newWidth;
+			// Update the size
+			const newSize = resizeProps.sizeStart + resizeProps.offset;
+			if (newSize > 5) {
+				if (resizeProps.direction === 'x') columnWidths[resizeProps.idxBeingResized] = newSize;
+				else rowHeights[resizeProps.idxBeingResized] = newSize;
 			}
 		},
 
@@ -105,7 +115,7 @@
 		}
 	};
 
-	function onRowClick(e, keyidx) {
+	function onRowClick(e: MouseEvent, keyidx: string) {
 		let dispatchSelect = true;
 		if (e.shiftKey) {
 			if (selected.length === 0) {
@@ -154,8 +164,9 @@
 <div class={'rounded-b-md overflow-hidden border-slate-300 ' + classes}>
 	<!-- Table -->
 	<div
-		class={`grid grid-rows-[1fr_auto] overflow-x-scroll text-sm bg-slate-100 ` + classes}
-		style={`grid-template-columns: 1fr ${columnWidths.join(columnUnit + " ")}${columnUnit};`}
+		class={`grid overflow-x-scroll text-sm bg-slate-100 ` + classes}
+		style={`grid-template-rows: 1fr ${rowHeights.join(rowUnit + ' ')}${rowUnit}; ` +
+			`grid-template-columns: 1fr ${columnWidths.join(columnUnit + ' ')}${columnUnit};`}
 	>
 		<!-- Header row -->
 
@@ -163,10 +174,7 @@
 		<div class="header-cell sticky top-0" />
 
 		{#each $schema.columns as column, col_index}
-			<div
-				class="header-cell sticky top-0 flex"
-				style={`grid-column:${col_index + 2} / span 1`}
-			>
+			<div class="header-cell sticky top-0 flex" style={`grid-column:${col_index + 2} / span 1`}>
 				<!-- Column icon and name -->
 				<div class="flex items-center gap-1 px-0.5 overflow-hidden">
 					<div class="w-5 mr-0.5">
@@ -184,17 +192,19 @@
 					</div>
 					<div class="">{column.name}</div>
 				</div>
+
 				<!-- Column resizer -->
 				<div
-					class="absolute flex justify-between opacity-0 hover:opacity-100 w-2.5 top-1/2 -right-1.5"
-					style="height: calc(100% - 20px); transform:translateY(-50%); cursor:col-resize;"
-					on:mousedown|preventDefault={resizeMethods.mousedown(col_index)}
+					class="absolute flex items-center opacity-0 hover:opacity-100 h-full w-2.5 -right-1.5 cursor-col-resize"
+					on:mousedown|preventDefault={resizeMethods.mousedown('x', col_index)}
 					on:dblclick|preventDefault={() => {
 						columnWidths[col_index] = 100;
 					}}
 				>
-					<div class="bg-slate-700 rounded-md" style="width: 3px;" />
-					<div class="bg-slate-700 rounded-md" style="width: 3px;" />
+					<div class="flex justify-between h-5 w-full">
+						<div class="bg-slate-700 rounded-md" style="width: 3px;" />
+						<div class="bg-slate-700 rounded-md" style="width: 3px;" />
+					</div>
 				</div>
 			</div>
 		{/each}
@@ -203,7 +213,7 @@
 
 		{#each zip($chunk.keyidxs, $chunk.posidxs) as [keyidx, posidx], rowi}
 			<!-- First column shows the poxidx (row number) -->
-			<div class="header-cell" style={`grid-column: 1 / 2`}>
+			<div class="header-cell sticky left-0" style={`grid-column: 1 / 2`}>
 				<button
 					class="w-7 text-center"
 					class:text-violet-600={selected.includes(keyidx)}
@@ -215,6 +225,20 @@
 				>
 					{posidx}
 				</button>
+
+				<!-- Row resizer -->
+				<div
+					class="absolute flex justify-center opacity-0 hover:opacity-100 h-2.5 w-full -bottom-1.5 cursor-row-resize"
+					on:mousedown|preventDefault={resizeMethods.mousedown('y', posidx)}
+					on:dblclick|preventDefault={() => {
+						rowHeights[posidx] = 20;
+					}}
+				>
+					<div class="flex flex-col justify-between w-5 h-full">
+						<div class="bg-slate-700 rounded-md" style="height: 3px;" />
+						<div class="bg-slate-700 rounded-md" style="height: 3px;" />
+					</div>
+				</div>
 			</div>
 
 			<!-- Data columns -->
@@ -253,6 +277,10 @@
 				{/if}
 				<div class="text-violet-600 font-mono text-sm ">{selected.length} Selected</div>
 			{/if}
+		</div>
+
+		<div class="px-2 flex space-x-1 items-center">
+			#TODO Wrap: {wrap}
 		</div>
 
 		<Pagination bind:page bind:perPage totalItems={$schema.nrows} dropdownPlacement={'top'} />
