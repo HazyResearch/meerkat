@@ -25,6 +25,9 @@
 	export let classes: string = 'h-fit';
 	let wrap: string = 'clip'; // 'wrap' | 'clip' (add 'overflow' later)
 
+	let cutoutWidth: number = 0;
+	let cutoutHeight: number = 0;
+
 	// Setup row modal
 	const open_row_modal = (posidx: number) => {
 		openModal(RowModal, {
@@ -174,11 +177,19 @@
 	>
 		<!-- Header row -->
 
-		<!-- Empty cell for posidx column -->
-		<div class="header-cell top-0 left-0 z-10" style={`grid-column:1 / 2; grid-row:1 / 2;`} />
+		<!-- Placeholder for cutout in top left corner to hide scrolling headers -->
+		<div
+			class="header-cell"
+			style={`grid-column:1 / 2; grid-row:1 / 2;`}
+			bind:clientWidth={cutoutWidth}
+			bind:clientHeight={cutoutHeight}
+		/>
 
 		{#each $schema.columns as column, col_index}
-			<div class="header-cell sticky top-0 z-10 flex" style={`grid-column:${col_index + 2} / span 1`}>
+			<div
+				class="header-cell sticky top-0 z-10 flex"
+				style={`grid-column:${col_index + 2} / span 1`}
+			>
 				<!-- Column icon and name -->
 				<div class="flex items-center gap-1 px-0.5 overflow-hidden">
 					<div class="w-5 mr-0.5">
@@ -216,7 +227,7 @@
 
 		{#each zip($chunk.keyidxs, $chunk.posidxs) as [keyidx, posidx], rowi}
 			<!-- First column shows the poxidx (row number) -->
-			<div class="header-cell sticky left-0 z-1" style={`grid-column: 1 / 2`}>
+			<div class="header-cell sticky left-0 z-10" style={`grid-column: 1 / 2`}>
 				<button
 					class="w-7 text-center"
 					class:text-violet-600={selected.includes(keyidx)}
@@ -265,6 +276,12 @@
 			{/each}
 		{/each}
 	</div>
+
+	<!-- Cutout in top left corner to hide scrolling headers -->
+	<div
+		class="header-cell absolute top-px left-px z-20"
+		style={`width:${cutoutWidth + 2}px; height:${cutoutHeight + 2}px`}
+	/>
 
 	<!-- Footer -->
 	<div
