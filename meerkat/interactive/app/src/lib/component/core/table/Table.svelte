@@ -4,7 +4,6 @@
 	import { fetchChunk, fetchSchema, dispatch } from '$lib/utils/api';
 	import { DataFrameChunk, type DataFrameRef, type DataFrameSchema } from '$lib/utils/dataframe';
 	import { without } from 'underscore';
-	import { onMount } from 'svelte';
 	import { openModal } from 'svelte-modals';
 	import type { Endpoint } from '$lib/utils/types';
 	import { zip } from 'underscore';
@@ -17,10 +16,15 @@
 	export let page: number = 0;
 	export let perPage: number = 50;
 
-	export let selected: Array<string> = [];
-	export let singleSelect: boolean = false;
 	export let onEdit: Endpoint;
-	export let onSelect: Endpoint;
+
+	export let primarySelectedCell: Array<string> = [];
+	export let selectedCells: Array<Array<string>> = [];
+	export let selectedCols: Array<string> = [];
+	export let selectedRows: Array<string> = [];
+	export let onSelectCells: Endpoint;
+	export let onSelectCols: Endpoint;
+	export let onSelectRows: Endpoint;
 
 	export let classes: string = 'h-fit';
 	let wrap: string = 'clip'; // 'wrap' | 'clip' (add 'overflow' later)
@@ -52,7 +56,7 @@
 	}).then((newSchema) => {
 		schema.set(newSchema);
 		if (columnWidths.length === 0) {
-			columnWidths = Array($schema.columns.length).fill(100);
+			columnWidths = Array(newSchema.columns.length).fill(100);
 		}
 	});
 
@@ -62,10 +66,10 @@
 		end: (page + 1) * perPage,
 		formatter: 'tiny'
 	}).then((newChunk) => {
-		console.log('here');
+		console.log('Fetching chunk');
 		chunk.set(newChunk);
 		if (rowHeights.length === 0) {
-			rowHeights = Array($chunk.keyidxs.length).fill(22); // same as text-sm + 2
+			rowHeights = Array(newChunk.keyidxs.length).fill(22); // same as text-sm + 2
 		}
 	});
 
@@ -88,7 +92,7 @@
 				// Store the current state in the resize props
 				resizeProps.direction = direction;
 				resizeProps.idxBeingResized = idx;
-				resizeProps.mouseStart = direction === 'x' ? e.clientX : e.clientY;
+				resizeProps.mouseStart = direction === 'x' ? e.x : e.y;
 				resizeProps.sizeStart = direction === 'x' ? columnWidths[idx] : rowHeights[idx];
 
 				// Attach listeners for events
@@ -102,7 +106,7 @@
 
 			// Determine how far the mouse has been moved
 			resizeProps.offset =
-				(resizeProps.direction === 'x' ? e.clientX : e.clientY) - resizeProps.mouseStart;
+				(resizeProps.direction === 'x' ? e.x : e.y) - resizeProps.mouseStart;
 
 			// Update the size
 			const newSize = resizeProps.sizeStart + resizeProps.offset;
@@ -118,48 +122,176 @@
 		}
 	};
 
-	function onRowClick(e: MouseEvent, keyidx: string) {
-		let dispatchSelect = true;
+	function onClickCell(e: MouseEvent, colName: string, keyidx: string) {
 		if (e.shiftKey) {
-			if (selected.length === 0) {
-				selected.push(keyidx);
-				dispatchSelect = false;
-			} else {
-				let lastIdx = selected[selected.length - 1];
-				let lasti = $chunk.keyidxs.indexOf(lastIdx);
-				let i = $chunk.keyidxs.indexOf(keyidx);
-				if (i > lasti) {
-					for (let j = lasti; j <= i; j++) {
-						if (!selected.includes($chunk.keyidxs[j])) {
-							selected.push($chunk.keyidxs[j]);
-						}
-					}
-				} else {
-					for (let j = lasti; j >= i; j--) {
-						if (!selected.includes($chunk.keyidxs[j])) {
-							selected.push($chunk.keyidxs[j]);
-						}
-					}
+			selectedCells = [];
+
+			// loop through all cells between primarySelectedCell and this cell
+			const col1 = $schema.columns.findIndex((c) => c.name === primarySelectedCell[0]);
+			const keyidx1 = $chunk.keyidxs.indexOf(primarySelectedCell[1]);
+
+			const col2 = $schema.columns.findIndex((c) => c.name === colName);
+			const keyidx2 = $chunk.keyidxs.indexOf(keyidx);
+
+			const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
+			const [keyidxStart, keyidxEnd] = keyidx1 < keyidx2 ? [keyidx1, keyidx2] : [keyidx2, keyidx1];
+			for (let i = colStart; i <= colEnd; i++) {
+				for (let j = keyidxStart; j <= keyidxEnd; j++) {
+					selectedCells.push([$schema.columns[i].name, $chunk.keyidxs[j]]);
 				}
 			}
-		} else if (e.altKey) {
-			selected = [];
-			selected.push(keyidx);
+		} else if (e.metaKey) {
+			const i = selectedCells.findIndex((cell) => cell[0] === colName && cell[1] === keyidx);
+			if (i !== -1) selectedCells.splice(i, 1);
+			else selectedCells.push([colName, keyidx]);
 		} else {
-			if (selected.includes(keyidx)) {
-				selected = without(selected, keyidx);
-			} else if (!selected.includes(keyidx)) {
-				if (singleSelect) {
-					selected.pop();
+			primarySelectedCell = [colName, keyidx];
+			selectedCells = []; // don't add to selectedCells
+			selectedCols = [];
+			selectedRows = [];
+
+			
+		}
+		selectedCells = selectedCells.slice(); // trigger update
+
+		if (onSelectCells && onSelectCells.endpointId) {
+			dispatch(onSelectCells.endpointId, { detail: { selected: selectedCells } });
+		}
+	}
+
+	function onClickCol(e: MouseEvent, colName: string) {
+		if (e.shiftKey) {
+			if (selectedCols.length === 0) {
+				selectedCols.push(colName);
+			} else {
+				selectedCols = [];
+				// loop through all cols between primarySelectedCol and this col
+				const col1 = $schema.columns.findIndex((c) => c.name === primarySelectedCell[0]);
+				const col2 = $schema.columns.findIndex((c) => c.name === colName);
+				const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
+				for (let i = colStart; i <= colEnd; i++) {
+					selectedCols.push($schema.columns[i].name);
 				}
-				selected.push(keyidx);
 			}
+		} else if (e.metaKey) {
+			const i = selectedCols.indexOf(colName);
+			if (i !== -1) {
+				// remove cells from selectedCells in this col
+				selectedCells = selectedCells.filter((cell) => cell[0] !== colName);
+				selectedCols.splice(i, 1);
+			} else {
+				primarySelectedCell = [colName, $chunk.keyidxs[0]];
+				selectedCols.push(colName);
+			}
+		} else {
+			primarySelectedCell = [colName, $chunk.keyidxs[0]];
+			selectedCells = [];
+			selectedCols = [colName];
+			selectedRows = [];
 		}
-		selected = selected;
-		if (dispatchSelect) {
-			console.log('dispatching onSelect', selected);
-			dispatch(onSelect.endpointId, { detail: { selected: selected } });
+		selectedCols = selectedCols.sort(
+			(a, b) =>
+				$schema.columns.findIndex((c) => c.name === a) -
+				$schema.columns.findIndex((c) => c.name === b)
+		);
+
+		if (onSelectCols && onSelectCols.endpointId) {
+			dispatch(onSelectCols.endpointId, { detail: { selected: selectedCols } });
 		}
+	}
+
+	function onClickRow(e: MouseEvent, keyidx: string) {
+		if (e.shiftKey) {
+			if (selectedRows.length === 0) {
+				selectedRows.push(keyidx);
+			} else {
+				selectedRows = [];
+				// loop through all rows between primarySelectedCol and this row
+				const row1 = $chunk.keyidxs.indexOf(primarySelectedCell[1]);
+				const row2 = $chunk.keyidxs.indexOf(keyidx);
+				const [rowStart, rowEnd] = row1 < row2 ? [row1, row2] : [row2, row1];
+				for (let i = rowStart; i <= rowEnd; i++) {
+					selectedRows.push($chunk.keyidxs[i]);
+				}
+			}
+		} else if (e.metaKey) {
+			const i = selectedRows.indexOf(keyidx);
+			if (i !== -1) {
+				// remove cells from selectedCells in this row
+				selectedCells = selectedCells.filter((cell) => cell[1] !== keyidx);
+				selectedRows.splice(i, 1);
+			} else {
+				primarySelectedCell = [$schema.columns[0].name, keyidx];
+				selectedRows.push(keyidx);
+			}
+		} else {
+			primarySelectedCell = [$schema.columns[0].name, keyidx];
+			selectedCells = [];
+			selectedCols = [];
+			selectedRows = [keyidx];
+		}
+		selectedRows = selectedRows.sort(
+			(a, b) => $chunk.keyidxs.indexOf(a) - $chunk.keyidxs.indexOf(b)
+		);
+
+		if (onSelectRows && onSelectRows.endpointId) {
+			dispatch(onSelectRows.endpointId, { detail: { selected: selectedCols } });
+		}
+	}
+
+	function getColumnSelectClasses(
+		colName: string,
+		primarySelectedCell: Array<string>,
+		selectedCells: Array<Array<string>>,
+		selectedCols: Array<string>,
+		selectedRows: Array<string>
+	) {
+		if (
+			primarySelectedCell[0] === colName ||
+			selectedCells.some((c) => c[0] === colName) ||
+			selectedCols.includes(colName) ||
+			selectedRows.length > 0
+		)
+			return 'bg-slate-200 text-violet-600 ';
+		return '';
+	}
+
+	function getRowSelectClasses(
+		keyidx: string,
+		primarySelectedCell: Array<string>,
+		selectedCells: Array<Array<string>>,
+		selectedCols: Array<string>,
+		selectedRows: Array<string>
+	) {
+		if (
+			primarySelectedCell[1] === keyidx ||
+			selectedCells.some((c) => c[1] === keyidx) ||
+			selectedCols.length > 0 ||
+			selectedRows.includes(keyidx)
+		)
+			return 'bg-slate-200 text-violet-600 ';
+		return '';
+	}
+
+	function getCellSelectClasses(
+		colName: string,
+		keyidx: string,
+		primarySelectedCell: Array<string>,
+		selectedCells: Array<Array<string>>,
+		selectedCols: Array<string>,
+		selectedRows: Array<string>
+	) {
+		let classes = '';
+		if (
+			selectedCells.some((c) => c[0] === colName && c[1] === keyidx) ||
+			selectedCols.includes(colName) ||
+			selectedRows.includes(keyidx)
+		)
+			classes += 'bg-violet-100 ';
+		if (primarySelectedCell[0] === colName && primarySelectedCell[1] === keyidx)
+			classes += 'border-2 border-violet-600 ';
+		else classes += 'border-t border-l border-slate-300 ';
+		return classes;
 	}
 </script>
 
@@ -179,7 +311,7 @@
 
 		<!-- Placeholder for cutout in top left corner to hide scrolling headers -->
 		<div
-			class="header-cell"
+			class="header-cell border border-slate-300 font-mono bg-slate-100 text-slate-800"
 			style={`grid-column:1 / 2; grid-row:1 / 2;`}
 			bind:clientWidth={cutoutWidth}
 			bind:clientHeight={cutoutHeight}
@@ -187,11 +319,21 @@
 
 		{#each $schema.columns as column, col_index}
 			<div
-				class="header-cell sticky top-0 z-10 flex"
+				class={'header-cell border border-slate-300 font-mono bg-slate-100 text-slate-800 sticky top-0 z-10 flex ' +
+					getColumnSelectClasses(
+						column.name,
+						primarySelectedCell,
+						selectedCells,
+						selectedCols,
+						selectedRows
+					)}
 				style={`grid-column:${col_index + 2} / span 1`}
 			>
 				<!-- Column icon and name -->
-				<div class="flex items-center gap-1 px-0.5 overflow-hidden">
+				<button
+					class="flex items-center gap-1 px-0.5 overflow-hidden"
+					on:click={(e) => onClickCol(e, column.name)}
+				>
 					<div class="w-5 mr-0.5">
 						{#if column.name === $schema.primaryKey}
 							<!-- Show a key icon for the primary key-->
@@ -206,7 +348,7 @@
 						{/if}
 					</div>
 					<div class="">{column.name}</div>
-				</div>
+				</button>
 
 				<!-- Column resizer -->
 				<div
@@ -226,16 +368,22 @@
 		<!-- Data rows -->
 
 		{#each zip($chunk.keyidxs, $chunk.posidxs) as [keyidx, posidx], rowi}
-			<!-- First column shows the poxidx (row number) -->
-			<div class="header-cell sticky left-0 z-10" style={`grid-column: 1 / 2`}>
+			<!-- First column shows the posidx (row number) -->
+			<div
+				class="header-cell border border-slate-300 font-mono bg-slate-100 text-slate-800 sticky left-0 z-10"
+				style={`grid-column: 1 / 2`}
+			>
 				<button
-					class="w-7 text-center"
-					class:text-violet-600={selected.includes(keyidx)}
-					class:bg-slate-200={selected.includes(keyidx)}
-					on:dblclick={(e) => {
-						open_row_modal(posidx);
-					}}
-					on:click={(e) => onRowClick(e, keyidx)}
+					class={'w-7 text-center ' +
+						getRowSelectClasses(
+							keyidx,
+							primarySelectedCell,
+							selectedCells,
+							selectedCols,
+							selectedRows
+						)}
+					on:dblclick={(e) => open_row_modal(posidx)}
+					on:click|preventDefault={(e) => onClickRow(e, keyidx)}
 				>
 					{posidx}
 				</button>
@@ -256,10 +404,25 @@
 
 			<!-- Data columns -->
 			{#each $chunk.columnInfos as col}
-				<div class="border-t border-l border-slate-200 hover:opacity-80 bg-white pl-1">
+				<div
+					class={'bg-white pl-1 ' +
+						getCellSelectClasses(
+							col.name,
+							keyidx,
+							primarySelectedCell,
+							selectedCells,
+							selectedCols,
+							selectedRows
+						)}
+					on:click={(e) => {
+						onClickCell(e, col.name, keyidx);
+						document.getSelection().removeAllRanges();
+					}}
+					on:keydown={(e) => console.log('keydown', e)}
+				>
 					<Cell
 						{...$chunk.getCell(rowi, col.name)}
-						editable={true}
+						editable={true && false}
 						on:edit={(e) => {
 							console.log(keyidx);
 							dispatch(onEdit.endpointId, {
@@ -279,7 +442,7 @@
 
 	<!-- Cutout in top left corner to hide scrolling headers -->
 	<div
-		class="header-cell absolute top-px left-px z-20"
+		class="header-cell border border-slate-300 font-mono bg-slate-100 text-slate-800 absolute top-px left-px z-20"
 		style={`width:${cutoutWidth + 2}px; height:${cutoutHeight + 2}px`}
 	/>
 
@@ -288,26 +451,26 @@
 		class="flex justify-between h-8 z-10 bg-slate-100 px-5 rounded-b-sm border-t border-t-slate-300"
 	>
 		<div class="px-2 flex space-x-1 items-center">
-			{#if selected.length > 0}
-				{#if selected.length === 1}
+			{#if selectedRows.length > 0}
+				{#if selectedRows.length === 1}
 					<Check class="text-violet-600" />
 				{:else}
 					<CheckAll class="text-violet-600" />
 				{/if}
-				<div class="text-violet-600 font-mono text-sm ">{selected.length} Selected</div>
+				<div class="text-violet-600 font-mono text-sm ">{selectedRows.length} rows selected</div>
 			{/if}
 		</div>
 
-		<div class="px-2 flex space-x-1 items-center">
+		<!-- <div class="px-2 flex space-x-1 items-center">
 			#TODO Wrap: {wrap}
-		</div>
+		</div> -->
 
 		<Pagination bind:page bind:perPage totalItems={$schema.nrows} dropdownPlacement={'top'} />
 	</div>
 </div>
 
 <style>
-	.header-cell {
+	/* .header-cell {
 		@apply border border-slate-300 font-mono bg-slate-100 text-slate-800;
-	}
+	} */
 </style>
