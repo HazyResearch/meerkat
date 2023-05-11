@@ -86,7 +86,7 @@
 		offset: 0
 	};
 
-	let resizeMethods = {
+	const resizeMethods = {
 		mousedown(direction: string, idx: number) {
 			return (e: MouseEvent) => {
 				// Store the current state in the resize props
@@ -105,8 +105,7 @@
 			if (resizeProps.idxBeingResized === -1) return;
 
 			// Determine how far the mouse has been moved
-			resizeProps.offset =
-				(resizeProps.direction === 'x' ? e.x : e.y) - resizeProps.mouseStart;
+			resizeProps.offset = (resizeProps.direction === 'x' ? e.x : e.y) - resizeProps.mouseStart;
 
 			// Update the size
 			const newSize = resizeProps.sizeStart + resizeProps.offset;
@@ -119,6 +118,94 @@
 		mouseup(e: MouseEvent) {
 			window.removeEventListener('mousemove', resizeMethods.mousemove);
 			window.removeEventListener('mouseup', resizeMethods.mouseup);
+		}
+	};
+
+	const selectCellMethods = {
+		mousedown(colName: string, keyidx: string) {
+			return (e: MouseEvent) => {
+				if (e.shiftKey) {
+					selectedCells = [];
+
+					// loop through all cells between primarySelectedCell and this cell
+					const col1 = $schema.columns.findIndex((c) => c.name === primarySelectedCell[0]);
+					const keyidx1 = $chunk.keyidxs.indexOf(primarySelectedCell[1]);
+
+					const col2 = $schema.columns.findIndex((c) => c.name === colName);
+					const keyidx2 = $chunk.keyidxs.indexOf(keyidx);
+
+					const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
+					const [keyidxStart, keyidxEnd] =
+						keyidx1 < keyidx2 ? [keyidx1, keyidx2] : [keyidx2, keyidx1];
+					for (let i = colStart; i <= colEnd; i++) {
+						for (let j = keyidxStart; j <= keyidxEnd; j++) {
+							selectedCells.push([$schema.columns[i].name, $chunk.keyidxs[j]]);
+						}
+					}
+				} else if (e.metaKey) {
+					if (selectedCells.length === 0 && primarySelectedCell.length !== 0) {
+						selectedCells = [primarySelectedCell];
+					}
+					primarySelectedCell = [colName, keyidx];
+
+					const i = selectedCells.findIndex((cell) => cell[0] === colName && cell[1] === keyidx);
+					if (i !== -1) selectedCells.splice(i, 1);
+					else selectedCells.push([colName, keyidx]);
+				} else {
+					primarySelectedCell = [colName, keyidx];
+					selectedCells = []; // don't add to selectedCells
+					selectedCols = [];
+					selectedRows = [];
+				}
+				selectedCells = selectedCells.slice(); // trigger update
+
+				// Attach listeners for events
+				window.addEventListener('mousemove', selectCellMethods.mousemove);
+				window.addEventListener('mouseup', selectCellMethods.mouseup);
+			};
+		},
+
+		mousemove(e: MouseEvent) {
+			const elements = document.elementsFromPoint(e.x, e.y);
+			// loop through elements to find the first cell
+			for (let i = 0; i < elements.length; i++) {
+				if (elements[i].classList.contains('cell')) {
+					const colName = elements[i].getAttribute('colName');
+					const keyidx = elements[i].getAttribute('keyidx') || '';
+					console.log(colName, keyidx);
+					console.log($chunk.keyidxs)
+
+					selectedCells = [];
+
+					// loop through all cells between primarySelectedCell and this cell
+					const col1 = $schema.columns.findIndex((c) => c.name === primarySelectedCell[0]);
+					const keyidx1 = $chunk.keyidxs.indexOf(primarySelectedCell[1]);
+
+					const col2 = $schema.columns.findIndex((c) => c.name === colName);
+					const keyidx2 = $chunk.keyidxs.indexOf(keyidx);
+					console.log(col2, keyidx2)
+
+					const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
+					const [keyidxStart, keyidxEnd] =
+						keyidx1 < keyidx2 ? [keyidx1, keyidx2] : [keyidx2, keyidx1];
+					for (let i = colStart; i <= colEnd; i++) {
+						for (let j = keyidxStart; j <= keyidxEnd; j++) {
+							selectedCells.push([$schema.columns[i].name, $chunk.keyidxs[j]]);
+						}
+					}
+					break;
+				}
+			}
+		},
+
+		mouseup(e: MouseEvent) {
+			const s = selectedCells.length > 0 ? selectedCells : [primarySelectedCell];
+			if (onSelectCells && onSelectCells.endpointId) {
+				dispatch(onSelectCells.endpointId, { detail: { selected: s } });
+			}
+
+			window.removeEventListener('mousemove', selectCellMethods.mousemove);
+			window.removeEventListener('mouseup', selectCellMethods.mouseup);
 		}
 	};
 
@@ -149,8 +236,6 @@
 			selectedCells = []; // don't add to selectedCells
 			selectedCols = [];
 			selectedRows = [];
-
-			
 		}
 		selectedCells = selectedCells.slice(); // trigger update
 
@@ -404,8 +489,12 @@
 
 			<!-- Data columns -->
 			{#each $chunk.columnInfos as col}
+				<!-- on:click={(e) => {
+					onClickCell(e, col.name, keyidx);
+					document.getSelection().removeAllRanges();
+				}} -->
 				<div
-					class={'bg-white pl-1 ' +
+					class={'cell bg-white pl-1 ' +
 						getCellSelectClasses(
 							col.name,
 							keyidx,
@@ -414,11 +503,9 @@
 							selectedCols,
 							selectedRows
 						)}
-					on:click={(e) => {
-						onClickCell(e, col.name, keyidx);
-						document.getSelection().removeAllRanges();
-					}}
-					on:keydown={(e) => console.log('keydown', e)}
+					on:mousedown|preventDefault={selectCellMethods.mousedown(col.name, keyidx)}
+					colName={col.name}
+					keyidx={keyidx}
 				>
 					<Cell
 						{...$chunk.getCell(rowi, col.name)}
