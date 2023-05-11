@@ -293,13 +293,14 @@
 		selectedCols: Array<string>,
 		selectedRows: Array<string>
 	) {
+		if (selectedCols.includes(colName))
+			return 'bg-violet-700 text-white font-bold '
 		if (
 			primarySelectedCell[0] === colName ||
 			selectedCells.some((c) => c[0] === colName) ||
-			selectedCols.includes(colName) ||
 			selectedRows.length > 0
 		)
-			return 'bg-slate-200 text-violet-600 ';
+			return 'bg-violet-100 ';
 		return '';
 	}
 
@@ -310,13 +311,14 @@
 		selectedCols: Array<string>,
 		selectedRows: Array<string>
 	) {
+		if (selectedRows.includes(keyidx))
+			return 'bg-violet-700 text-white font-bold '
 		if (
 			primarySelectedCell[1] === keyidx ||
 			selectedCells.some((c) => c[1] === keyidx) ||
-			selectedCols.length > 0 ||
-			selectedRows.includes(keyidx)
+			selectedCols.length > 0
 		)
-			return 'bg-slate-200 text-violet-600 ';
+			return 'bg-violet-100 ';
 		return '';
 	}
 
