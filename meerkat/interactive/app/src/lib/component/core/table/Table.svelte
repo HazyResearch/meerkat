@@ -206,41 +206,6 @@
 		}
 	};
 
-	function onClickCell(e: MouseEvent, colName: string, keyidx: string) {
-		if (e.shiftKey) {
-			selectedCells = [];
-
-			// loop through all cells between primarySelectedCell and this cell
-			const col1 = $schema.columns.findIndex((c) => c.name === primarySelectedCell[0]);
-			const keyidx1 = $chunk.keyidxs.indexOf(primarySelectedCell[1]);
-
-			const col2 = $schema.columns.findIndex((c) => c.name === colName);
-			const keyidx2 = $chunk.keyidxs.indexOf(keyidx);
-
-			const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
-			const [keyidxStart, keyidxEnd] = keyidx1 < keyidx2 ? [keyidx1, keyidx2] : [keyidx2, keyidx1];
-			for (let i = colStart; i <= colEnd; i++) {
-				for (let j = keyidxStart; j <= keyidxEnd; j++) {
-					selectedCells.push([$schema.columns[i].name, $chunk.keyidxs[j]]);
-				}
-			}
-		} else if (e.metaKey) {
-			const i = selectedCells.findIndex((cell) => cell[0] === colName && cell[1] === keyidx);
-			if (i !== -1) selectedCells.splice(i, 1);
-			else selectedCells.push([colName, keyidx]);
-		} else {
-			primarySelectedCell = [colName, keyidx];
-			selectedCells = []; // don't add to selectedCells
-			selectedCols = [];
-			selectedRows = [];
-		}
-		selectedCells = selectedCells.slice(); // trigger update
-
-		if (onSelectCells && onSelectCells.endpointId) {
-			dispatch(onSelectCells.endpointId, { detail: { selected: selectedCells } });
-		}
-	}
-
 	function onClickCol(e: MouseEvent, colName: string) {
 		if (e.shiftKey) {
 			if (selectedCols.length === 0) {
