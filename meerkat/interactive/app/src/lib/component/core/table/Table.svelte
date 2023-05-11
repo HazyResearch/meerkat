@@ -172,8 +172,6 @@
 				if (elements[i].classList.contains('cell')) {
 					const colName = elements[i].getAttribute('colName');
 					const keyidx = elements[i].getAttribute('keyidx') || '';
-					console.log(colName, keyidx);
-					console.log($chunk.keyidxs)
 
 					selectedCells = [];
 
@@ -182,8 +180,7 @@
 					const keyidx1 = $chunk.keyidxs.indexOf(primarySelectedCell[1]);
 
 					const col2 = $schema.columns.findIndex((c) => c.name === colName);
-					const keyidx2 = $chunk.keyidxs.indexOf(keyidx);
-					console.log(col2, keyidx2)
+					const keyidx2 = $chunk.keyidxs.findIndex((k) => k.toString() === keyidx);
 
 					const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
 					const [keyidxStart, keyidxEnd] =
@@ -505,7 +502,7 @@
 						)}
 					on:mousedown|preventDefault={selectCellMethods.mousedown(col.name, keyidx)}
 					colName={col.name}
-					keyidx={keyidx}
+					{keyidx}
 				>
 					<Cell
 						{...$chunk.getCell(rowi, col.name)}
