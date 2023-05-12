@@ -394,18 +394,40 @@
 	}
 
 	/**
-	 * Helper function that returns the number of times a cell is selected.
+	 * Helper function that returns a number representing the ways a cell has
+	 * been selected or not.
+	 *
+	 * - one's place: selectedCells (0 or 1)
+	 * - ten's place: selectedCols (0 or 10)
+	 * - hundred's place: selectedRows (0 or 100)
+	 *
 	 * @param column
 	 * @param keyidx
 	 */
-	function countTimesSelected(column: string, keyidx: number) {
+	function getSelectedBitmap(column: string, keyidx: number) {
 		return (
 			(selectedCells.some((c) => c.column === column && c.keyidx === keyidx) ? 1 : 0) +
-			(selectedCols.includes(column) ? 1 : 0) +
-			(selectedRows.includes(keyidx) ? 1 : 0)
+			(selectedCols.includes(column) ? 10 : 0) +
+			(selectedRows.includes(keyidx) ? 100 : 0)
 		);
 	}
 
+	/**
+	 * Helper function that returns a string of classes for a cell based on
+	 * how it has been selected.
+	 *
+	 * NOTE: The params selectedCells, selectedCols, and selectedRows are
+	 * included so that this funciton is called reactively whenever any of those
+	 * (or primarySelectedCell) changes.
+	 *
+	 * @param column
+	 * @param keyidx
+	 * @param posidx
+	 * @param primarySelectedCell
+	 * @param selectedCells
+	 * @param selectedCols
+	 * @param selectedRows
+	 */
 	function getCellSelectClasses(
 		column: string,
 		keyidx: number,
@@ -416,10 +438,13 @@
 		selectedRows: Array<number>
 	) {
 		let classes = '';
-		const count = countTimesSelected(column, keyidx);
+		const bitmap = getSelectedBitmap(column, keyidx);
 
 		// Determine background color
-		if (count > 0) classes += `bg-violet-${count}00 `;
+		if (bitmap > 0) {
+			const count = bitmap.toString().split('1').length - 1;
+			classes += `bg-violet-${count}00 `;
+		}
 
 		// Determine borders
 		if (primarySelectedCell.column === column && primarySelectedCell.keyidx === keyidx) {
@@ -428,10 +453,9 @@
 			classes += 'border-t border-l '; // border width of 1px
 
 			if (posidx > 0) {
-				const countAbove = countTimesSelected(column, parseInt($chunk.keyidxs[posidx - 1]));
-				if ((count > 0 && countAbove === 0) || (count === 0 && countAbove > 0))
-					classes += 'border-t-violet-600 ';
-			} else if (count > 0 && posidx === 0) {
+				const bitmapAbove = getSelectedBitmap(column, parseInt($chunk.keyidxs[posidx - 1]));
+				if (bitmap !== bitmapAbove) classes += 'border-t-violet-600 ';
+			} else if (bitmap > 0 && posidx === 0) {
 				classes += 'border-t-violet-600 ';
 			} else {
 				classes += 'border-t-slate-300 ';
@@ -439,10 +463,9 @@
 
 			const colidx = col2idx(column);
 			if (colidx > 0) {
-				const countLeft = countTimesSelected($chunk.columns[colidx - 1], keyidx);
-				if ((count > 0 && countLeft === 0) || (count === 0 && countLeft > 0))
-					classes += 'border-l-violet-600 ';
-			} else if (count > 0 && colidx === 0) {
+				const bitmapLeft = getSelectedBitmap($chunk.columns[colidx - 1], keyidx);
+				if (bitmap !== bitmapLeft) classes += 'border-l-violet-600 ';
+			} else if (bitmap > 0 && colidx === 0) {
 				classes += 'border-l-violet-600 ';
 			} else {
 				classes += 'border-l-slate-300 ';
@@ -453,28 +476,6 @@
 		if (secondarySelectedCell.column === column && secondarySelectedCell.keyidx === keyidx) {
 			classes += 'text-red-600 ';
 		}
-
-		if (getCell(column, posidx).value === 'KNDJX3AE8G') {
-			console.log('count', count);
-			console.log('classes', classes);
-		}
-
-		// let col = col2idx(column),
-		// 	col1 = col2idx(primarySelectedCell.column),
-		// 	col2 = col2idx(secondarySelectedCell.column);
-		// [col1, col2] = col1 < col2 ? [col1, col2] : [col2, col1];
-		// let row = posidx,
-		// 	row1 = primarySelectedCell.posidx,
-		// 	row2 = secondarySelectedCell.posidx;
-		// [row1, row2] = row1 < row2 ? [row1, row2] : [row2, row1];
-
-		// if (col1 <= col && col <= col2) {
-		// 	if (row === row1 || row === row2 + 1) classes += 'border-t-violet-600 ';
-		// }
-
-		// if (row1 <= row && row <= row2) {
-		// 	if (col === col1 || col === col2 + 1) classes += 'border-l-violet-600 ';
-		// }
 
 		return classes;
 	}
@@ -687,10 +688,6 @@
 
 			<!-- Data columns -->
 			{#each $chunk.columnInfos as col}
-				<!-- on:click={(e) => {
-					onClickCell(e, col.name, keyidx);
-					document.getSelection().removeAllRanges();
-				}} -->
 				<div
 					class={'cell pl-1 overflow-hidden ' +
 						getCellSelectClasses(
