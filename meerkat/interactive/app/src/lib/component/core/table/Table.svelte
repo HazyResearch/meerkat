@@ -665,7 +665,7 @@
 					document.getSelection().removeAllRanges();
 				}} -->
 				<div
-					class={'cell pl-1 ' +
+					class={'cell pl-1 overflow-hidden ' +
 						getCellSelectClasses(
 							col.name,
 							keyidx,
