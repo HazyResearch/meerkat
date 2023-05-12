@@ -180,18 +180,20 @@
 	 * secondarySelectedCell, adding them to the selectedCells array.
 	 */
 	function shiftSelect() {
-		// console.log('primarySelectedCell', primarySelectedCell);
-		// console.log('secondarySelectedCell', secondarySelectedCell);
 		selectedCells = [];
 
 		const col1 = col2idx(primarySelectedCell.column);
-		const keyidx1 = keyidx2idx(primarySelectedCell.keyidx);
+		const row1 = primarySelectedCell.posidx;
 
 		const col2 = col2idx(secondarySelectedCell.column);
-		const keyidx2 = keyidx2idx(secondarySelectedCell.keyidx);
+		const row2 = secondarySelectedCell.posidx;
+
+		// If the user clicks on the same cell, none should be selected
+		if (col1 !== -1 && col1 === col2 && row1 !== -1 && row1 === row2)
+			return;
 
 		const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
-		const [keyidxStart, keyidxEnd] = keyidx1 < keyidx2 ? [keyidx1, keyidx2] : [keyidx2, keyidx1];
+		const [keyidxStart, keyidxEnd] = row1 < row2 ? [row1, row2] : [row2, row1];
 
 		for (let i = colStart; i <= colEnd; i++) {
 			for (let j = keyidxStart; j <= keyidxEnd; j++) {
@@ -216,14 +218,27 @@
 					if (selectedCells.length === 0 && primarySelectedCell.posidx !== -1) {
 						selectedCells = [primarySelectedCell];
 					}
-					primarySelectedCell = secondarySelectedCell = cell;
 
 					const i = selectedCells.findIndex(
 						(c) => c.column === cell.column && c.keyidx === cell.keyidx
 					);
-					if (i !== -1) selectedCells.splice(i, 1);
-					// TODO: set new primarySelectedCell
-					else selectedCells.push(cell);
+					if (i !== -1) {
+						if (selectedCells.length === 1) {
+							primarySelectedCell = secondarySelectedCell = selectedCells[0];
+							selectedCells.splice(i, 1);
+						}
+						else if (
+							selectedCells.length > 1 &&
+							selectedCells[i].column === primarySelectedCell.column &&
+							selectedCells[i].keyidx === primarySelectedCell.keyidx
+						) {
+							selectedCells.splice(i, 1);
+							primarySelectedCell = secondarySelectedCell = selectedCells[selectedCells.length - 1];
+						}
+					} else {
+						primarySelectedCell = secondarySelectedCell = cell;
+						selectedCells.push(cell);
+					}
 				} else {
 					primarySelectedCell = secondarySelectedCell = cell;
 					selectedCells = []; // don't add to selectedCells
@@ -239,18 +254,14 @@
 		},
 
 		mousemove(e: MouseEvent) {
-			// loop through elements to find the first cell
+			// Loop through elements beneath the mouse x and y to find the first
+			// element with class 'cell'
 			for (const element of document.elementsFromPoint(e.x, e.y)) {
 				if (!element.classList.contains('cell')) {
 					continue;
 				}
 				const column = element.getAttribute('column') || '';
 				const keyidx = parseInt(element.getAttribute('keyidx') || '-1');
-
-				if (column === primarySelectedCell.column && keyidx === primarySelectedCell.keyidx) {
-					// same cell as primarySelectedCell
-					return;
-				}
 
 				const posidx = keyidx2idx(keyidx);
 				secondarySelectedCell = getCell(column, posidx);
@@ -310,14 +321,15 @@
 	}
 
 	function onClickRow(e: MouseEvent, keyidx: number) {
+		const posidx = keyidx2idx(keyidx);
 		if (e.shiftKey) {
 			if (selectedRows.length === 0) {
 				selectedRows.push(keyidx);
 			} else {
 				selectedRows = [];
 				// loop through all rows between primarySelectedCol and this row
-				const row1 = keyidx2idx(primarySelectedCell.keyidx);
-				const row2 = keyidx2idx(keyidx);
+				const row1 = primarySelectedCell.posidx;
+				const row2 = posidx;
 				const [rowStart, rowEnd] = row1 < row2 ? [row1, row2] : [row2, row1];
 				for (let i = rowStart; i <= rowEnd; i++) {
 					selectedRows.push(parseInt($chunk.keyidxs[i]));
@@ -332,13 +344,11 @@
 				// TODO: set new primarySelectedCell
 			} else {
 				const column = $schema.columns[0].name;
-				const posidx = keyidx2idx(keyidx);
 				primarySelectedCell = secondarySelectedCell = getCell(column, posidx);
 				selectedRows.push(keyidx);
 			}
 		} else {
 			const column = $schema.columns[0].name;
-			const posidx = keyidx2idx(keyidx);
 			primarySelectedCell = secondarySelectedCell = getCell(column, posidx);
 			selectedCells = [];
 			selectedCols = [];
@@ -394,8 +404,7 @@
 		selectedCols: Array<string>,
 		selectedRows: Array<number>
 	) {
-		let classes = 'border-t border-l border-slate-300 ';
-		// let classes = '';
+		let classes = '';
 
 		if (
 			selectedCells.some((c) => c.column === column && c.keyidx === keyidx) ||
@@ -409,44 +418,28 @@
 			classes += 'text-red-600 ';
 		}
 
-		// if the column is between the primary and secondary selected cells
-		if (
-			(col2idx(primarySelectedCell.column) <= col2idx(column) &&
-				col2idx(column) <= col2idx(secondarySelectedCell.column)) ||
-			(col2idx(secondarySelectedCell.column) <= col2idx(column) &&
-				col2idx(column) <= col2idx(primarySelectedCell.column))
-		) {
-			if (primarySelectedCell.posidx <= secondarySelectedCell.posidx) {
-				if (posidx === primarySelectedCell.posidx) classes += 'border-t-violet-600 ';
-				if (posidx === secondarySelectedCell.posidx) classes += 'border-b border-b-violet-600 ';
-			}
-			if (primarySelectedCell.posidx >= secondarySelectedCell.posidx) {
-				if (posidx === primarySelectedCell.posidx) classes += 'border-b border-b-violet-600 ';
-				if (posidx === secondarySelectedCell.posidx) classes += 'border-t-violet-600 ';
-			}
-		}
-
-		// if the posidx is between the primary and secondary selected cells
-		if (
-			(primarySelectedCell.posidx <= posidx && posidx <= secondarySelectedCell.posidx) ||
-			(secondarySelectedCell.posidx <= posidx && posidx <= primarySelectedCell.posidx)
-		) {
-			if (col2idx(primarySelectedCell.column) <= col2idx(secondarySelectedCell.column)) {
-				if (col2idx(column) === col2idx(primarySelectedCell.column))
-					classes += 'border-l-violet-600 ';
-				if (col2idx(column) === col2idx(secondarySelectedCell.column))
-					classes += 'border-r border-r-violet-600 ';
-			}
-			if (col2idx(primarySelectedCell.column) >= col2idx(secondarySelectedCell.column)) {
-				if (col2idx(column) === col2idx(primarySelectedCell.column))
-					classes += 'border-r border-r-violet-600 ';
-				if (col2idx(column) === col2idx(secondarySelectedCell.column))
-					classes += 'border-l-violet-600 ';
-			}
-		}
-
 		if (primarySelectedCell.column === column && primarySelectedCell.keyidx === keyidx) {
 			classes += 'border-2 border-violet-600 ';
+			return classes;
+		}
+
+		classes += 'border-t border-l border-slate-300 ';
+
+		let col = col2idx(column),
+			col1 = col2idx(primarySelectedCell.column),
+			col2 = col2idx(secondarySelectedCell.column);
+		[col1, col2] = col1 < col2 ? [col1, col2] : [col2, col1];
+		let row = posidx,
+			row1 = primarySelectedCell.posidx,
+			row2 = secondarySelectedCell.posidx;
+		[row1, row2] = row1 < row2 ? [row1, row2] : [row2, row1];
+
+		if (col1 <= col && col <= col2) {
+			if (row === row1 || row === row2 + 1) classes += 'border-t-violet-600 ';
+		}
+
+		if (row1 <= row && row <= row2) {
+			if (col === col1 || col === col2 + 1) classes += 'border-l-violet-600 ';
 		}
 
 		return classes;
@@ -458,7 +451,7 @@
 
 		if (e.key === 'ArrowDown') {
 			if (e.shiftKey) {
-				const posidx2 = keyidx2idx(secondarySelectedCell.keyidx);
+				const posidx2 = secondarySelectedCell.posidx;
 				if (posidx2 + 1 < $chunk.keyidxs.length) {
 					secondarySelectedCell = getCell(secondarySelectedCell.column, posidx2 + 1);
 					shiftSelect();
@@ -483,7 +476,7 @@
 			selectedRows = [];
 		} else if (e.key === 'ArrowUp') {
 			if (e.shiftKey) {
-				const posidx2 = keyidx2idx(secondarySelectedCell.keyidx);
+				const posidx2 = secondarySelectedCell.posidx;
 				if (posidx2 > 0) {
 					secondarySelectedCell = getCell(secondarySelectedCell.column, posidx2 - 1);
 					shiftSelect();
