@@ -222,16 +222,21 @@
 						(c) => c.column === cell.column && c.keyidx === cell.keyidx
 					);
 					if (i !== -1) {
-						if (selectedCells.length === 1) {
-							primarySelectedCell = secondarySelectedCell = selectedCells[0];
+						if (selectedCells.length === 2) {
 							selectedCells.splice(i, 1);
+							primarySelectedCell = secondarySelectedCell = selectedCells[0];
+							selectedCells = [];
 						} else if (
-							selectedCells.length > 1 &&
-							selectedCells[i].column === primarySelectedCell.column &&
-							selectedCells[i].keyidx === primarySelectedCell.keyidx
+							(selectedCells.length > 1 &&
+								selectedCells[i].column === primarySelectedCell.column &&
+								selectedCells[i].keyidx === primarySelectedCell.keyidx) ||
+							(selectedCells[i].column === secondarySelectedCell.column &&
+								selectedCells[i].keyidx === secondarySelectedCell.keyidx)
 						) {
 							selectedCells.splice(i, 1);
 							primarySelectedCell = secondarySelectedCell = selectedCells[selectedCells.length - 1];
+						} else {
+							selectedCells.splice(i, 1);
 						}
 					} else {
 						primarySelectedCell = secondarySelectedCell = cell;
@@ -261,6 +266,14 @@
 				const column = element.getAttribute('column') || '';
 				const keyidx = parseInt(element.getAttribute('keyidx') || '-1');
 
+				if (
+					selectedCells.length > 0 &&
+					column === primarySelectedCell.column &&
+					keyidx === primarySelectedCell.keyidx
+				) {
+					return;
+				}
+
 				const posidx = keyidx2idx(keyidx);
 				secondarySelectedCell = getCell(column, posidx);
 				shiftSelect();
@@ -282,17 +295,13 @@
 
 	function onClickCol(e: MouseEvent, column: string) {
 		if (e.shiftKey) {
-			if (selectedCols.length === 0) {
-				selectedCols.push(column);
-			} else {
-				selectedCols = [];
-				// loop through all cols between primarySelectedCol and this col
-				const col1 = col2idx(primarySelectedCell.column);
-				const col2 = col2idx(column);
-				const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
-				for (let i = colStart; i <= colEnd; i++) {
-					selectedCols.push($schema.columns[i].name);
-				}
+			selectedCols = [];
+			// loop through all cols between primarySelectedCol and this col
+			const col1 = col2idx(primarySelectedCell.column);
+			const col2 = col2idx(column);
+			const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
+			for (let i = colStart; i <= colEnd; i++) {
+				selectedCols.push($schema.columns[i].name);
 			}
 		} else if (e.metaKey) {
 			const i = selectedCols.indexOf(column);
@@ -300,7 +309,18 @@
 				// remove cells from selectedCells in this col
 				selectedCells = selectedCells.filter((c) => c.column !== column);
 				selectedCols.splice(i, 1);
-				// TODO: set new primarySelectedCell
+
+				// set new primarySelectedCell
+				if (selectedCells.length > 0)
+					primarySelectedCell = secondarySelectedCell = selectedCells[0];
+				else if (selectedCols.length > 0)
+					primarySelectedCell = secondarySelectedCell = getCell(selectedCols[0], 0);
+				else if (selectedRows.length > 0)
+					primarySelectedCell = secondarySelectedCell = getCell(
+						$schema.columns[0].name,
+						selectedRows[0]
+					);
+				else primarySelectedCell = secondarySelectedCell = getCell($schema.columns[0].name, 0);
 			} else {
 				primarySelectedCell = secondarySelectedCell = getCell(column, 0);
 				selectedCols.push(column);
@@ -321,17 +341,13 @@
 	function onClickRow(e: MouseEvent, keyidx: number) {
 		const posidx = keyidx2idx(keyidx);
 		if (e.shiftKey) {
-			if (selectedRows.length === 0) {
-				selectedRows.push(keyidx);
-			} else {
-				selectedRows = [];
-				// loop through all rows between primarySelectedCol and this row
-				const row1 = primarySelectedCell.posidx;
-				const row2 = posidx;
-				const [rowStart, rowEnd] = row1 < row2 ? [row1, row2] : [row2, row1];
-				for (let i = rowStart; i <= rowEnd; i++) {
-					selectedRows.push(parseInt($chunk.keyidxs[i]));
-				}
+			selectedRows = [];
+			// loop through all rows between primarySelectedCol and this row
+			const row1 = primarySelectedCell.posidx;
+			const row2 = posidx;
+			const [rowStart, rowEnd] = row1 < row2 ? [row1, row2] : [row2, row1];
+			for (let i = rowStart; i <= rowEnd; i++) {
+				selectedRows.push(parseInt($chunk.keyidxs[i]));
 			}
 		} else if (e.metaKey) {
 			const i = selectedRows.indexOf(keyidx);
@@ -339,7 +355,18 @@
 				// remove cells from selectedCells in this row
 				selectedCells = selectedCells.filter((c) => c.keyidx !== keyidx);
 				selectedRows.splice(i, 1);
-				// TODO: set new primarySelectedCell
+
+				// set new primarySelectedCell
+				if (selectedCells.length > 0)
+					primarySelectedCell = secondarySelectedCell = selectedCells[0];
+				else if (selectedCols.length > 0)
+					primarySelectedCell = secondarySelectedCell = getCell(selectedCols[0], 0);
+				else if (selectedRows.length > 0)
+					primarySelectedCell = secondarySelectedCell = getCell(
+						$schema.columns[0].name,
+						selectedRows[0]
+					);
+				else primarySelectedCell = secondarySelectedCell = getCell($schema.columns[0].name, 0);
 			} else {
 				const column = $schema.columns[0].name;
 				primarySelectedCell = secondarySelectedCell = getCell(column, posidx);
@@ -485,6 +512,7 @@
 		const posidx = primarySelectedCell.posidx;
 
 		if (e.key === 'ArrowDown') {
+			e.preventDefault();
 			if (e.shiftKey) {
 				const posidx2 = secondarySelectedCell.posidx;
 				if (posidx2 + 1 < $chunk.keyidxs.length) {
@@ -510,6 +538,7 @@
 			selectedCols = [];
 			selectedRows = [];
 		} else if (e.key === 'ArrowUp') {
+			e.preventDefault();
 			if (e.shiftKey) {
 				const posidx2 = secondarySelectedCell.posidx;
 				if (posidx2 > 0) {
@@ -538,6 +567,7 @@
 			selectedCols = [];
 			selectedRows = [];
 		} else if (e.key === 'ArrowLeft') {
+			e.preventDefault();
 			if (e.shiftKey) {
 				const colidx2 = col2idx(secondarySelectedCell.column);
 				const posidx2 = secondarySelectedCell.posidx;
@@ -557,6 +587,7 @@
 			selectedCols = [];
 			selectedRows = [];
 		} else if (e.key === 'ArrowRight') {
+			e.preventDefault();
 			if (e.shiftKey) {
 				const colidx2 = col2idx(secondarySelectedCell.column);
 				const posidx2 = secondarySelectedCell.posidx;
