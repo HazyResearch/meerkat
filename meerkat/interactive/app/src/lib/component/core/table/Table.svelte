@@ -3,13 +3,19 @@
 	import Pagination from '$lib/shared/pagination/Pagination.svelte';
 	import { fetchChunk, fetchSchema, dispatch } from '$lib/utils/api';
 	import { DataFrameChunk, type DataFrameRef, type DataFrameSchema } from '$lib/utils/dataframe';
-	import { without } from 'underscore';
 	import { openModal } from 'svelte-modals';
 	import type { Endpoint } from '$lib/utils/types';
 	import { zip } from 'underscore';
 	import { writable, type Writable } from 'svelte/store';
 	import Cell from '$lib/shared/cell/Cell.svelte';
 	import { Check, CheckAll, KeyFill } from 'svelte-bootstrap-icons';
+
+	type Cell = {
+		column: string;
+		keyidx: number; // TODO: decide if this should be number or string
+		posidx: number;
+		value: any;
+	};
 
 	export let df: DataFrameRef;
 
@@ -18,10 +24,11 @@
 
 	export let onEdit: Endpoint;
 
-	export let primarySelectedCell: Array<string> = [];
-	export let selectedCells: Array<Array<string>> = [];
+	export let primarySelectedCell: Cell = { column: '', keyidx: -1, posidx: -1, value: '' };
+	export let secondarySelectedCell: Cell = { column: '', keyidx: -1, posidx: -1, value: '' };
+	export let selectedCells: Array<Cell> = [];
 	export let selectedCols: Array<string> = [];
-	export let selectedRows: Array<string> = [];
+	export let selectedRows: Array<number> = [];
 	export let onSelectCells: Endpoint;
 	export let onSelectCols: Endpoint;
 	export let onSelectRows: Endpoint;
@@ -58,6 +65,12 @@
 		if (columnWidths.length === 0) {
 			columnWidths = Array(newSchema.columns.length).fill(100);
 		}
+		if (primarySelectedCell.posidx === -1) {
+			primarySelectedCell = secondarySelectedCell = {
+				...primarySelectedCell,
+				column: newSchema.columns[0].name
+			};
+		}
 	});
 
 	$: fetchChunk({
@@ -70,6 +83,14 @@
 		chunk.set(newChunk);
 		if (rowHeights.length === 0) {
 			rowHeights = Array(newChunk.keyidxs.length).fill(22); // same as text-sm + 2
+		}
+		if (primarySelectedCell.posidx === -1) {
+			primarySelectedCell = secondarySelectedCell = {
+				...primarySelectedCell,
+				keyidx: parseInt(newChunk.keyidxs[0]),
+				posidx: 0,
+				value: newChunk.getCell(0, $schema.columns[0].name).data
+			};
 		}
 	});
 
@@ -121,38 +142,90 @@
 		}
 	};
 
+	/**
+	 * Helper function to convert a column name to the index of that column in
+	 * the schema.
+	 * @param col - The name of the column
+	 */
+	function col2idx(col: string) {
+		return $schema.columns.findIndex((c) => c.name === col);
+	}
+
+	/**
+	 * Helper function to convert a keyidx to the index of that keyidx in the
+	 * chunk. This also corresponds to the posidx.
+	 * @param keyidx - The keyidx of the row
+	 */
+	function keyidx2idx(keyidx: number) {
+		// TODO: figure out why we need to do k.toString(). It is a number when it should be a string
+		return $chunk.keyidxs.findIndex((k) => k.toString() === keyidx.toString());
+	}
+
+	/**
+	 * Helper function to get the cell at a given column and posidx.
+	 * @param col
+	 * @param posidx
+	 */
+	function getCell(column: string, posidx: number) {
+		return {
+			column,
+			keyidx: parseInt($chunk.keyidxs[posidx]),
+			posidx,
+			value: $chunk.getCell(posidx, column).data
+		};
+	}
+
+	/**
+	 * Loops through all cells between primarySelectedCell and
+	 * secondarySelectedCell, adding them to the selectedCells array.
+	 */
+	function shiftSelect() {
+		// console.log('primarySelectedCell', primarySelectedCell);
+		// console.log('secondarySelectedCell', secondarySelectedCell);
+		selectedCells = [];
+
+		const col1 = col2idx(primarySelectedCell.column);
+		const keyidx1 = keyidx2idx(primarySelectedCell.keyidx);
+
+		const col2 = col2idx(secondarySelectedCell.column);
+		const keyidx2 = keyidx2idx(secondarySelectedCell.keyidx);
+
+		const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
+		const [keyidxStart, keyidxEnd] = keyidx1 < keyidx2 ? [keyidx1, keyidx2] : [keyidx2, keyidx1];
+
+		for (let i = colStart; i <= colEnd; i++) {
+			for (let j = keyidxStart; j <= keyidxEnd; j++) {
+				const column = $schema.columns[i].name;
+				const keyidx = parseInt($chunk.keyidxs[j]);
+				const posidx = j;
+				const value = $chunk.getCell(posidx, column).data;
+				selectedCells.push({ column, keyidx, posidx, value });
+			}
+		}
+
+		selectedCells = selectedCells.slice(); // trigger update
+	}
+
 	const selectCellMethods = {
-		mousedown(colName: string, keyidx: string) {
+		mousedown(cell: Cell) {
 			return (e: MouseEvent) => {
 				if (e.shiftKey) {
-					selectedCells = [];
-
-					// loop through all cells between primarySelectedCell and this cell
-					const col1 = $schema.columns.findIndex((c) => c.name === primarySelectedCell[0]);
-					const keyidx1 = $chunk.keyidxs.indexOf(primarySelectedCell[1]);
-
-					const col2 = $schema.columns.findIndex((c) => c.name === colName);
-					const keyidx2 = $chunk.keyidxs.indexOf(keyidx);
-
-					const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
-					const [keyidxStart, keyidxEnd] =
-						keyidx1 < keyidx2 ? [keyidx1, keyidx2] : [keyidx2, keyidx1];
-					for (let i = colStart; i <= colEnd; i++) {
-						for (let j = keyidxStart; j <= keyidxEnd; j++) {
-							selectedCells.push([$schema.columns[i].name, $chunk.keyidxs[j]]);
-						}
-					}
+					secondarySelectedCell = cell;
+					shiftSelect();
 				} else if (e.metaKey) {
-					if (selectedCells.length === 0 && primarySelectedCell.length !== 0) {
+					if (selectedCells.length === 0 && primarySelectedCell.posidx !== -1) {
 						selectedCells = [primarySelectedCell];
 					}
-					primarySelectedCell = [colName, keyidx];
+					primarySelectedCell = secondarySelectedCell = cell;
 
-					const i = selectedCells.findIndex((cell) => cell[0] === colName && cell[1] === keyidx);
+					const i = selectedCells.findIndex(
+						(c) => c.column === cell.column && c.keyidx === cell.keyidx
+					);
 					if (i !== -1) selectedCells.splice(i, 1);
-					else selectedCells.push([colName, keyidx]);
+					// TODO: set new primarySelectedCell
+					else selectedCells.push(cell);
 				} else {
-					primarySelectedCell = [colName, keyidx];
+					primarySelectedCell = secondarySelectedCell = cell;
 					selectedCells = []; // don't add to selectedCells
 					selectedCols = [];
 					selectedRows = [];
@@ -166,32 +239,24 @@
 		},
 
 		mousemove(e: MouseEvent) {
-			const elements = document.elementsFromPoint(e.x, e.y);
 			// loop through elements to find the first cell
-			for (let i = 0; i < elements.length; i++) {
-				if (elements[i].classList.contains('cell')) {
-					const colName = elements[i].getAttribute('colName');
-					const keyidx = elements[i].getAttribute('keyidx') || '';
-
-					selectedCells = [];
-
-					// loop through all cells between primarySelectedCell and this cell
-					const col1 = $schema.columns.findIndex((c) => c.name === primarySelectedCell[0]);
-					const keyidx1 = $chunk.keyidxs.indexOf(primarySelectedCell[1]);
-
-					const col2 = $schema.columns.findIndex((c) => c.name === colName);
-					const keyidx2 = $chunk.keyidxs.findIndex((k) => k.toString() === keyidx);
-
-					const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
-					const [keyidxStart, keyidxEnd] =
-						keyidx1 < keyidx2 ? [keyidx1, keyidx2] : [keyidx2, keyidx1];
-					for (let i = colStart; i <= colEnd; i++) {
-						for (let j = keyidxStart; j <= keyidxEnd; j++) {
-							selectedCells.push([$schema.columns[i].name, $chunk.keyidxs[j]]);
-						}
-					}
-					break;
+			for (const element of document.elementsFromPoint(e.x, e.y)) {
+				if (!element.classList.contains('cell')) {
+					continue;
 				}
+				const column = element.getAttribute('column') || '';
+				const keyidx = parseInt(element.getAttribute('keyidx') || '-1');
+
+				if (column === primarySelectedCell.column && keyidx === primarySelectedCell.keyidx) {
+					// same cell as primarySelectedCell
+					return;
+				}
+
+				const posidx = keyidx2idx(keyidx);
+				secondarySelectedCell = getCell(column, posidx);
+				shiftSelect();
+
+				break;
 			}
 		},
 
@@ -206,80 +271,80 @@
 		}
 	};
 
-	function onClickCol(e: MouseEvent, colName: string) {
+	function onClickCol(e: MouseEvent, column: string) {
 		if (e.shiftKey) {
 			if (selectedCols.length === 0) {
-				selectedCols.push(colName);
+				selectedCols.push(column);
 			} else {
 				selectedCols = [];
 				// loop through all cols between primarySelectedCol and this col
-				const col1 = $schema.columns.findIndex((c) => c.name === primarySelectedCell[0]);
-				const col2 = $schema.columns.findIndex((c) => c.name === colName);
+				const col1 = col2idx(primarySelectedCell.column);
+				const col2 = col2idx(column);
 				const [colStart, colEnd] = col1 < col2 ? [col1, col2] : [col2, col1];
 				for (let i = colStart; i <= colEnd; i++) {
 					selectedCols.push($schema.columns[i].name);
 				}
 			}
 		} else if (e.metaKey) {
-			const i = selectedCols.indexOf(colName);
+			const i = selectedCols.indexOf(column);
 			if (i !== -1) {
 				// remove cells from selectedCells in this col
-				selectedCells = selectedCells.filter((cell) => cell[0] !== colName);
+				selectedCells = selectedCells.filter((c) => c.column !== column);
 				selectedCols.splice(i, 1);
+				// TODO: set new primarySelectedCell
 			} else {
-				primarySelectedCell = [colName, $chunk.keyidxs[0]];
-				selectedCols.push(colName);
+				primarySelectedCell = secondarySelectedCell = getCell(column, 0);
+				selectedCols.push(column);
 			}
 		} else {
-			primarySelectedCell = [colName, $chunk.keyidxs[0]];
+			primarySelectedCell = secondarySelectedCell = getCell(column, 0);
 			selectedCells = [];
-			selectedCols = [colName];
+			selectedCols = [column];
 			selectedRows = [];
 		}
-		selectedCols = selectedCols.sort(
-			(a, b) =>
-				$schema.columns.findIndex((c) => c.name === a) -
-				$schema.columns.findIndex((c) => c.name === b)
-		);
+		selectedCols = selectedCols.sort((a, b) => col2idx(a) - col2idx(b));
 
 		if (onSelectCols && onSelectCols.endpointId) {
 			dispatch(onSelectCols.endpointId, { detail: { selected: selectedCols } });
 		}
 	}
 
-	function onClickRow(e: MouseEvent, keyidx: string) {
+	function onClickRow(e: MouseEvent, keyidx: number) {
 		if (e.shiftKey) {
 			if (selectedRows.length === 0) {
 				selectedRows.push(keyidx);
 			} else {
 				selectedRows = [];
 				// loop through all rows between primarySelectedCol and this row
-				const row1 = $chunk.keyidxs.indexOf(primarySelectedCell[1]);
-				const row2 = $chunk.keyidxs.indexOf(keyidx);
+				const row1 = keyidx2idx(primarySelectedCell.keyidx);
+				const row2 = keyidx2idx(keyidx);
 				const [rowStart, rowEnd] = row1 < row2 ? [row1, row2] : [row2, row1];
 				for (let i = rowStart; i <= rowEnd; i++) {
-					selectedRows.push($chunk.keyidxs[i]);
+					selectedRows.push(parseInt($chunk.keyidxs[i]));
 				}
 			}
 		} else if (e.metaKey) {
 			const i = selectedRows.indexOf(keyidx);
 			if (i !== -1) {
 				// remove cells from selectedCells in this row
-				selectedCells = selectedCells.filter((cell) => cell[1] !== keyidx);
+				selectedCells = selectedCells.filter((c) => c.keyidx !== keyidx);
 				selectedRows.splice(i, 1);
+				// TODO: set new primarySelectedCell
 			} else {
-				primarySelectedCell = [$schema.columns[0].name, keyidx];
+				const column = $schema.columns[0].name;
+				const posidx = keyidx2idx(keyidx);
+				primarySelectedCell = secondarySelectedCell = getCell(column, posidx);
 				selectedRows.push(keyidx);
 			}
 		} else {
-			primarySelectedCell = [$schema.columns[0].name, keyidx];
+			const column = $schema.columns[0].name;
+			const posidx = keyidx2idx(keyidx);
+			primarySelectedCell = secondarySelectedCell = getCell(column, posidx);
 			selectedCells = [];
 			selectedCols = [];
 			selectedRows = [keyidx];
 		}
-		selectedRows = selectedRows.sort(
-			(a, b) => $chunk.keyidxs.indexOf(a) - $chunk.keyidxs.indexOf(b)
-		);
+		selectedRows = selectedRows.sort((a, b) => keyidx2idx(a) - keyidx2idx(b));
 
 		if (onSelectRows && onSelectRows.endpointId) {
 			dispatch(onSelectRows.endpointId, { detail: { selected: selectedCols } });
@@ -287,66 +352,172 @@
 	}
 
 	function getColumnSelectClasses(
-		colName: string,
-		primarySelectedCell: Array<string>,
-		selectedCells: Array<Array<string>>,
+		column: string,
+		primarySelectedCell: Cell,
+		selectedCells: Array<Cell>,
 		selectedCols: Array<string>,
-		selectedRows: Array<string>
+		selectedRows: Array<number>
 	) {
-		if (selectedCols.includes(colName))
-			return 'bg-violet-700 text-white font-bold '
+		if (selectedCols.includes(column)) return 'bg-violet-700 text-white font-bold ';
 		if (
-			primarySelectedCell[0] === colName ||
-			selectedCells.some((c) => c[0] === colName) ||
+			primarySelectedCell.column === column ||
+			selectedCells.some((c) => c.column === column) ||
 			selectedRows.length > 0
 		)
-			return 'bg-violet-100 ';
+			return 'bg-violet-200 ';
 		return '';
 	}
 
 	function getRowSelectClasses(
-		keyidx: string,
-		primarySelectedCell: Array<string>,
-		selectedCells: Array<Array<string>>,
+		keyidx: number,
+		primarySelectedCell: Cell,
+		selectedCells: Array<Cell>,
 		selectedCols: Array<string>,
-		selectedRows: Array<string>
+		selectedRows: Array<number>
 	) {
-		if (selectedRows.includes(keyidx))
-			return 'bg-violet-700 text-white font-bold '
+		if (selectedRows.includes(keyidx)) return 'bg-violet-700 text-white font-bold ';
 		if (
-			primarySelectedCell[1] === keyidx ||
-			selectedCells.some((c) => c[1] === keyidx) ||
+			primarySelectedCell.keyidx === keyidx ||
+			selectedCells.some((c) => c.keyidx === keyidx) ||
 			selectedCols.length > 0
 		)
-			return 'bg-violet-100 ';
+			return 'bg-violet-200 ';
 		return '';
 	}
 
 	function getCellSelectClasses(
-		colName: string,
-		keyidx: string,
-		primarySelectedCell: Array<string>,
-		selectedCells: Array<Array<string>>,
+		column: string,
+		keyidx: number,
+		primarySelectedCell: Cell,
+		selectedCells: Array<Cell>,
 		selectedCols: Array<string>,
-		selectedRows: Array<string>
+		selectedRows: Array<number>
 	) {
 		let classes = '';
+
 		if (
-			selectedCells.some((c) => c[0] === colName && c[1] === keyidx) ||
-			selectedCols.includes(colName) ||
+			selectedCells.some((c) => c.column === column && c.keyidx === keyidx) ||
+			selectedCols.includes(column) ||
 			selectedRows.includes(keyidx)
-		)
+		) {
 			classes += 'bg-violet-100 ';
-		if (primarySelectedCell[0] === colName && primarySelectedCell[1] === keyidx)
+		}
+
+		if (primarySelectedCell.column === column && primarySelectedCell.keyidx === keyidx) {
 			classes += 'border-2 border-violet-600 ';
-		else classes += 'border-t border-l border-slate-300 ';
+		} else {
+			classes += 'border-t border-l border-slate-300 ';
+		}
+
+		if (secondarySelectedCell.column === column && secondarySelectedCell.keyidx === keyidx) {
+			classes += 'text-red-600 ';
+		}
+
 		return classes;
 	}
+
+	window.addEventListener('keydown', (e) => {
+		const colidx = col2idx(primarySelectedCell.column);
+		const posidx = primarySelectedCell.posidx;
+
+		if (e.key === 'ArrowDown') {
+			if (e.shiftKey) {
+				const posidx2 = keyidx2idx(secondarySelectedCell.keyidx);
+				if (posidx2 + 1 < $chunk.keyidxs.length) {
+					secondarySelectedCell = getCell(secondarySelectedCell.column, posidx2 + 1);
+					shiftSelect();
+				} else if (page * perPage + posidx2 < $schema.nrows - 1) {
+					// TODO: flesh out this case
+					page++;
+					secondarySelectedCell = getCell(secondarySelectedCell.column, 0);
+				}
+			} else {
+				if (posidx < $chunk.keyidxs.length - 1) {
+					primarySelectedCell = secondarySelectedCell = getCell(
+						primarySelectedCell.column,
+						posidx + 1
+					);
+				} else if (page * perPage + posidx < $schema.nrows - 1) {
+					page++;
+					primarySelectedCell = secondarySelectedCell = getCell(primarySelectedCell.column, 0);
+				}
+				selectedCells = [];
+			}
+			selectedCols = [];
+			selectedRows = [];
+		} else if (e.key === 'ArrowUp') {
+			if (e.shiftKey) {
+				const posidx2 = keyidx2idx(secondarySelectedCell.keyidx);
+				if (posidx2 > 0) {
+					secondarySelectedCell = getCell(secondarySelectedCell.column, posidx2 - 1);
+					shiftSelect();
+				} else if (page > 0) {
+					// TODO: flesh out this case
+					page--;
+					secondarySelectedCell = getCell(secondarySelectedCell.column, $chunk.keyidxs.length - 1);
+				}
+			} else {
+				if (posidx > 0) {
+					primarySelectedCell = secondarySelectedCell = getCell(
+						primarySelectedCell.column,
+						posidx - 1
+					);
+				} else if (page > 0) {
+					page--;
+					primarySelectedCell = secondarySelectedCell = getCell(
+						primarySelectedCell.column,
+						$chunk.keyidxs.length - 1
+					);
+				}
+				selectedCells = [];
+			}
+			selectedCols = [];
+			selectedRows = [];
+		} else if (e.key === 'ArrowLeft') {
+			if (e.shiftKey) {
+				const colidx2 = col2idx(secondarySelectedCell.column);
+				const posidx2 = secondarySelectedCell.posidx;
+				if (colidx2 > 0) {
+					secondarySelectedCell = getCell($schema.columns[colidx2 - 1].name, posidx2);
+					shiftSelect();
+				}
+			} else {
+				if (colidx > 0) {
+					primarySelectedCell = secondarySelectedCell = getCell(
+						$schema.columns[colidx - 1].name,
+						posidx
+					);
+				}
+				selectedCells = [];
+			}
+			selectedCols = [];
+			selectedRows = [];
+		} else if (e.key === 'ArrowRight') {
+			if (e.shiftKey) {
+				const colidx2 = col2idx(secondarySelectedCell.column);
+				const posidx2 = secondarySelectedCell.posidx;
+				if (colidx2 < $schema.columns.length - 1) {
+					secondarySelectedCell = getCell($schema.columns[colidx2 + 1].name, posidx2);
+					shiftSelect();
+				}
+			} else {
+				if (colidx < $schema.columns.length - 1) {
+					primarySelectedCell = secondarySelectedCell = getCell(
+						$schema.columns[colidx + 1].name,
+						posidx
+					);
+				}
+				selectedCells = [];
+			}
+			selectedCols = [];
+			selectedRows = [];
+		}
+	});
 </script>
 
 <!-- Subtract 15px for scrollbar -->
 <div
-	class={'rounded-b-md border-slate-300 w-fit ' + classes}
+	class={'rounded-b-md border-slate-300 w-fit bg-white ' + classes}
 	style="max-width:calc(100vw - 15px); max-height:calc(100vh - 15px)"
 >
 	<!-- Table (max-height subtracts 32px for height of footer)-->
@@ -458,7 +629,7 @@
 					document.getSelection().removeAllRanges();
 				}} -->
 				<div
-					class={'cell bg-white pl-1 ' +
+					class={'cell pl-1 ' +
 						getCellSelectClasses(
 							col.name,
 							keyidx,
@@ -467,15 +638,19 @@
 							selectedCols,
 							selectedRows
 						)}
-					on:mousedown|preventDefault={selectCellMethods.mousedown(col.name, keyidx)}
-					colName={col.name}
+					on:mousedown|preventDefault={selectCellMethods.mousedown({
+						column: col.name,
+						keyidx: keyidx,
+						posidx: posidx,
+						value: $chunk.getCell(rowi, col.name).data
+					})}
+					column={col.name}
 					{keyidx}
 				>
 					<Cell
 						{...$chunk.getCell(rowi, col.name)}
 						editable={true && false}
 						on:edit={(e) => {
-							console.log(keyidx);
 							dispatch(onEdit.endpointId, {
 								detail: {
 									column: col.name,

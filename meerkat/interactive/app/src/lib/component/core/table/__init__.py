@@ -1,5 +1,7 @@
 from typing import Any, List
 
+from pydantic import BaseModel
+
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import EndpointProperty
@@ -25,8 +27,23 @@ class OnEditInterface(EventInterface):
     value: Any
 
 
-class OnSelectTable(EventInterface):
-    selected: List[Any]
+class Cell(BaseModel):
+    column: str
+    keyidx: int
+    posidx: int
+    value: Any
+
+
+class OnSelectTableCells(EventInterface):
+    selected: List[Cell]
+
+
+class OnSelectTableCols(EventInterface):
+    selected: List[str]  # list of column names
+
+
+class OnSelectTableRows(EventInterface):
+    selected: List[int]  # list of keyidx
 
 
 class Table(Component):
@@ -36,9 +53,9 @@ class Table(Component):
     classes: str = "h-fit"
 
     on_edit: EndpointProperty[OnEditInterface] = None
-    on_select_cells: EndpointProperty[OnSelectTable] = None
-    on_select_cols: EndpointProperty[OnSelectTable] = None
-    on_select_rows: EndpointProperty[OnSelectTable] = None
+    on_select_cells: EndpointProperty[OnSelectTableCells] = None
+    on_select_cols: EndpointProperty[OnSelectTableCols] = None
+    on_select_rows: EndpointProperty[OnSelectTableRows] = None
 
     def __init__(
         self,
