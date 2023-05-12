@@ -388,12 +388,14 @@
 	function getCellSelectClasses(
 		column: string,
 		keyidx: number,
+		posidx: number,
 		primarySelectedCell: Cell,
 		selectedCells: Array<Cell>,
 		selectedCols: Array<string>,
 		selectedRows: Array<number>
 	) {
-		let classes = '';
+		let classes = 'border-t border-l border-slate-300 ';
+		// let classes = '';
 
 		if (
 			selectedCells.some((c) => c.column === column && c.keyidx === keyidx) ||
@@ -403,14 +405,48 @@
 			classes += 'bg-violet-100 ';
 		}
 
-		if (primarySelectedCell.column === column && primarySelectedCell.keyidx === keyidx) {
-			classes += 'border-2 border-violet-600 ';
-		} else {
-			classes += 'border-t border-l border-slate-300 ';
-		}
-
 		if (secondarySelectedCell.column === column && secondarySelectedCell.keyidx === keyidx) {
 			classes += 'text-red-600 ';
+		}
+
+		// if the column is between the primary and secondary selected cells
+		if (
+			(col2idx(primarySelectedCell.column) <= col2idx(column) &&
+				col2idx(column) <= col2idx(secondarySelectedCell.column)) ||
+			(col2idx(secondarySelectedCell.column) <= col2idx(column) &&
+				col2idx(column) <= col2idx(primarySelectedCell.column))
+		) {
+			if (primarySelectedCell.posidx <= secondarySelectedCell.posidx) {
+				if (posidx === primarySelectedCell.posidx) classes += 'border-t-violet-600 ';
+				if (posidx === secondarySelectedCell.posidx) classes += 'border-b border-b-violet-600 ';
+			}
+			if (primarySelectedCell.posidx >= secondarySelectedCell.posidx) {
+				if (posidx === primarySelectedCell.posidx) classes += 'border-b border-b-violet-600 ';
+				if (posidx === secondarySelectedCell.posidx) classes += 'border-t-violet-600 ';
+			}
+		}
+
+		// if the posidx is between the primary and secondary selected cells
+		if (
+			(primarySelectedCell.posidx <= posidx && posidx <= secondarySelectedCell.posidx) ||
+			(secondarySelectedCell.posidx <= posidx && posidx <= primarySelectedCell.posidx)
+		) {
+			if (col2idx(primarySelectedCell.column) <= col2idx(secondarySelectedCell.column)) {
+				if (col2idx(column) === col2idx(primarySelectedCell.column))
+					classes += 'border-l-violet-600 ';
+				if (col2idx(column) === col2idx(secondarySelectedCell.column))
+					classes += 'border-r border-r-violet-600 ';
+			}
+			if (col2idx(primarySelectedCell.column) >= col2idx(secondarySelectedCell.column)) {
+				if (col2idx(column) === col2idx(primarySelectedCell.column))
+					classes += 'border-r border-r-violet-600 ';
+				if (col2idx(column) === col2idx(secondarySelectedCell.column))
+					classes += 'border-l-violet-600 ';
+			}
+		}
+
+		if (primarySelectedCell.column === column && primarySelectedCell.keyidx === keyidx) {
+			classes += 'border-2 border-violet-600 ';
 		}
 
 		return classes;
@@ -633,6 +669,7 @@
 						getCellSelectClasses(
 							col.name,
 							keyidx,
+							posidx,
 							primarySelectedCell,
 							selectedCells,
 							selectedCols,
