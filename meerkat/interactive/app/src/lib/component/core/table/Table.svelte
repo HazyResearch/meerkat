@@ -513,7 +513,17 @@
 
 		if (e.key === 'ArrowDown') {
 			e.preventDefault();
-			if (e.shiftKey) {
+			if (e.metaKey) {
+				if (e.shiftKey) {
+					secondarySelectedCell = getCell(secondarySelectedCell.column, $chunk.keyidxs.length - 1);
+					shiftSelect();
+				} else {
+					primarySelectedCell = secondarySelectedCell = getCell(
+						primarySelectedCell.column,
+						$chunk.keyidxs.length - 1
+					);
+				}
+			} else if (e.shiftKey) {
 				const posidx2 = secondarySelectedCell.posidx;
 				if (posidx2 + 1 < $chunk.keyidxs.length) {
 					secondarySelectedCell = getCell(secondarySelectedCell.column, posidx2 + 1);
@@ -539,7 +549,14 @@
 			selectedRows = [];
 		} else if (e.key === 'ArrowUp') {
 			e.preventDefault();
-			if (e.shiftKey) {
+			if (e.metaKey) {
+				if (e.shiftKey) {
+					secondarySelectedCell = getCell(secondarySelectedCell.column, 0);
+					shiftSelect();
+				} else {
+					primarySelectedCell = secondarySelectedCell = getCell(primarySelectedCell.column, 0);
+				}
+			} else if (e.shiftKey) {
 				const posidx2 = secondarySelectedCell.posidx;
 				if (posidx2 > 0) {
 					secondarySelectedCell = getCell(secondarySelectedCell.column, posidx2 - 1);
@@ -568,7 +585,14 @@
 			selectedRows = [];
 		} else if (e.key === 'ArrowLeft') {
 			e.preventDefault();
-			if (e.shiftKey) {
+			if (e.metaKey) {
+				if (e.shiftKey) {
+					secondarySelectedCell = getCell($schema.columns[0].name, secondarySelectedCell.posidx);
+					shiftSelect();
+				} else {
+					primarySelectedCell = secondarySelectedCell = getCell($schema.columns[0].name, posidx);
+				}
+			} else if (e.shiftKey) {
 				const colidx2 = col2idx(secondarySelectedCell.column);
 				const posidx2 = secondarySelectedCell.posidx;
 				if (colidx2 > 0) {
@@ -588,7 +612,20 @@
 			selectedRows = [];
 		} else if (e.key === 'ArrowRight') {
 			e.preventDefault();
-			if (e.shiftKey) {
+			if (e.metaKey) {
+				if (e.shiftKey) {
+					secondarySelectedCell = getCell(
+						$schema.columns[$schema.columns.length - 1].name,
+						secondarySelectedCell.posidx
+					);
+					shiftSelect();
+				} else {
+					primarySelectedCell = secondarySelectedCell = getCell(
+						$schema.columns[$schema.columns.length - 1].name,
+						posidx
+					);
+				}
+			} else if (e.shiftKey) {
 				const colidx2 = col2idx(secondarySelectedCell.column);
 				const posidx2 = secondarySelectedCell.posidx;
 				if (colidx2 < $schema.columns.length - 1) {
