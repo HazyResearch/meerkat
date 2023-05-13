@@ -26,6 +26,7 @@
 
 	export let primarySelectedCell: Cell = { column: '', keyidx: -1, posidx: -1, value: '' };
 	export let secondarySelectedCell: Cell = { column: '', keyidx: -1, posidx: -1, value: '' };
+	export let activeCells: Array<Cell> = []; // the cells currently being interacted with
 	export let selectedCells: Array<Cell> = [];
 	export let selectedCols: Array<string> = [];
 	export let selectedRows: Array<number> = [];
@@ -176,12 +177,23 @@
 	}
 
 	/**
-	 * Selects all cells between cell1 and cell2, inclusive.
+	 * Helper function to determine if two cells are equal.
 	 * @param cell1
 	 * @param cell2
 	 */
-	function selectRange(cell1: Cell, cell2: Cell) {
-		selectedCells = [];
+	function areEqual(cell1: Cell, cell2: Cell) {
+		return cell1.column === cell2.column && cell1.posidx === cell2.posidx;
+	}
+
+	/**
+	 * Selects all cells between cell1 and cell2, inclusive.
+	 * @param cell1
+	 * @param cell2
+	 * @param select - If true, will select the cells. If false, will mark as active
+	 */
+	function selectRange(cell1: Cell, cell2: Cell, select = true) {
+		if (select) selectedCells = [];
+		else activeCells = [];
 
 		const [col1, row1] = [col2idx(cell1.column), cell1.posidx];
 		const [col2, row2] = [col2idx(cell2.column), cell2.posidx];
@@ -198,11 +210,14 @@
 				const keyidx = parseInt($chunk.keyidxs[j]);
 				const posidx = j;
 				const value = $chunk.getCell(posidx, column).data;
-				selectedCells.push({ column, keyidx, posidx, value });
+				if (select) selectedCells.push({ column, keyidx, posidx, value });
+				else activeCells.push({ column, keyidx, posidx, value });
 			}
 		}
 
-		selectedCells = selectedCells.slice(); // trigger update
+		// trigger update
+		if (select) selectedCells = selectedCells.slice();
+		else activeCells = activeCells.slice();
 	}
 
 	const selectCellMethods = {
@@ -212,51 +227,8 @@
 					secondarySelectedCell = cell;
 					selectRange(primarySelectedCell, secondarySelectedCell);
 				} else if (e.metaKey) {
-					if (selectedCells.length === 0 && primarySelectedCell.posidx !== -1) {
-						selectedCells = [primarySelectedCell];
-					}
-
-					const i = selectedCells.findIndex(
-						(c) => c.column === cell.column && c.keyidx === cell.keyidx
-					);
-					if (i !== -1) {
-						if (selectedCells.length === 2) {
-							selectedCells.splice(i, 1);
-							primarySelectedCell = secondarySelectedCell = selectedCells[0];
-							selectedCells = [];
-						} else if (
-							(selectedCells.length > 1 &&
-								selectedCells[i].column === primarySelectedCell.column &&
-								selectedCells[i].keyidx === primarySelectedCell.keyidx) ||
-							(selectedCells[i].column === secondarySelectedCell.column &&
-								selectedCells[i].keyidx === secondarySelectedCell.keyidx)
-						) {
-							selectedCells.splice(i, 1);
-							primarySelectedCell = secondarySelectedCell = selectedCells[selectedCells.length - 1];
-						} else {
-							selectedCells.splice(i, 1);
-						}
-					} else if (selectedCols.includes(cell.column)) {
-						selectedCols.splice(selectedCols.indexOf(cell.column), 1);
-						// add all the cells in the column to selectedCells except the one we clicked on
-						for (let i = 0; i < $chunk.keyidxs.length; i++) {
-							if (i !== cell.posidx) {
-								selectedCells.push(getCell(cell.column, i));
-							}
-						}
-					} else if (selectedRows.includes(cell.keyidx)) {
-						selectedRows.splice(selectedRows.indexOf(cell.keyidx), 1);
-						// add all the cells in the row to selectedCells except the one we clicked on
-						for (let i = 0; i < $schema.columns.length; i++) {
-							if ($schema.columns[i].name !== cell.column) {
-								selectedCells.push(getCell($schema.columns[i].name, cell.posidx));
-							}
-						}
-					} else {
-						// not selected yet
-						primarySelectedCell = secondarySelectedCell = cell;
-						selectedCells.push(cell);
-					}
+					primarySelectedCell = secondarySelectedCell = cell;
+					activeCells.push(cell);
 				} else {
 					primarySelectedCell = secondarySelectedCell = cell;
 					selectedCells = []; // don't add to selectedCells
@@ -291,13 +263,66 @@
 
 				const posidx = keyidx2idx(keyidx);
 				secondarySelectedCell = getCell(column, posidx);
-				selectRange(primarySelectedCell, secondarySelectedCell);
+				selectRange(primarySelectedCell, secondarySelectedCell, false);
 
 				break;
 			}
 		},
 
 		mouseup(e: MouseEvent) {
+			// select all activeCells if at least one of them is not already selected
+			let foundUnselected = false;
+			for (const cell of activeCells) {
+				if (getSelectedBitmap(cell.column, cell.keyidx, false) === 0) {
+					foundUnselected = true;
+					break;
+				}
+			}
+
+			if (foundUnselected) {
+				// select all cells
+				selectedCells = selectedCells.concat(activeCells);
+			} else {
+				// unselect all cells
+				for (const cell of activeCells) {
+					const i = selectedCells.findIndex((c) => areEqual(c, cell));
+					if (i !== -1) {
+						if (selectedCells.length === 2) {
+							selectedCells.splice(i, 1);
+							primarySelectedCell = secondarySelectedCell = selectedCells[0];
+							selectedCells = [];
+						} else if (
+							selectedCells.length > 1 &&
+							(areEqual(selectedCells[i], primarySelectedCell) ||
+								areEqual(selectedCells[i], secondarySelectedCell))
+						) {
+							selectedCells.splice(i, 1);
+							primarySelectedCell = secondarySelectedCell = selectedCells[selectedCells.length - 1];
+						} else {
+							selectedCells.splice(i, 1);
+						}
+					} else if (selectedCols.includes(cell.column)) {
+						selectedCols.splice(selectedCols.indexOf(cell.column), 1);
+						// add all the cells in the column to selectedCells except the one we clicked on
+						for (let i = 0; i < $chunk.keyidxs.length; i++) {
+							if (i !== cell.posidx) {
+								selectedCells.push(getCell(cell.column, i));
+							}
+						}
+					} else if (selectedRows.includes(cell.keyidx)) {
+						selectedRows.splice(selectedRows.indexOf(cell.keyidx), 1);
+						// add all the cells in the row to selectedCells except the one we clicked on
+						for (let i = 0; i < $schema.columns.length; i++) {
+							if ($schema.columns[i].name !== cell.column) {
+								selectedCells.push(getCell($schema.columns[i].name, cell.posidx));
+							}
+						}
+					}
+				}
+			}
+
+			activeCells = [];
+
 			const s = selectedCells.length > 0 ? selectedCells : [primarySelectedCell];
 			if (onSelectCells && onSelectCells.endpointId) {
 				dispatch(onSelectCells.endpointId, { detail: { selected: s } });
@@ -414,7 +439,7 @@
 			selectedCells.some((c) => c.column === column) ||
 			selectedRows.length > 0
 		)
-			return 'bg-violet-200 ';
+			return 'bg-violet-200 font-bold ';
 		return '';
 	}
 
@@ -431,7 +456,7 @@
 			selectedCells.some((c) => c.keyidx === keyidx) ||
 			selectedCols.length > 0
 		)
-			return 'bg-violet-200 ';
+			return 'bg-violet-200 font-bold ';
 		return '';
 	}
 
@@ -439,18 +464,23 @@
 	 * Helper function that returns a number representing the ways a cell has
 	 * been selected or not.
 	 *
-	 * - one's place: selectedCells (0 or 1)
+	 * - one's place: number of occurences in selectedCells
 	 * - ten's place: selectedCols (0 or 10)
 	 * - hundred's place: selectedRows (0 or 100)
+	 * - thousand's place: activeCells (0 or 1000)
 	 *
 	 * @param column
 	 * @param keyidx
+	 * @param countActive
 	 */
-	function getSelectedBitmap(column: string, keyidx: number) {
+	function getSelectedBitmap(column: string, keyidx: number, countActive = true) {
 		return (
-			(selectedCells.some((c) => c.column === column && c.keyidx === keyidx) ? 1 : 0) +
+			selectedCells.filter((c) => c.column === column && c.keyidx === keyidx).length +
 			(selectedCols.includes(column) ? 10 : 0) +
-			(selectedRows.includes(keyidx) ? 100 : 0)
+			(selectedRows.includes(keyidx) ? 100 : 0) +
+			(countActive && activeCells.some((c) => c.column === column && c.keyidx === keyidx)
+				? 1000
+				: 0)
 		);
 	}
 
@@ -458,14 +488,15 @@
 	 * Helper function that returns a string of classes for a cell based on
 	 * how it has been selected.
 	 *
-	 * NOTE: The params selectedCells, selectedCols, and selectedRows are
-	 * included so that this funciton is called reactively whenever any of those
-	 * (or primarySelectedCell) changes.
+	 * NOTE: The params activeCells, selectedCells, selectedCols, and
+	 * selectedRows are included so that this funciton is called reactively
+	 * whenever any of those (or primarySelectedCell) changes.
 	 *
 	 * @param column
 	 * @param keyidx
 	 * @param posidx
 	 * @param primarySelectedCell
+	 * @param activeCells
 	 * @param selectedCells
 	 * @param selectedCols
 	 * @param selectedRows
@@ -475,6 +506,7 @@
 		keyidx: number,
 		posidx: number,
 		primarySelectedCell: Cell,
+		activeCells: Array<Cell>,
 		selectedCells: Array<Cell>,
 		selectedCols: Array<string>,
 		selectedRows: Array<number>
@@ -484,7 +516,14 @@
 
 		// Determine background color
 		if (bitmap > 0) {
-			const count = bitmap.toString().split('1').length - 1;
+			// sum the digits in the bitmap
+			const count = bitmap
+				.toString()
+				.split('')
+				.map(Number)
+				.reduce(function (a, b) {
+					return a + b;
+				}, 0);
 			classes += `bg-violet-${count}00 `;
 		}
 
@@ -502,7 +541,8 @@
 				classes += 'border-t-violet-600 ';
 			}
 
-			if (bitmap > 0 && posidx === $chunk.keyidxs.length - 1) classes += 'border-b border-b-violet-600 ';
+			if (bitmap > 0 && posidx === $chunk.keyidxs.length - 1)
+				classes += 'border-b border-b-violet-600 ';
 
 			const colidx = col2idx(column);
 			if (colidx > 0) {
@@ -512,7 +552,8 @@
 				classes += 'border-l-violet-600 ';
 			}
 
-			if (bitmap > 0 && colidx === $schema.columns.length - 1) classes += 'border-r border-r-violet-600 ';
+			if (bitmap > 0 && colidx === $schema.columns.length - 1)
+				classes += 'border-r border-r-violet-600 ';
 		}
 
 		// Determine text color
@@ -530,10 +571,9 @@
 
 		if (e.key === 'a' && e.metaKey) {
 			e.preventDefault();
-			selectRange(
-				getCell($schema.columns[0].name, 0),
-				getCell($schema.columns[$schema.columns.length - 1].name, $chunk.keyidxs.length - 1)
-			);
+			selectedCells = [];
+			selectedCols = $schema.columns.map((c) => c.name);
+			selectedRows = $chunk.keyidxs.map((k) => parseInt(k));
 		} else if (e.key === 'ArrowDown') {
 			e.preventDefault();
 			if (e.metaKey) {
@@ -787,6 +827,7 @@
 							keyidx,
 							posidx,
 							primarySelectedCell,
+							activeCells,
 							selectedCells,
 							selectedCols,
 							selectedRows
