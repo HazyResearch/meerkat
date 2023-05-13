@@ -227,6 +227,8 @@
 					secondarySelectedCell = cell;
 					selectRange(primarySelectedCell, secondarySelectedCell);
 				} else if (e.metaKey) {
+					if (getSelectedBitmap(cell.column, cell.keyidx) === 0)
+						selectedCells.push(primarySelectedCell);
 					primarySelectedCell = secondarySelectedCell = cell;
 					activeCells.push(cell);
 				} else {
@@ -297,7 +299,7 @@
 								areEqual(selectedCells[i], secondarySelectedCell))
 						) {
 							selectedCells.splice(i, 1);
-							primarySelectedCell = secondarySelectedCell = selectedCells[selectedCells.length - 1];
+							primarySelectedCell = secondarySelectedCell = selectedCells[0];
 						} else {
 							selectedCells.splice(i, 1);
 						}
@@ -309,6 +311,9 @@
 								selectedCells.push(getCell(cell.column, i));
 							}
 						}
+						if (selectedCells.length > 0)
+							primarySelectedCell = secondarySelectedCell = selectedCells[0];
+						else primarySelectedCell = secondarySelectedCell = getCell(cell.column, cell.posidx);
 					} else if (selectedRows.includes(cell.keyidx)) {
 						selectedRows.splice(selectedRows.indexOf(cell.keyidx), 1);
 						// add all the cells in the row to selectedCells except the one we clicked on
@@ -317,6 +322,9 @@
 								selectedCells.push(getCell($schema.columns[i].name, cell.posidx));
 							}
 						}
+						if (selectedCells.length > 0)
+							primarySelectedCell = secondarySelectedCell = selectedCells[0];
+						else primarySelectedCell = secondarySelectedCell = getCell(cell.column, cell.posidx);
 					}
 				}
 			}
