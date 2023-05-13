@@ -176,17 +176,15 @@
 	}
 
 	/**
-	 * Loops through all cells between primarySelectedCell and
-	 * secondarySelectedCell, adding them to the selectedCells array.
+	 * Selects all cells between cell1 and cell2, inclusive.
+	 * @param cell1
+	 * @param cell2
 	 */
-	function shiftSelect() {
+	function selectRange(cell1: Cell, cell2: Cell) {
 		selectedCells = [];
 
-		const col1 = col2idx(primarySelectedCell.column);
-		const row1 = primarySelectedCell.posidx;
-
-		const col2 = col2idx(secondarySelectedCell.column);
-		const row2 = secondarySelectedCell.posidx;
+		const [col1, row1] = [col2idx(cell1.column), cell1.posidx];
+		const [col2, row2] = [col2idx(cell2.column), cell2.posidx];
 
 		// If the user clicks on the same cell, none should be selected
 		if (col1 !== -1 && col1 === col2 && row1 !== -1 && row1 === row2) return;
@@ -212,7 +210,7 @@
 			return (e: MouseEvent) => {
 				if (e.shiftKey) {
 					secondarySelectedCell = cell;
-					shiftSelect();
+					selectRange(primarySelectedCell, secondarySelectedCell);
 				} else if (e.metaKey) {
 					if (selectedCells.length === 0 && primarySelectedCell.posidx !== -1) {
 						selectedCells = [primarySelectedCell];
@@ -238,7 +236,24 @@
 						} else {
 							selectedCells.splice(i, 1);
 						}
+					} else if (selectedCols.includes(cell.column)) {
+						selectedCols.splice(selectedCols.indexOf(cell.column), 1);
+						// add all the cells in the column to selectedCells except the one we clicked on
+						for (let i = 0; i < $chunk.keyidxs.length; i++) {
+							if (i !== cell.posidx) {
+								selectedCells.push(getCell(cell.column, i));
+							}
+						}
+					} else if (selectedRows.includes(cell.keyidx)) {
+						selectedRows.splice(selectedRows.indexOf(cell.keyidx), 1);
+						// add all the cells in the row to selectedCells except the one we clicked on
+						for (let i = 0; i < $schema.columns.length; i++) {
+							if ($schema.columns[i].name !== cell.column) {
+								selectedCells.push(getCell($schema.columns[i].name, cell.posidx));
+							}
+						}
 					} else {
+						// not selected yet
 						primarySelectedCell = secondarySelectedCell = cell;
 						selectedCells.push(cell);
 					}
@@ -276,7 +291,7 @@
 
 				const posidx = keyidx2idx(keyidx);
 				secondarySelectedCell = getCell(column, posidx);
-				shiftSelect();
+				selectRange(primarySelectedCell, secondarySelectedCell);
 
 				break;
 			}
@@ -477,16 +492,17 @@
 		if (primarySelectedCell.column === column && primarySelectedCell.keyidx === keyidx) {
 			classes += 'border-2 border-violet-600 ';
 		} else {
-			classes += 'border-t border-l '; // border width of 1px
+			// border width of 1px, default color slate
+			classes += 'border-t border-l border-slate-300 ';
 
 			if (posidx > 0) {
 				const bitmapAbove = getSelectedBitmap(column, parseInt($chunk.keyidxs[posidx - 1]));
 				if (bitmap !== bitmapAbove) classes += 'border-t-violet-600 ';
 			} else if (bitmap > 0 && posidx === 0) {
 				classes += 'border-t-violet-600 ';
-			} else {
-				classes += 'border-t-slate-300 ';
 			}
+
+			if (bitmap > 0 && posidx === $chunk.keyidxs.length - 1) classes += 'border-b border-b-violet-600 ';
 
 			const colidx = col2idx(column);
 			if (colidx > 0) {
@@ -494,29 +510,36 @@
 				if (bitmap !== bitmapLeft) classes += 'border-l-violet-600 ';
 			} else if (bitmap > 0 && colidx === 0) {
 				classes += 'border-l-violet-600 ';
-			} else {
-				classes += 'border-l-slate-300 ';
 			}
+
+			if (bitmap > 0 && colidx === $schema.columns.length - 1) classes += 'border-r border-r-violet-600 ';
 		}
 
 		// Determine text color
-		if (secondarySelectedCell.column === column && secondarySelectedCell.keyidx === keyidx) {
-			classes += 'text-red-600 ';
-		}
+		// if (secondarySelectedCell.column === column && secondarySelectedCell.keyidx === keyidx) {
+		// 	classes += 'text-red-600 ';
+		// }
 
 		return classes;
 	}
 
+	// Define keyboard shortcuts
 	window.addEventListener('keydown', (e) => {
 		const colidx = col2idx(primarySelectedCell.column);
 		const posidx = primarySelectedCell.posidx;
 
-		if (e.key === 'ArrowDown') {
+		if (e.key === 'a' && e.metaKey) {
+			e.preventDefault();
+			selectRange(
+				getCell($schema.columns[0].name, 0),
+				getCell($schema.columns[$schema.columns.length - 1].name, $chunk.keyidxs.length - 1)
+			);
+		} else if (e.key === 'ArrowDown') {
 			e.preventDefault();
 			if (e.metaKey) {
 				if (e.shiftKey) {
 					secondarySelectedCell = getCell(secondarySelectedCell.column, $chunk.keyidxs.length - 1);
-					shiftSelect();
+					selectRange(primarySelectedCell, secondarySelectedCell);
 				} else {
 					primarySelectedCell = secondarySelectedCell = getCell(
 						primarySelectedCell.column,
@@ -527,7 +550,7 @@
 				const posidx2 = secondarySelectedCell.posidx;
 				if (posidx2 + 1 < $chunk.keyidxs.length) {
 					secondarySelectedCell = getCell(secondarySelectedCell.column, posidx2 + 1);
-					shiftSelect();
+					selectRange(primarySelectedCell, secondarySelectedCell);
 				} else if (page * perPage + posidx2 < $schema.nrows - 1) {
 					// TODO: flesh out this case
 					page++;
@@ -552,7 +575,7 @@
 			if (e.metaKey) {
 				if (e.shiftKey) {
 					secondarySelectedCell = getCell(secondarySelectedCell.column, 0);
-					shiftSelect();
+					selectRange(primarySelectedCell, secondarySelectedCell);
 				} else {
 					primarySelectedCell = secondarySelectedCell = getCell(primarySelectedCell.column, 0);
 				}
@@ -560,7 +583,7 @@
 				const posidx2 = secondarySelectedCell.posidx;
 				if (posidx2 > 0) {
 					secondarySelectedCell = getCell(secondarySelectedCell.column, posidx2 - 1);
-					shiftSelect();
+					selectRange(primarySelectedCell, secondarySelectedCell);
 				} else if (page > 0) {
 					// TODO: flesh out this case
 					page--;
@@ -588,7 +611,7 @@
 			if (e.metaKey) {
 				if (e.shiftKey) {
 					secondarySelectedCell = getCell($schema.columns[0].name, secondarySelectedCell.posidx);
-					shiftSelect();
+					selectRange(primarySelectedCell, secondarySelectedCell);
 				} else {
 					primarySelectedCell = secondarySelectedCell = getCell($schema.columns[0].name, posidx);
 				}
@@ -597,7 +620,7 @@
 				const posidx2 = secondarySelectedCell.posidx;
 				if (colidx2 > 0) {
 					secondarySelectedCell = getCell($schema.columns[colidx2 - 1].name, posidx2);
-					shiftSelect();
+					selectRange(primarySelectedCell, secondarySelectedCell);
 				}
 			} else {
 				if (colidx > 0) {
@@ -618,7 +641,7 @@
 						$schema.columns[$schema.columns.length - 1].name,
 						secondarySelectedCell.posidx
 					);
-					shiftSelect();
+					selectRange(primarySelectedCell, secondarySelectedCell);
 				} else {
 					primarySelectedCell = secondarySelectedCell = getCell(
 						$schema.columns[$schema.columns.length - 1].name,
@@ -630,7 +653,7 @@
 				const posidx2 = secondarySelectedCell.posidx;
 				if (colidx2 < $schema.columns.length - 1) {
 					secondarySelectedCell = getCell($schema.columns[colidx2 + 1].name, posidx2);
-					shiftSelect();
+					selectRange(primarySelectedCell, secondarySelectedCell);
 				}
 			} else {
 				if (colidx < $schema.columns.length - 1) {
