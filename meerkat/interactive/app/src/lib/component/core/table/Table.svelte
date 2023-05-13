@@ -710,6 +710,7 @@
 					on:click={(e) => onClickCol(e, column.name)}
 				>
 					<div class="w-5 mr-0.5">
+						<!-- TODO: make white when selected -->
 						{#if column.name === $schema.primaryKey}
 							<!-- Show a key icon for the primary key-->
 							<KeyFill class="text-violet-600" />
