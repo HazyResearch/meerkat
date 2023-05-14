@@ -731,6 +731,26 @@
 			}
 			selectedCols = [];
 			selectedRows = [];
+		} else if (e.key === 'Tab') {
+			e.preventDefault();
+			if (e.shiftKey) {
+				if (colidx > 0) {
+					primarySelectedCell = secondarySelectedCell = getCell(
+						$schema.columns[colidx - 1].name,
+						posidx
+					);
+				}
+			} else {
+				if (colidx < $schema.columns.length - 1) {
+					primarySelectedCell = secondarySelectedCell = getCell(
+						$schema.columns[colidx + 1].name,
+						posidx
+					);
+				}
+			}
+			selectedCells = [];
+			selectedCols = [];
+			selectedRows = [];
 		}
 	});
 </script>
