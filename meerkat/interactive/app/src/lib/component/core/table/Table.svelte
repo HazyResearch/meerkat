@@ -733,6 +733,7 @@
 			selectedRows = [];
 		} else if (e.key === 'Tab') {
 			e.preventDefault();
+			// TODO: if there are selected cells, loop through them
 			if (e.shiftKey) {
 				if (colidx > 0) {
 					primarySelectedCell = secondarySelectedCell = getCell(
