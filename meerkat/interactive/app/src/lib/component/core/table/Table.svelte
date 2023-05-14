@@ -227,7 +227,7 @@
 					secondarySelectedCell = cell;
 					selectRange(primarySelectedCell, secondarySelectedCell);
 				} else if (e.metaKey) {
-					if (getSelectedBitmap(cell.column, cell.keyidx) === 0)
+					if (getSelectedBitmap(primarySelectedCell.column, primarySelectedCell.keyidx) === 0)
 						selectedCells.push(primarySelectedCell);
 					primarySelectedCell = secondarySelectedCell = cell;
 					activeCells.push(cell);
@@ -336,7 +336,6 @@
 				// filter out duplicate cells
 				s = selectedCells.filter((cell, i, arr) => arr.findIndex((c) => areEqual(c, cell)) === i);
 			}
-			console.log('s', s);
 			if (onSelectCells && onSelectCells.endpointId) {
 				dispatch(onSelectCells.endpointId, { detail: { selected: s } });
 			}
@@ -477,10 +476,10 @@
 	 * Helper function that returns a number representing the ways a cell has
 	 * been selected or not.
 	 *
-	 * - one's place: number of occurences in selectedCells
-	 * - ten's place: selectedCols (0 or 10)
-	 * - hundred's place: selectedRows (0 or 100)
-	 * - thousand's place: activeCells (0 or 1000)
+	 * - ones's place: selectedCols (0 or 1)
+	 * - ten's place: selectedRows (0 or 10)
+	 * - hundred's place: activeCells (0 or 100)
+	 * - thousand's place: number of occurences in selectedCells
 	 *
 	 * @param column
 	 * @param keyidx
@@ -488,12 +487,32 @@
 	 */
 	function getSelectedBitmap(column: string, keyidx: number, countActive = true) {
 		return (
-			selectedCells.filter((c) => c.column === column && c.keyidx === keyidx).length +
-			(selectedCols.includes(column) ? 10 : 0) +
-			(selectedRows.includes(keyidx) ? 100 : 0) +
+			(selectedCols.includes(column) ? 1 : 0) +
+			(selectedRows.includes(keyidx) ? 10 : 0) +
 			(countActive && activeCells.some((c) => c.column === column && c.keyidx === keyidx)
-				? 1000
-				: 0)
+				? 100
+				: 0) +
+			selectedCells.filter((c) => c.column === column && c.keyidx === keyidx).length * 1000
+		);
+	}
+
+	/**
+	 * Helper function that returns the number of times a cell is selected.
+	 * @param column
+	 * @param keyidx
+	 * @param posidx
+	 * @param primarySelectedCell
+	 * @param activeCells
+	 * @param selectedCells
+	 * @param selectedCols
+	 * @param selectedRows
+	 */
+	function getSelectedCount(column: string, keyidx: number) {
+		return (
+			(selectedCols.includes(column) ? 1 : 0) +
+			(selectedRows.includes(keyidx) ? 1 : 0) +
+			(activeCells.some((c) => c.column === column && c.keyidx === keyidx) ? 1 : 0) +
+			selectedCells.filter((c) => c.column === column && c.keyidx === keyidx).length
 		);
 	}
 
@@ -529,15 +548,8 @@
 
 		// Determine background color
 		if (bitmap > 0) {
-			// sum the digits in the bitmap
-			const count = bitmap
-				.toString()
-				.split('')
-				.map(Number)
-				.reduce(function (a, b) {
-					return a + b;
-				}, 0);
-			classes += `bg-violet-${count}00 `;
+			// the max tailwind color is 900, so we cap the count at 9
+			classes += `bg-violet-${Math.min(getSelectedCount(column, keyidx), 9)}00 `;
 		}
 
 		// Determine borders
