@@ -331,7 +331,12 @@
 
 			activeCells = [];
 
-			const s = selectedCells.length > 0 ? selectedCells : [primarySelectedCell];
+			let s = [primarySelectedCell];
+			if (selectedCells.length > 0) {
+				// filter out duplicate cells
+				s = selectedCells.filter((cell, i, arr) => arr.findIndex((c) => areEqual(c, cell)) === i);
+			}
+			console.log('s', s);
 			if (onSelectCells && onSelectCells.endpointId) {
 				dispatch(onSelectCells.endpointId, { detail: { selected: s } });
 			}
@@ -758,11 +763,13 @@
 					on:click={(e) => onClickCol(e, column.name)}
 				>
 					<div class="w-5 mr-0.5">
-						<!-- TODO: make white when selected -->
 						{#if column.name === $schema.primaryKey}
 							<!-- Show a key icon for the primary key-->
-							<KeyFill class="text-violet-600" />
+							<KeyFill
+								class={selectedCols.includes(column.name) ? 'text-violet-300' : 'text-violet-600'}
+							/>
 						{:else}
+							<!-- TODO: make white when selected -->
 							<Cell
 								data={''}
 								cellComponent={column.cellComponent}
