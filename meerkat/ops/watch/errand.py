@@ -15,7 +15,7 @@ def errand(fn: Optional[Callable] = None, *, logger: WatchLogger):
     # If not, raise an error.
     signature = inspect.signature(fn)
     if "engine" not in signature.parameters:
-        raise ValueError(f"Errands must have an argument called `engine`.")
+        raise ValueError("Errands must have an argument called `engine`.")
 
     # Log the errand.
     errand_id = logger.log_errand(
@@ -30,7 +30,7 @@ def errand(fn: Optional[Callable] = None, *, logger: WatchLogger):
         bound = signature.bind(*args, **kwargs)
 
         # Get the engine.
-        engine = bound.arguments.get("engine", signature.parameters['engine'].default)
+        engine = bound.arguments.get("engine", signature.parameters["engine"].default)
 
         # Collect all the inputs i.e. all arguments except `engine`.
         inputs = {

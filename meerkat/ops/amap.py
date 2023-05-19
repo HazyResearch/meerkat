@@ -52,12 +52,25 @@ async def apply_function(fn: Callable, column: mk.Column):
     return results
 
 
+def as_single_arg_fn(fn: Callable) -> Callable:
+    """
+    Convert a function that takes multiple arguments to a function that takes
+    a single argument.
+    """
+
+    @functools.wraps(fn)
+    def wrapper(kwargs):
+        return fn(**kwargs)
+
+    return wrapper
+
+
 async def amap(
-    data: Union["DataFrame", "Column"],
+    data: Union[mk.DataFrame, mk.Column],
     function: Callable,
     pbar: bool = True,
     max_concurrent: int = 100,
-) -> Union["DataFrame", "Column"]:
+) -> Union[mk.DataFrame, mk.Column]:
     """Apply a function to each element in the column.
 
     Args:
@@ -75,7 +88,6 @@ async def amap(
             f"Function {function} is not async. Automatically converting to async."
             " Consider making it async before calling `amap`."
         )
-        function = asasync(function)
 
     if isinstance(data, mk.Column):
         # Run the function asynchronously on the column.
@@ -87,13 +99,36 @@ async def amap(
         # Synchonously apply the function to each chunk.
         results = []
         for chunk in tqdm(chunks, desc=f"Chunked execution of `{function.__name__}`"):
-            results.append(await apply_function(function, chunk))
+            results.append(await apply_function(asasync(function), chunk))
         # Flatten the results.
         results = [item for sublist in results for item in sublist]
         # Create a new column with the results.
         return mk.ScalarColumn(results)
 
     elif isinstance(data, mk.DataFrame):
-        raise NotImplementedError("DataFrame not yet supported.")
+        # Run the function asynchronously on the dataframe.
+        # Only run `max_concurrent` tasks at a time.
+        # Get the function parameter names.
+        import inspect
 
-    return None
+        parameter_names = list(inspect.signature(function).parameters.keys())
+
+        # Restrict the dataframe to only the columns that are needed.
+        data = data[parameter_names]
+
+        # Split the dataframe into chunks of size `max_concurrent`.
+        chunks = [
+            data[i : i + max_concurrent] for i in range(0, len(data), max_concurrent)
+        ]
+        # Synchonously apply the function to each chunk.
+        results = []
+        for chunk in tqdm(chunks, desc=f"Chunked execution of `{function.__name__}`"):
+            results.append(
+                await apply_function(asasync(as_single_arg_fn(function)), chunk)
+            )
+        # Flatten the results.
+        results = [item for sublist in results for item in sublist]
+        # Create a new column with the results.
+        return mk.ScalarColumn(results)
+    else:
+        raise TypeError(f"Data must be a Column or DataFrame. Got {type(data)}.")

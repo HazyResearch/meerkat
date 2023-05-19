@@ -101,6 +101,10 @@ class TextCompletion(BaseEngine):
     def with_openai(cls, key: str = None):
         return OpenAITextCompletion(key=key)
 
+    @classmethod
+    def with_together(cls, key: str = None):
+        return TogetherTextCompletion(key=key)
+
     @property
     def parameter_mapping(self):
         """Map from Meerkat parameter names to the engine's parameter names."""
@@ -411,3 +415,85 @@ class OpenAITextCompletion(TextCompletion, OpenAIMixin):
     def key(self, key: str):
         self.setup_engine(key=key)
         return self
+
+
+class TogetherTextCompletion(TextCompletion):
+    ENDPOINT = "https://staging.together.xyz/api/inference"
+
+    def __init__(
+        self,
+        key: Optional[str] = None,
+        model: Optional[str] = "red-pajama-700B-tokens-fancy",
+        temperature: Optional[float] = 0.0,
+        max_tokens: Optional[int] = 20,
+        top_k: Optional[int] = None,
+        top_p: Optional[float] = None,
+        n: Optional[int] = None,
+        stop: Optional[Union[str, List[str]]] = None,
+    ):
+        super().__init__(
+            key=key,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_k=top_k,
+            top_p=top_p,
+            n=n,
+            stop=stop,
+        )
+
+
+    def _engine(
+        self,
+        prompt: str,
+        model: str,
+        temperature: float = 0.0,
+        max_tokens: int = 128,
+        top_p: float = None,
+        top_k: int = None,
+        stop: Union[str, List[str]] = None,
+    ):
+        import requests
+
+        payload = {
+            "model": model,
+            "prompt": prompt,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+        }
+        if top_p is not None:
+            payload["top_p"] = top_p
+        if top_k is not None:
+            payload["top_k"] = top_k
+        if stop is not None:
+            payload["stop"] = stop
+
+        res = requests.post(
+            self.ENDPOINT,
+            json=payload,
+            headers={
+                "Authorization": "Bearer " + self.together_key,
+                "User-Agent": "Meerkat",
+            },
+        )
+        try:
+            return res.json()
+        except:
+            return {}
+
+    def parse_response(self, response: dict) -> str:
+        try:
+            return response["output"]["choices"][0]["text"]
+        except:
+            print("Together returned an invalid response: ", response)
+            return ""
+
+    def key(self, key: str):
+        self.together_key = key
+
+    def _check_import(self):
+        pass
+
+    def setup_engine(self, **kwargs):
+        if 'key' in kwargs:
+            self.key(kwargs['key'])
