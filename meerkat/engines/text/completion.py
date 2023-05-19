@@ -101,6 +101,10 @@ class TextCompletion(BaseEngine):
     def with_openai(cls, key: str = None):
         return OpenAITextCompletion(key=key)
 
+    @classmethod
+    def with_together(cls, key: str = None):
+        return TogetherTextCompletion(key=key)
+
     @property
     def parameter_mapping(self):
         """Map from Meerkat parameter names to the engine's parameter names."""
@@ -169,6 +173,17 @@ class TextCompletion(BaseEngine):
     def run(self, prompt: str) -> str:
         """Run the engine on a prompt and return the completion."""
         self.prompt = prompt
+        cached_run = self.on_run_start()
+        if cached_run:
+            self.response = cached_run
+            self.result = result = cached_run.output
+            self.on_run_end(
+                cost=0.0,
+                input_tokens=cached_run.input_tokens,
+                output_tokens=cached_run.output_tokens,
+            )
+            return result
+
         self.response = self.engine(prompt=self.format_prompt(prompt))
         self.result = result = self.parse_response(self.response)
         self.on_run_end()
@@ -180,22 +195,37 @@ class TextCompletion(BaseEngine):
     def set_errand_run_id(self, errand_run_id: str):
         self._errand_run_id = errand_run_id
 
-    def on_run_end(self):
+    def on_run_start(self):
+        """Run before the engine has been run."""
+        if self._logger is None:
+            return
+
+        # Check if the query is already in the cache.
+        run = self._logger.retrieve_engine_run(
+            input=self.prompt,
+            engine=f"{self.name}/{self._model}",
+        )
+
+        return run
+
+    def on_run_end(self, **kwargs):
         """Run after the engine has been run."""
         if self._logger is None:
             return
 
-        self._logger.log_engine_run(
-            errand_run_id=self._errand_run_id
+        kwargs = {
+            "errand_run_id": self._errand_run_id
             if hasattr(self, "_errand_run_id")
             else None,
-            input=self.prompt,
-            output=self.result,
-            engine=f"{self.name}/{self._model}",
-            cost=0,
-            input_tokens=0,
-            output_tokens=0,
-        )
+            "input": self.prompt,
+            "output": self.result,
+            "engine": f"{self.name}/{self._model}",
+            "cost": 0,
+            "input_tokens": 0,
+            "output_tokens": 0,
+        }
+        kwargs.update(**kwargs)
+        self._logger.log_engine_run(**kwargs)
 
     def parse_response(self, response) -> str:
         """Parse the response from the engine."""
@@ -361,7 +391,7 @@ class OpenAITextCompletion(TextCompletion, OpenAIMixin):
                 " Please install it with `pip install openai`."
             )
 
-    def on_run_end(self):
+    def on_run_end(self, **kwargs):
         """Run after the engine has been run."""
         if self._logger is None:
             return
@@ -385,3 +415,85 @@ class OpenAITextCompletion(TextCompletion, OpenAIMixin):
     def key(self, key: str):
         self.setup_engine(key=key)
         return self
+
+
+class TogetherTextCompletion(TextCompletion):
+    ENDPOINT = "https://staging.together.xyz/api/inference"
+
+    def __init__(
+        self,
+        key: Optional[str] = None,
+        model: Optional[str] = "red-pajama-700B-tokens-fancy",
+        temperature: Optional[float] = 0.0,
+        max_tokens: Optional[int] = 20,
+        top_k: Optional[int] = None,
+        top_p: Optional[float] = None,
+        n: Optional[int] = None,
+        stop: Optional[Union[str, List[str]]] = None,
+    ):
+        super().__init__(
+            key=key,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_k=top_k,
+            top_p=top_p,
+            n=n,
+            stop=stop,
+        )
+
+
+    def _engine(
+        self,
+        prompt: str,
+        model: str,
+        temperature: float = 0.0,
+        max_tokens: int = 128,
+        top_p: float = None,
+        top_k: int = None,
+        stop: Union[str, List[str]] = None,
+    ):
+        import requests
+
+        payload = {
+            "model": model,
+            "prompt": prompt,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+        }
+        if top_p is not None:
+            payload["top_p"] = top_p
+        if top_k is not None:
+            payload["top_k"] = top_k
+        if stop is not None:
+            payload["stop"] = stop
+
+        res = requests.post(
+            self.ENDPOINT,
+            json=payload,
+            headers={
+                "Authorization": "Bearer " + self.together_key,
+                "User-Agent": "Meerkat",
+            },
+        )
+        try:
+            return res.json()
+        except:
+            return {}
+
+    def parse_response(self, response: dict) -> str:
+        try:
+            return response["output"]["choices"][0]["text"]
+        except:
+            print("Together returned an invalid response: ", response)
+            return ""
+
+    def key(self, key: str):
+        self.together_key = key
+
+    def _check_import(self):
+        pass
+
+    def setup_engine(self, **kwargs):
+        if 'key' in kwargs:
+            self.key(kwargs['key'])
