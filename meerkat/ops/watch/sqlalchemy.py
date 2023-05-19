@@ -3,7 +3,7 @@ import logging
 import threading
 import uuid
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from meerkat import DataFrame
 
@@ -86,6 +86,16 @@ class Object(Base):
     def __init__(self, *args: Any, value: Any, **kwargs: Any) -> None:
         value = str(value)
         super().__init__(*args, value=value, **kwargs)
+
+
+TABLE_TO_MODEL = {
+    "engine_runs": EngineRun,
+    "errand_runs": ErrandRun,
+    "errands": Errand,
+    "errand_run_inputs": ErrandRunInput,
+    "errand_run_outputs": ErrandRunOutput,
+    "objects": Object,
+}
 
 
 class SQLAlchemyWatchLogger(WatchLogger):
@@ -259,7 +269,10 @@ class SQLAlchemyWatchLogger(WatchLogger):
         engine = create_engine(f"sqlite:///{path}")
         return cls(engine=engine)
 
-    def get_table(self, model: type):
+    def get_table(self, model: Union[type, str]):
+        if isinstance(model, str):
+            model = TABLE_TO_MODEL[model]
+
         session = self.session
         result = session.query(model).all()
 
