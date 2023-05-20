@@ -35,6 +35,8 @@ class EngineRun(Base):
     input_tokens = Column(Integer)
     output_tokens = Column(Integer)
     created_at = Column(String)
+    configuration = Column(String)
+    hash = Column(String)
 
 
 class ErrandRun(Base):
@@ -116,6 +118,7 @@ class SQLAlchemyWatchLogger(WatchLogger):
                     "cache_db": ""
                 }
         """
+        self.sql_engine = engine
         db_exists = len(sqlalchemy.inspect(engine).get_table_names()) > 0
         if not db_exists:
             logger.info("Creating database...")
@@ -129,6 +132,7 @@ class SQLAlchemyWatchLogger(WatchLogger):
     def session(self):
         # Need to use a different session if we're in a different thread.
         # This happens when running an engine asynchronously.
+        return self.sessionmaker()
         if self.thread_id != threading.get_ident():
             # Do this ephemerally.
             return self.sessionmaker()
@@ -196,21 +200,32 @@ class SQLAlchemyWatchLogger(WatchLogger):
         session.commit()
         return errand_run.id
 
+    def _hash_run(self, input: str, engine: str, configuration: Dict[str, Any]):
+        from hashlib import sha256
+        import json
+
+        return sha256(json.dumps({
+            "input": input,
+            "engine": engine,
+            "configuration": configuration
+        }
+        ).encode('utf-8')).hexdigest()
+
     def retrieve_engine_run(
         self,
         input: str,
         engine: str,
+        configuration: Dict[str, Any]
     ) -> Optional[EngineRun]:
         """Retrieve the most recent engine run for a given input and engine."""
         # Query the `engine_runs` table to see if the engine run is already there
         # If not, return None
+        hashed = self._hash_run(input=input, configuration=configuration, engine=engine)
+
         session = self.session
         response = (
             session.query(EngineRun)
-            .filter_by(
-                input=input,
-                engine=engine,
-            )
+            .filter_by(hash=hashed)
             .order_by(EngineRun.created_at.desc())
             .first()
         )
@@ -228,7 +243,11 @@ class SQLAlchemyWatchLogger(WatchLogger):
         cost: float,
         input_tokens: int,
         output_tokens: int,
+        configuration: Dict[str, Any],
+
     ) -> None:
+        hashed = self._hash_run(input=input, configuration=configuration, engine=engine)
+
         # Log to Tables: engine_runs
         session = self.session
         session.add(
@@ -241,7 +260,9 @@ class SQLAlchemyWatchLogger(WatchLogger):
                 cost=cost,
                 input_tokens=input_tokens,
                 output_tokens=output_tokens,
-                created_at=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                configuration=configuration,
+                hash=hashed,
             )
         )
         session.commit()
@@ -294,6 +315,51 @@ class SQLAlchemyWatchLogger(WatchLogger):
     def from_sqlite(cls, path: str):
         engine = create_engine(f"sqlite:///{path}")
         return cls(engine=engine)
+    
+    @classmethod
+    def from_google_cloud_sql(
+        cls, 
+        instance_connection_string: str,
+        username: str,
+        password: str,
+        database_name: str,
+    ):
+        """Create a new instance of the class from a Google Cloud SQL connection.
+
+        This method establishes a connection to a Google Cloud SQL database instance 
+        and returns a new instance of the class, configured to use this connection.
+
+        Args:
+            instance_connection_string (str): The connection string of the Google Cloud SQL instance. 
+                This should include the instance's project, region, and name.
+            username (str): The username to authenticate with the database instance.
+            password (str): The password to authenticate with the database instance.
+            database_name (str): The name of the specific database to connect to within the instance.
+
+        Returns:
+            cls: A new instance of the class, configured to use the provided Google Cloud SQL connection.
+        """
+        from google.cloud.sql.connector import Connector
+        # initialize Cloud SQL Python Connector object
+        connector = Connector()
+
+        def getconn():
+            conn = connector.connect(
+                instance_connection_string,
+                "pg8000",
+                user=username,
+                password=password,
+                db=database_name,
+            )
+            return conn
+        
+        engine = sqlalchemy.create_engine(
+            "postgresql+pg8000://",
+            creator=getconn,    
+            pool_size=30
+        )
+        return cls(engine=engine)
+
 
     def get_table(self, model: Union[type, str]):
         if isinstance(model, str):

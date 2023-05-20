@@ -1,3 +1,4 @@
+import json
 from typing import List, Optional, Union
 
 from pydantic import BaseModel, validator
@@ -126,7 +127,10 @@ class OpenAIChatCompletion(OpenAIMixin, ChatCompletion):
         system_prompt: str = "You are a helpful assistant.",
     ):
         """Run the engine on a prompt."""
-        self.prompt = prompt
+        cached_run = self.on_run_start(prompt=prompt)
+        if cached_run:
+            return cached_run.output
+
         messages = (
             [
                 {
@@ -137,32 +141,34 @@ class OpenAIChatCompletion(OpenAIMixin, ChatCompletion):
             + [message.dict() for message in history]
             + [{"role": "user", "content": prompt}]
         )
-        self.messages = messages
-        self.response = self.engine(messages=messages)
-
-        self.result = result = self.parse_response(self.response)
-        self.on_run_end()
+        response = self.engine(messages=messages)
+        result = self.parse_response(response)
+        self.on_run_end(
+            prompt=prompt,
+            result=result,
+            response=response,
+        )
         return result
 
     def parse_response(self, response: dict) -> str:
         return response["choices"][0]["message"]["content"]
 
-    def on_run_end(self):
+    def on_run_end(self, prompt: str, result: str, response: dict):
         """Run after the engine has been run."""
         if self._logger is None:
-            return
+            return prompt
 
         self._logger.log_engine_run(
             errand_run_id=self._errand_run_id
             if hasattr(self, "_errand_run_id")
             else None,
-            input=self.prompt,
-            output=self.result,
+            input=prompt,
+            output=result,
             engine=f"{self.name}/{self._model}",
-            cost=self.COST_PER_TOKEN[self._model]
-            * self.response["usage"]["total_tokens"],
-            input_tokens=self.response["usage"]["prompt_tokens"],
-            output_tokens=self.response["usage"]["completion_tokens"],
+            cost=self.COST_PER_TOKEN[self._model] * response["usage"]["total_tokens"],
+            input_tokens=response["usage"]["prompt_tokens"],
+            output_tokens=response["usage"]["completion_tokens"],
+            configuration=self.configuration
         )
 
     def key(self, key: str):

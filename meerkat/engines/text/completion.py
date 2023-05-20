@@ -1,9 +1,11 @@
 from functools import partial
-from typing import Callable, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
+from hashlib import sha256
 
 from meerkat.engines.abstract import BaseEngine
 from meerkat.ops.watch.abstract import WatchLogger
 from meerkat.tools.lazy_loader import LazyLoader
+
 
 from ..providers import OpenAIMixin
 
@@ -127,6 +129,10 @@ class TextCompletion(BaseEngine):
             setattr(self, f"_{k}", v)
         self._engine = partial(self._engine, **kwargs)
         return self
+    
+
+
+
 
     def model(self, model: str):
         """The name of the model to use for completion."""
@@ -195,17 +201,20 @@ class TextCompletion(BaseEngine):
     def set_errand_run_id(self, errand_run_id: str):
         self._errand_run_id = errand_run_id
 
-    def on_run_start(self):
+    def on_run_start(
+        self, 
+        prompt: str, 
+    ):
         """Run before the engine has been run."""
         if self._logger is None:
             return
 
         # Check if the query is already in the cache.
         run = self._logger.retrieve_engine_run(
-            input=self.prompt,
+            input=prompt,
             engine=f"{self.name}/{self._model}",
+            configuration=self.configuration,
         )
-
         return run
 
     def on_run_end(self, **kwargs):
