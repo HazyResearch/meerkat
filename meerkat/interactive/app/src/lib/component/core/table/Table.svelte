@@ -22,6 +22,8 @@
 	export let page: number = 0;
 	export let perPage: number = 50;
 
+	let editMode: boolean = false;
+	let editValue: string = '';
 	export let onEdit: Endpoint;
 
 	export let primarySelectedCell: Cell = { column: '', keyidx: -1, posidx: -1, value: '' };
@@ -222,6 +224,20 @@
 
 	const selectCellMethods = {
 		mousedown(cell: Cell) {
+			if (editMode) {
+				if (onEdit && onEdit.endpointId) {
+					const { column, keyidx, posidx } = primarySelectedCell;
+					dispatch(onEdit.endpointId, {
+						detail: {
+							column,
+							keyidx,
+							posidx,
+							value: editValue
+						}
+					});
+				}
+				editMode = false;
+			}
 			return (e: MouseEvent) => {
 				if (e.shiftKey) {
 					secondarySelectedCell = cell;
@@ -555,13 +571,18 @@
 		// Determine borders
 		if (primarySelectedCell.column === column && primarySelectedCell.keyidx === keyidx) {
 			classes += 'border-2 border-violet-600 ';
+			// TODO: add a shadow if the cell is being edited
+			// if (editMode) classes += 'shadow-md shadow-violet-500 ';
 		} else {
 			// border width of 1px, default color slate
 			classes += 'border-t border-l border-slate-300 ';
 
 			if (posidx > 0) {
+				// TODO: Don't add border if the cell above is primarySelectedCell
+				// if (!areEqual(getCell(column, parseInt($chunk.keyidxs[posidx - 1])), primarySelectedCell)) {
 				const bitmapAbove = getSelectedBitmap(column, parseInt($chunk.keyidxs[posidx - 1]));
 				if (bitmap !== bitmapAbove) classes += 'border-t-violet-600 ';
+				// }
 			} else if (bitmap > 0 && posidx === 0) {
 				classes += 'border-t-violet-600 ';
 			}
@@ -571,8 +592,11 @@
 
 			const colidx = col2idx(column);
 			if (colidx > 0) {
+				// TODO: Don't add border if the cell on the left is primarySelectedCell
+				// if (!areEqual(getCell($chunk.columns[colidx - 1], keyidx), primarySelectedCell)) {
 				const bitmapLeft = getSelectedBitmap($chunk.columns[colidx - 1], keyidx);
 				if (bitmap !== bitmapLeft) classes += 'border-l-violet-600 ';
+				// }
 			} else if (bitmap > 0 && colidx === 0) {
 				classes += 'border-l-violet-600 ';
 			}
@@ -672,6 +696,7 @@
 			selectedCols = [];
 			selectedRows = [];
 		} else if (e.key === 'ArrowLeft') {
+			if (editMode) return;
 			e.preventDefault();
 			if (e.metaKey) {
 				if (e.shiftKey) {
@@ -699,6 +724,7 @@
 			selectedCols = [];
 			selectedRows = [];
 		} else if (e.key === 'ArrowRight') {
+			if (editMode) return;
 			e.preventDefault();
 			if (e.metaKey) {
 				if (e.shiftKey) {
@@ -752,6 +778,24 @@
 			selectedCells = [];
 			selectedCols = [];
 			selectedRows = [];
+		} else if (e.key === 'Enter') {
+			e.preventDefault();
+			if (editMode) {
+				if (onEdit && onEdit.endpointId) {
+					const { column, keyidx, posidx } = primarySelectedCell;
+					dispatch(onEdit.endpointId, {
+						detail: {
+							column,
+							keyidx,
+							posidx,
+							value: editValue
+						}
+					});
+				}
+				editMode = false;
+			} else {
+				editMode = true;
+			}
 		}
 	});
 </script>
@@ -886,22 +930,19 @@
 						posidx: posidx,
 						value: $chunk.getCell(rowi, col.name).data
 					})}
+					on:dblclick={() => {
+						console.log('double click');
+						editMode = true;
+					}}
 					column={col.name}
 					{keyidx}
 				>
 					<Cell
 						{...$chunk.getCell(rowi, col.name)}
-						editable={true && false}
-						on:edit={(e) => {
-							dispatch(onEdit.endpointId, {
-								detail: {
-									column: col.name,
-									keyidx: keyidx,
-									posidx: posidx,
-									value: e.detail.value
-								}
-							});
-						}}
+						editable={editMode &&
+							col.name === primarySelectedCell.column &&
+							keyidx === primarySelectedCell.keyidx}
+						on:edit={(e) => (editValue = e.detail.value)}
 					/>
 				</div>
 			{/each}
@@ -936,9 +977,3 @@
 		<Pagination bind:page bind:perPage totalItems={$schema.nrows} dropdownPlacement={'top'} />
 	</div>
 </div>
-
-<style>
-	/* .header-cell {
-		@apply border border-slate-300 font-mono bg-slate-100 text-slate-800;
-	} */
-</style>
