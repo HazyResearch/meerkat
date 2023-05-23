@@ -557,7 +557,8 @@
 		activeCells: Array<Cell>,
 		selectedCells: Array<Cell>,
 		selectedCols: Array<string>,
-		selectedRows: Array<number>
+		selectedRows: Array<number>,
+		editMode: boolean
 	) {
 		let classes = '';
 		const bitmap = getSelectedBitmap(column, keyidx);
@@ -572,7 +573,7 @@
 		if (primarySelectedCell.column === column && primarySelectedCell.keyidx === keyidx) {
 			classes += 'border-2 border-violet-600 ';
 			// TODO: add a shadow if the cell is being edited
-			// if (editMode) classes += 'shadow-md shadow-violet-500 ';
+			if (editMode) classes += 'text-violet-500 ';
 		} else {
 			// border width of 1px, default color slate
 			classes += 'border-t border-l border-slate-300 ';
@@ -795,6 +796,7 @@
 				editMode = false;
 			} else {
 				editMode = true;
+				editValue = primarySelectedCell.value;
 			}
 		}
 	});
@@ -922,7 +924,8 @@
 							activeCells,
 							selectedCells,
 							selectedCols,
-							selectedRows
+							selectedRows,
+							editMode
 						)}
 					on:mousedown|preventDefault={selectCellMethods.mousedown({
 						column: col.name,
@@ -931,8 +934,8 @@
 						value: $chunk.getCell(rowi, col.name).data
 					})}
 					on:dblclick={() => {
-						console.log('double click');
 						editMode = true;
+						editValue = primarySelectedCell.value;
 					}}
 					column={col.name}
 					{keyidx}

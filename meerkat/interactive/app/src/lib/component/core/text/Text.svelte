@@ -16,7 +16,6 @@
 		if (editablePrev === focus) return;
 		editablePrev = focus;
 
-		console.log('Trying to setFocus:', data, focus, editableCell);
 		if (editableCell) {
 			if (!focus) {
 				editableCell.blur();
@@ -42,7 +41,7 @@
 </script>
 
 <div
-	class={classes + 'border-none'}
+	class={classes + 'outline-none'}
 	contenteditable="true"
 	bind:innerHTML={data}
 	bind:this={editableCell}
