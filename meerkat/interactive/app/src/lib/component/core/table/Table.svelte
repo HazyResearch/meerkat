@@ -26,12 +26,12 @@
 	let editValue: string = '';
 	export let onEdit: Endpoint;
 
-	export let primarySelectedCell: Cell = { column: '', keyidx: -1, posidx: -1, value: '' };
-	export let secondarySelectedCell: Cell = { column: '', keyidx: -1, posidx: -1, value: '' };
-	export let activeCells: Array<Cell> = []; // the cells currently being interacted with
-	export let selectedCells: Array<Cell> = [];
-	export let selectedCols: Array<string> = [];
-	export let selectedRows: Array<number> = [];
+	let primarySelectedCell: Cell = { column: '', keyidx: -1, posidx: -1, value: '' };
+	let secondarySelectedCell: Cell = { column: '', keyidx: -1, posidx: -1, value: '' };
+	let activeCells: Array<Cell> = []; // the cells currently being interacted with
+	let selectedCells: Array<Cell> = [];
+	let selectedCols: Array<string> = [];
+	let selectedRows: Array<number> = [];
 	export let onSelectCells: Endpoint;
 	export let onSelectCols: Endpoint;
 	export let onSelectRows: Endpoint;
@@ -64,15 +64,11 @@
 		df: df,
 		formatter: 'icon'
 	}).then((newSchema) => {
+		console.log('Fetching schema');
 		schema.set(newSchema);
 		if (columnWidths.length === 0) {
 			columnWidths = Array(newSchema.columns.length).fill(100);
-		}
-		if (primarySelectedCell.posidx === -1) {
-			primarySelectedCell = secondarySelectedCell = {
-				...primarySelectedCell,
-				column: newSchema.columns[0].name
-			};
+			columnWidths[0] = 200;
 		}
 	});
 
@@ -85,15 +81,8 @@
 		console.log('Fetching chunk');
 		chunk.set(newChunk);
 		if (rowHeights.length === 0) {
-			rowHeights = Array(newChunk.keyidxs.length).fill(22); // same as text-sm + 2
-		}
-		if (primarySelectedCell.posidx === -1) {
-			primarySelectedCell = secondarySelectedCell = {
-				...primarySelectedCell,
-				keyidx: parseInt(newChunk.keyidxs[0]),
-				posidx: 0,
-				value: newChunk.getCell(0, $schema.columns[0].name).data
-			};
+			rowHeights = Array(newChunk.keyidxs.length).fill(24); // same as text-sm + 4
+			rowHeights[0] = 32;
 		}
 	});
 
@@ -571,9 +560,8 @@
 
 		// Determine borders
 		if (primarySelectedCell.column === column && primarySelectedCell.keyidx === keyidx) {
-			classes += 'border-2 border-violet-600 ';
-			// TODO: add a shadow if the cell is being edited
-			if (editMode) classes += 'text-violet-500 ';
+			if (editMode) classes += 'text-violet-500 overflow-visible ';
+			else classes += 'border-2 border-violet-600 ';
 		} else {
 			// border width of 1px, default color slate
 			classes += 'border-t border-l border-slate-300 ';
@@ -614,6 +602,35 @@
 		return classes;
 	}
 
+	/**
+	 * Start editing the current cell.
+	 */
+	function startEdit() {
+		editMode = true;
+		editValue = primarySelectedCell.value;
+	}
+
+	/**
+	 * Finish editing. If callOnEdit is true, save the edit by calling the
+	 * onEdit endpoint.
+	 * @param callOnEdit Whether or not to call the onEdit endpoint.
+	 */
+	function endEdit(callOnEdit: boolean = true) {
+		if (callOnEdit && onEdit && onEdit.endpointId) {
+			const { column, keyidx, posidx } = primarySelectedCell;
+			dispatch(onEdit.endpointId, {
+				detail: {
+					column,
+					keyidx,
+					posidx,
+					value: editValue
+				}
+			});
+		}
+		editMode = false;
+		if (!callOnEdit) console.log('primarySelectedCell:', primarySelectedCell);
+	}
+
 	// Define keyboard shortcuts
 	window.addEventListener('keydown', (e) => {
 		const colidx = col2idx(primarySelectedCell.column);
@@ -626,6 +643,7 @@
 			selectedRows = $chunk.keyidxs.map((k) => parseInt(k));
 		} else if (e.key === 'ArrowDown') {
 			e.preventDefault();
+			if (editMode) endEdit();
 			if (e.metaKey) {
 				if (e.shiftKey) {
 					secondarySelectedCell = getCell(secondarySelectedCell.column, $chunk.keyidxs.length - 1);
@@ -662,6 +680,7 @@
 			selectedRows = [];
 		} else if (e.key === 'ArrowUp') {
 			e.preventDefault();
+			if (editMode) endEdit();
 			if (e.metaKey) {
 				if (e.shiftKey) {
 					secondarySelectedCell = getCell(secondarySelectedCell.column, 0);
@@ -760,6 +779,7 @@
 			selectedRows = [];
 		} else if (e.key === 'Tab') {
 			e.preventDefault();
+			if (editMode) endEdit();
 			// TODO: if there are selected cells, loop through them
 			if (e.shiftKey) {
 				if (colidx > 0) {
@@ -781,23 +801,12 @@
 			selectedRows = [];
 		} else if (e.key === 'Enter') {
 			e.preventDefault();
-			if (editMode) {
-				if (onEdit && onEdit.endpointId) {
-					const { column, keyidx, posidx } = primarySelectedCell;
-					dispatch(onEdit.endpointId, {
-						detail: {
-							column,
-							keyidx,
-							posidx,
-							value: editValue
-						}
-					});
-				}
-				editMode = false;
-			} else {
-				editMode = true;
-				editValue = primarySelectedCell.value;
-			}
+			if (editMode) endEdit();
+			else startEdit();
+		} else if (e.key === 'Escape') {
+			// TODO: make the cell revert immediately instead of on refresh
+			e.preventDefault();
+			if (editMode) endEdit(false);
 		}
 	});
 </script>
@@ -913,9 +922,9 @@
 			</div>
 
 			<!-- Data columns -->
-			{#each $chunk.columnInfos as col}
+			{#each $chunk.columnInfos as col, col_index}
 				<div
-					class={'cell pl-1 overflow-hidden ' +
+					class={'cell overflow-hidden ' +
 						getCellSelectClasses(
 							col.name,
 							keyidx,
@@ -933,10 +942,7 @@
 						posidx: posidx,
 						value: $chunk.getCell(rowi, col.name).data
 					})}
-					on:dblclick={() => {
-						editMode = true;
-						editValue = primarySelectedCell.value;
-					}}
+					on:dblclick={startEdit}
 					column={col.name}
 					{keyidx}
 				>
@@ -945,6 +951,8 @@
 						editable={editMode &&
 							col.name === primarySelectedCell.column &&
 							keyidx === primarySelectedCell.keyidx}
+						minWidth={columnWidths[col_index]}
+						minHeight={rowHeights[posidx]}
 						on:edit={(e) => (editValue = e.detail.value)}
 					/>
 				</div>

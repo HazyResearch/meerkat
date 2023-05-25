@@ -31,6 +31,7 @@ export interface CellInfo {
     dfRefId: string;
     columnName: string;
     row: number;
+    style: any;
 }
 
 /**

@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { getContext } from 'svelte/internal';
+	import { get } from 'svelte/store';
+	import { getContext, onDestroy } from 'svelte/internal';
+	import type { CellInfo } from '$lib/utils/dataframe';
 
 	export let data: any;
 	export let editable: boolean = false;
@@ -7,6 +9,29 @@
 	export let classes: string = '';
 
 	const cellEdit: CallableFunction = getContext('cellEdit');
+
+	// Build up style if it exists in the context
+	const cellInfo: CellInfo = getContext('cellInfo');
+	let style: string = '';
+	if (editable && cellInfo) {
+		if (cellInfo.style) {
+			if (cellInfo.style.minWidth) {
+				const unsubscribe = cellInfo.style.minWidth.subscribe((value: number) => {
+					console.log('minWidth:', value);
+					style = style.replace(/min-width: \d+px;/, '');
+					style += `min-width: ${value}px;`;
+				});
+				onDestroy(unsubscribe);
+			}
+			if (cellInfo.style.minHeight) {
+				const unsubscribe = cellInfo.style.minHeight.subscribe((value: number) => {
+					style = style.replace(/min-height: \d+px;/, '');
+					style += `min-height: ${value}px;`;
+				});
+				onDestroy(unsubscribe);
+			}
+		}
+	}
 
 	let editableCell: HTMLDivElement;
 
@@ -40,10 +65,15 @@
 	}
 </script>
 
-<div
-	class={classes + 'outline-none'}
-	contenteditable="true"
-	bind:innerHTML={data}
-	bind:this={editableCell}
-	on:input={() => cellEdit(data)}
-/>
+<div class="relative">
+	<div
+		class={classes +
+			' px-1 outline-none whitespace-nowrap ' +
+			(editable ? 'bg-white border-2 border-red-500 w-fit z-50' : '')}
+		{style}
+		contenteditable="true"
+		bind:innerHTML={data}
+		bind:this={editableCell}
+		on:input={() => cellEdit(data)}
+	/>
+</div>
