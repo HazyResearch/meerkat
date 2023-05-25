@@ -68,7 +68,9 @@
 	<div
 		class={classes +
 			' px-1 outline-none whitespace-nowrap ' +
-			(editable ? 'bg-white border-2 border-red-500 w-fit z-50' : '')}
+			(editable
+				? 'bg-white border-double border-2 border-red-500 outline-2 outline-offset-0 outline-red-300 w-fit z-50'
+				: '')}
 		{style}
 		contenteditable="true"
 		bind:innerHTML={data}
