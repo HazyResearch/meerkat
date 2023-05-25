@@ -643,8 +643,8 @@
 			selectedCols = $schema.columns.map((c) => c.name);
 			selectedRows = $chunk.keyidxs.map((k) => parseInt(k));
 		} else if (e.key === 'ArrowDown') {
+			if (editMode) return;
 			e.preventDefault();
-			if (editMode) endEdit();
 			if (e.metaKey) {
 				if (e.shiftKey) {
 					secondarySelectedCell = getCell(secondarySelectedCell.column, $chunk.keyidxs.length - 1);
@@ -680,8 +680,8 @@
 			selectedCols = [];
 			selectedRows = [];
 		} else if (e.key === 'ArrowUp') {
+			if (editMode) return;
 			e.preventDefault();
-			if (editMode) endEdit();
 			if (e.metaKey) {
 				if (e.shiftKey) {
 					secondarySelectedCell = getCell(secondarySelectedCell.column, 0);
@@ -801,9 +801,17 @@
 			selectedCols = [];
 			selectedRows = [];
 		} else if (e.key === 'Enter') {
-			e.preventDefault();
-			if (editMode) endEdit();
-			else startEdit();
+			if (editMode) {
+				if (e.ctrlKey || e.altKey || e.metaKey) {
+					return;
+				} else {
+					e.preventDefault();
+					endEdit();
+				}
+			} else {
+				e.preventDefault();
+				startEdit();
+			}
 		} else if (e.key === 'Escape') {
 			// TODO: make the cell revert immediately instead of on refresh
 			e.preventDefault();
