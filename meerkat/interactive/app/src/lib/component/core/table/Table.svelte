@@ -560,8 +560,9 @@
 
 		// Determine borders
 		if (primarySelectedCell.column === column && primarySelectedCell.keyidx === keyidx) {
-			if (editMode) classes += 'text-violet-500 overflow-visible ';
-			else classes += 'border-2 border-violet-600 ';
+			// TODO: styles are awkwardly split between here and Text.svelte
+			if (editMode) classes += 'overflow-visible -ml-px -mt-px ';
+			else classes += 'border-2 border-violet-600 -ml-px -mt-px ';
 		} else {
 			// border width of 1px, default color slate
 			classes += 'border-t border-l border-slate-300 ';
