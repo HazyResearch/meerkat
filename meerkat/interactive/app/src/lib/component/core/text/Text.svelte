@@ -10,14 +10,13 @@
 
 	const cellEdit: CallableFunction = getContext('cellEdit');
 
-	// Build up style if it exists in the context
 	const cellInfo: CellInfo = getContext('cellInfo');
+	// Build up style if it exists in the context
 	let style: string = '';
-	if (editable && cellInfo) {
+	if (cellInfo) {
 		if (cellInfo.style) {
 			if (cellInfo.style.minWidth) {
 				const unsubscribe = cellInfo.style.minWidth.subscribe((value: number) => {
-					console.log('minWidth:', value);
 					style = style.replace(/min-width: \d+px;/, '');
 					style += `min-width: ${value}px;`;
 				});

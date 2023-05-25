@@ -26,7 +26,6 @@
 	$: {
 		cellInfoObj.style.minWidth.set(minWidth);
 		cellInfoObj.style.minHeight.set(minHeight);
-		console.log('minWidth:', minWidth, 'minHeight:', minHeight);
 	}
 	setContext('cellInfo', cellInfoObj);
 
