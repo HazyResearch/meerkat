@@ -18,6 +18,11 @@ Create interactive views of any dataset.
 
 </div>
 
+<div align="center">
+
+<img src="website/static/dataframe-demo.gif" height=300 alt="Meerkat logo"/>
+</div>
+
 ## ⚡️ Quickstart
 
 ```bash
