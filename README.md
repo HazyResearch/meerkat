@@ -7,7 +7,7 @@
 [![GitHub](https://img.shields.io/github/license/HazyResearch/meerkat)](https://img.shields.io/github/license/HazyResearch/meerkat)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
-Meerkat is an open-source Python library that facilitates the evaluation of foundation models on data-intensive tasks.
+Create interactive views of any dataset.
 
 [**Website**](http://meerkat.wiki)
 | [**Quickstart**](http://meerkat.wiki/docs/start/quickstart-df.html)
@@ -20,13 +20,11 @@ Meerkat is an open-source Python library that facilitates the evaluation of foun
 
 ## ⚡️ Quickstart
 
-We recommend installing Meerkat in a virtual environment,
-
 ```bash
 pip install meerkat-ml
 ```
-
-> **_GPU Install_**: If you want to use Meerkat with a GPU, you will need to install PyTorch with GPU support. See [here](https://pytorch.org/get-started/locally/) for more details.
+<!-- 
+> **_GPU Install_**: If you want to use Meerkat with a GPU, you will need to install PyTorch with GPU support. See [here](https://pytorch.org/get-started/locally/) for more details. -->
 
 <!-- ```bash
 pip install "meerkat-ml @ git+https://github.com/robustness-gym/meerkat@clever-dev"
@@ -49,15 +47,13 @@ Check out our [Getting Started page](http://meerkat.wiki/docs/start/quickstart-d
 
 ## Why Meerkat?
 
-Meerkat is an open-source Python library, designed to help
-technical teams interactively wrangle images, videos, text
+Meerkat is an open-source Python library, designed to help interactively wrangle images, videos, text
 documents and more with foundation models.
 
-Our goal is to make foundation models a more reliable
+<!-- Our goal is to make foundation models a more reliable
 software abstraction for processing unstructured datasets.
 [Read our blogpost to learn more.](https://hazyresearch.stanford.edu/blog/2023-03-01-meerkat)
-
-
+ -->
 
 Meerkat’s approach is based on two pillars:
 
@@ -97,6 +93,20 @@ mk.gui.html.div([match, gallery])
 <div align="center">
 <img src="website/static/interact-demo.gif" height=400 alt="Meerkat logo"/>
 </div>
+ 
+**✨ Use cases where Meerkat shines:**
+- _Are the outputs of large language models (_e.g._ GPT-3)._ [Demo](https://www.youtube.com/watch?v=3ItA70qoe-o))
+- _Are you trying to explore a dataset of unstructured data types () and find patterns?_ [Demo](https://www.youtube.com/watch?v=a8FBT33QACQ)
+- _Are you error analysis_ [Demo](https://youtu.be/4Kk_LZbNWNs)
+- Rapid labeling. 
+
+
+**🤔 Use cases where Meerkat may not be a great fit:**
+
+- _Are you trying to make a straightforward demo of a machine learning model (single input/output, chatbot) and share with the world?_ [Gradio](https://gradio.app/) is likely a better fit! Though, if your demo involves visualizing lots of data, you may find Meerkat useful.
+- _Are you only working with structured data (e.g. numerical and categorical variables)?_ Popular data visualization libraries (_e.g._ [Seaborn](https://seaborn.pydata.org/), [Matplotlib](https://matplotlib.org/)) are often sufficient. If you're looking for interactivity, [Plotly](https://plotly.com/) and [Streamlit](https://streamlit.io/) work well with structured data. Meerkat is differentiated in how it visualizes unstructured data types: long-form text, PDFs, HTML, images, video, audio...  
+- _Are you trying to manually label tens of thousands of data points?_  If you are looking for a data labeling tool to use with a large labeling team tasked with manually processing lots of data, there are great open source labeling solutions designed for this (_e.g._ [LabelStudio](https://labelstud.io/)). In contrast, Meerkat is great fit for teams/individuals without access to a large labeling workforce who are using pretrained models (_e.g._ GPT-3) and need to label validation data or in-context examples.
+
 
 ## ✉️ About
 
