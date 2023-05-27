@@ -47,37 +47,49 @@ Check out our [Getting Started page](http://meerkat.wiki/docs/start/quickstart-d
 
 ## Why Meerkat?
 
-Meerkat is an open-source Python library, designed to help interactively wrangle images, videos, text
-documents and more with foundation models.
+Meerkat is an open-source Python library that helps users to visualize, explore, and annotate any dataset.
 
-<!-- Our goal is to make foundation models a more reliable
-software abstraction for processing unstructured datasets.
-[Read our blogpost to learn more.](https://hazyresearch.stanford.edu/blog/2023-03-01-meerkat)
- -->
+### ✨ Use cases where Meerkat shines
+- _Exploratory analysis over unstructured data._ [Demo](https://www.youtube.com/watch?v=a8FBT33QACQ)
+- _Spot-checking the behavior of large language models (e.g. GPT-3)._  [Demo](https://www.youtube.com/watch?v=3ItA70qoe-o)
+- _Identifying systematic errors made by machine learning models._ [Demo](https://youtu.be/4Kk_LZbNWNs)
+- _Rapid labeling of validation data._
 
-Meerkat’s approach is based on two pillars:
+### 🤔 Use cases where Meerkat may not be the right fit
 
-**(1) Heterogeneous data frames with extended API.** At the heart of Meerkat is a data frame that can store structured fields (e.g. numbers, strings, and dates) alongside complex objects (e.g. images, web pages, audio) and their tensor representations (e.g. embeddings, logits) in a single table. Meerkat's data frame API goes beyond structured data analysis libraries like Pandas by providing a set of FM-backed unstructured data operations.
+- _Are you only working with structured data (e.g. numerical and categorical variables)?_ Popular data visualization libraries (_e.g._ [Seaborn](https://seaborn.pydata.org/), [Matplotlib](https://matplotlib.org/)) are often sufficient. If you're looking for interactivity, [Plotly](https://plotly.com/) and [Streamlit](https://streamlit.io/) work well with structured data. Meerkat is differentiated in how it visualizes unstructured data types: long-form text, PDFs, HTML, images, video, audio...  
+- _Are you trying to make a straightforward demo of a machine learning model (single input/output, chatbot) and share with the world?_ [Gradio](https://gradio.app/) is likely a better fit! Though, if your demo involves visualizing lots of data, you may find Meerkat useful.
+- _Are you trying to manually label tens of thousands of data points?_  If you are looking for a data labeling tool to use with a labeling team, there are great open source labeling solutions designed for this (_e.g._ [LabelStudio](https://labelstud.io/)). In contrast, Meerkat is great fit for teams/individuals without access to a large labeling workforce who are using pretrained models (_e.g._ GPT-3) and need to label validation data or in-context examples.
+
+
+### ✏️ Features and Design Principles
+
+Here are four principles that inform Meerkat's designs.
+
+**(1) Low overhead.**  With four lines of Python, start interacting with any dataset. 
+	- Zero-copy integrations with your preferred data abstractions: Pandas, Arrow, HF Datasets, Ibis, SQL.
+	- Limits data movement, allowing you to interact with your data where it already lives. No uploads to external databases and no reformatting.
+	- Meets you where you are. Meerkat works in notebooks and in scripts. 
 
 ```python
 import meerkat as mk
 
 df = mk.from_csv("paintings.csv")
 df["img"] = mk.files("img_path")
-df["embeddings"] = mk.embed(df["img"], encoder="clip")
 df
 ```
-
 <div align="center">
 
-<img src="website/static/dataframe-demo.gif" height=400 alt="Meerkat logo"/>
+<img src="website/static/dataframe-demo.gif" height=300 alt="Meerkat logo"/>
 </div>
 
-**(2) Interactivity in Python.** Meerkat provides interactive data frame visualizations that allow you to control foundation models as they process your data.
-Meerkat visualizations are implemented in Python, so they can be composed and customized in notebooks or data scripts.
-Labeling is critical for instructing and validating foundation models. Labeling GUIs are a priority in Meerkat.
+**(2) Diverse data types.** Visualize and annotate almost any data type in Meerkat interfaces: text, images, audio, video, MRI scans, PDFs, HTML, JSON. 
+TODO: show some images of different data type visualizations
+
+**(3) "Intelligent" user interfaces.** Meerkat makes it easy to embed **machine learning models** (e.g. LLMs) within user interfaces to enable intelligent functionality such as searching, grouping and autocomplete. 
 
 ```python
+df["embedding"] = mk.embed(df["img"], engine="clip")
 match = mk.gui.Match(df,
 	against="embedding",
 	engine="clip"
@@ -91,25 +103,23 @@ mk.gui.html.div([match, gallery])
 ```
 
 <div align="center">
-<img src="website/static/interact-demo.gif" height=400 alt="Meerkat logo"/>
+	<img src="website/static/interact-demo.gif" height=300 alt="Meerkat logo"/>
 </div>
- 
-**✨ Use cases where Meerkat shines:**
-- _Are the outputs of large language models (_e.g._ GPT-3)._ [Demo](https://www.youtube.com/watch?v=3ItA70qoe-o))
-- _Are you trying to explore a dataset of unstructured data types () and find patterns?_ [Demo](https://www.youtube.com/watch?v=a8FBT33QACQ)
-- _Are you error analysis_ [Demo](https://youtu.be/4Kk_LZbNWNs)
-- Rapid labeling. 
+
+**(4) Declarative (think: Seaborn), but also infinitely customizable and composable.**
+Meerkat visualizations are implemented in Python, so they can be composed and customized.
+TODO: Simple example of the composition and customization. 
 
 
-**🤔 Use cases where Meerkat may not be a great fit:**
+<!-- Our goal is to make foundation models a more reliable
+software abstraction for processing unstructured datasets.
+[Read our blogpost to learn more.](https://hazyresearch.stanford.edu/blog/2023-03-01-meerkat)
+ -->
 
-- _Are you trying to make a straightforward demo of a machine learning model (single input/output, chatbot) and share with the world?_ [Gradio](https://gradio.app/) is likely a better fit! Though, if your demo involves visualizing lots of data, you may find Meerkat useful.
-- _Are you only working with structured data (e.g. numerical and categorical variables)?_ Popular data visualization libraries (_e.g._ [Seaborn](https://seaborn.pydata.org/), [Matplotlib](https://matplotlib.org/)) are often sufficient. If you're looking for interactivity, [Plotly](https://plotly.com/) and [Streamlit](https://streamlit.io/) work well with structured data. Meerkat is differentiated in how it visualizes unstructured data types: long-form text, PDFs, HTML, images, video, audio...  
-- _Are you trying to manually label tens of thousands of data points?_  If you are looking for a data labeling tool to use with a large labeling team tasked with manually processing lots of data, there are great open source labeling solutions designed for this (_e.g._ [LabelStudio](https://labelstud.io/)). In contrast, Meerkat is great fit for teams/individuals without access to a large labeling workforce who are using pretrained models (_e.g._ GPT-3) and need to label validation data or in-context examples.
 
 
 ## ✉️ About
 
-Meerkat is being built by Machine Learning PhD students in the [Hazy Research](https://hazyresearch.stanford.edu) lab at Stanford. We're excited to build for a future where models will make it easier for teams to sift and reason through large volumes of data effortlessly. We have varied research backgrounds and have done research that touches all parts of the machine learning process: we've created new model architectures, studied model robustness and evaluation, worked on applications ranging from audio generation to medical imaging.
+Meerkat is being built by Machine Learning PhD students in the [Hazy Research](https://hazyresearch.stanford.edu) lab at Stanford. We're excited to build for a future where models will make it easier for teams to sift and reason through large volumes of unstructtured data effortlessly. 
 
 Please reach out to `kgoel [at] cs [dot] stanford [dot] edu, eyuboglu [at] stanford [dot] edu, and arjundd [at] stanford [dot] edu` if you would like to use Meerkat for a project, at your company or if you have any questions.
