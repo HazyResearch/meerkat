@@ -132,7 +132,6 @@ class SQLAlchemyWatchLogger(WatchLogger):
     def session(self):
         # Need to use a different session if we're in a different thread.
         # This happens when running an engine asynchronously.
-        return self.sessionmaker()
         if self.thread_id != threading.get_ident():
             # Do this ephemerally.
             return self.sessionmaker()
@@ -221,7 +220,6 @@ class SQLAlchemyWatchLogger(WatchLogger):
         # Query the `engine_runs` table to see if the engine run is already there
         # If not, return None
         hashed = self._hash_run(input=input, configuration=configuration, engine=engine)
-
         session = self.session
         response = (
             session.query(EngineRun)
