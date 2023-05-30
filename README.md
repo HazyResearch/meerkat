@@ -50,7 +50,7 @@ Meerkat is an open-source Python library that helps users visualize, explore, an
 
 ### ✏️ Features and Design Principles
 
-Here are four principles that inform Meerkat's designs.
+Here are four principles that inform Meerkat's design.
 
 **(1) Low overhead.**  With four lines of Python, start interacting with any dataset. 
 - Zero-copy integrations with your preferred data abstractions: Pandas, Arrow, HF Datasets, Ibis, SQL.
