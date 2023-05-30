@@ -18,10 +18,6 @@ Create interactive views of any dataset.
 
 </div>
 
-<div align="center">
-
-<img src="website/static/dataframe-demo.gif" height=300 alt="Meerkat logo"/>
-</div>
 
 ## ⚡️ Quickstart
 
@@ -63,9 +59,13 @@ Here are four principles that inform Meerkat's designs.
 ```python
 import meerkat as mk
 df = mk.from_csv("paintings.csv")
-df["img"] = mk.files("img_path")
-df.gui.gallery(main_column="img")
+df["image"] = mk.files("image_url")
+df
 ```
+
+<div align="center">
+  <img src="website/static/dataframe-demo.gif" height=300 alt="Meerkat logo"/>
+</div>
 
 
 **(2) Diverse data types.** Visualize and annotate almost any data type in Meerkat interfaces: text, images, audio, video, MRI scans, PDFs, HTML, JSON. 
