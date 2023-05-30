@@ -24,12 +24,19 @@ class MRIPerturbationInference(mk.gui.html.div):
     that are unique for each scan.
 
     Current motion artifacts are limited to 2-shot 1D translational motion.
+
+    This interface is based off the following paper:
+        Desai et al. VORTEX: Physics-Driven Data Augmentations Using Consistency
+        Training for Robust Accelerated MRI Reconstruction. MIDL 2022.
     """
 
     def __init__(
         self,
         df: mk.DataFrame,
         models: Dict[str, Union[str, Tuple[str, str], nn.Module, Callable]],
+        acc: Tuple[int] = (2, 20, 1),
+        sigma: Tuple[float] = (0.0, 1.0, 0.1),
+        alpha: Tuple[float] = (0.0, 1.0, 0.1),
         seed: int = 0,
         device: str = "cpu",
         title: str = "MRI Perturbation Inference",
@@ -46,6 +53,9 @@ class MRIPerturbationInference(mk.gui.html.div):
                   Shape: (H, W, #coils)
                 * ``target`` (optional): The target image for the slice. Shape: (H, W).
             models: A dictionary mapping model names to model URLs.
+            acc: The acceleration factor range. Format: (min, max, step)
+            sigma: The noise standard deviation range. Format: (min, max, step)
+            alpha: The motion standard deviation range. Format: (min, max, step)
             seed: The random seed to use. This is required if results
                 are to be cached.
             device: The device to use for inference.
@@ -56,6 +66,9 @@ class MRIPerturbationInference(mk.gui.html.div):
 
         self.df = df
         self.models = models
+        self.acc = acc
+        self.sigma = sigma
+        self.alpha = alpha
         self.seed = seed
         self.device = device
         self.title = title
@@ -69,18 +82,21 @@ class MRIPerturbationInference(mk.gui.html.div):
         """Build the graph for the interface."""
         self.df.mark()
 
-        scan_names = self.df["id"].unique()
+        scan_names = list(self.df["id"].unique())
         scan_name = mk.Store(scan_names[0])
 
         model_names = list(self.models.keys())
         model_name = mk.Store(model_names[0])
 
         # Acceleration factor.
-        acc = mk.Store(4.0)
+        min_acc, max_acc, step_acc = self._get_range_fields(self.acc)
+        acc = mk.Store(min_acc.value)
         # Noise standard deviation.
-        sigma = mk.Store(0.0)
+        min_sigma, max_sigma, step_sigma = self._get_range_fields(self.sigma)
+        sigma = mk.Store(min_sigma.value)
         # Motion standard deviation.
-        alpha = mk.Store(0.0)
+        min_alpha, max_alpha, step_alpha = self._get_range_fields(self.alpha)
+        alpha = mk.Store(min_alpha.value)
 
         # Filter the dataframe by the selected scan.
         df = self.get_scan_df(self.df, scan_name)
@@ -125,25 +141,25 @@ class MRIPerturbationInference(mk.gui.html.div):
         )
         acc = mk.gui.Slider(
             value=acc.value,
-            min=2,
-            max=20,
-            step=1,
+            min=min_acc,
+            max=max_acc,
+            step=step_acc,
             description="Acceleration",
             on_change=on_change.partial(acc),
         )
         noise = mk.gui.Slider(
             value=sigma.value,
-            min=0,
-            max=1.0,
-            step=0.1,
+            min=min_sigma,
+            max=max_sigma,
+            step=step_sigma,
             description="Noise",
             on_change=on_change.partial(sigma),
         )
         motion = mk.gui.Slider(
             value=alpha.value,
-            min=0,
-            max=1.0,
-            step=0.1,
+            min=min_alpha,
+            max=max_alpha,
+            step=step_alpha,
             description="Motion",
             on_change=on_change.partial(alpha),
         )
@@ -163,6 +179,9 @@ class MRIPerturbationInference(mk.gui.html.div):
 
         # Model type
         selector = mk.gui.Select(values=model_names, value=model_name)
+
+        # Scan
+        scan_selector = mk.gui.Select(values=scan_names, value=scan_name)
 
         # Text.
         text = [
@@ -200,11 +219,26 @@ class MRIPerturbationInference(mk.gui.html.div):
         # Slider Panel
         sliders = mk.gui.html.flexcol(
             [
-                mk.gui.html.grid(
+                mk.gui.html.gridcols2(
                     [
-                        mk.gui.Markdown("Model Type", classes="text-slate-600 text-sm"),
-                        selector,
-                    ]
+                        mk.gui.html.grid(
+                            [
+                                mk.gui.Markdown(
+                                    "Scan", classes="text-slate-600 text-sm"
+                                ),
+                                scan_selector,
+                            ]
+                        ),
+                        mk.gui.html.grid(
+                            [
+                                mk.gui.Markdown(
+                                    "Model", classes="text-slate-600 text-sm"
+                                ),
+                                selector,
+                            ]
+                        ),
+                    ],
+                    classes="gap-x-4",
                 ),
                 mk.gui.html.grid(
                     [mk.gui.Markdown("Noise", classes="text-slate-600 text-sm"), noise]
@@ -230,6 +264,16 @@ class MRIPerturbationInference(mk.gui.html.div):
             classes="gap-4 h-screen grid grid-rows-[auto_1fr] bg-white",
         )
         return view
+
+    def _get_range_fields(self, x):
+        """Get the min, max and step from a tuple."""
+        if len(x) == 2:
+            min_x, max_x = x
+            step_x = (max_x - min_x) / 10
+        else:
+            min_x, max_x, step_x = x
+
+        return mk.Store(min_x), mk.Store(max_x), mk.Store(step_x)
 
     @mk.reactive(backend_only=True)
     def get_scan_df(self, df: mk.DataFrame, scan_id: str) -> mk.DataFrame:
@@ -276,7 +320,8 @@ class MRIPerturbationInference(mk.gui.html.div):
     def generate_mask(self, shape, acc: float):
         """Generate Poisson Disc undersampling mask.
 
-        To generate other types of masks, see :mod:`meddlr.data.transforms.subsample`.
+        To generate other types of masks, see
+        :mod:`meddlr.data.transforms.subsample`.
         """
         shape = shape[:-1]
         mask_func = PoissonDiskMaskFunc(accelerations=(acc,), calib_size=24)
