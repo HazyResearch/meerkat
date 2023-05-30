@@ -52,7 +52,7 @@ Check out our [Getting Started page](http://meerkat.wiki/docs/start/quickstart-d
 
 ## Why Meerkat?
 
-Meerkat is an open-source Python library that helps users to visualize, explore, and annotate any dataset.
+Meerkat is an open-source Python library that helps users visualize, explore, and annotate any dataset. 
 
 ### ✨ Use cases where Meerkat shines
 - _Exploratory analysis over unstructured data._ [Demo](https://www.youtube.com/watch?v=a8FBT33QACQ)
@@ -89,7 +89,6 @@ df
 </div>
 
 **(2) Diverse data types.** Visualize and annotate almost any data type in Meerkat interfaces: text, images, audio, video, MRI scans, PDFs, HTML, JSON. 
-TODO: show some images of different data type visualizations
 
 **(3) "Intelligent" user interfaces.** Meerkat makes it easy to embed **machine learning models** (e.g. LLMs) within user interfaces to enable intelligent functionality such as searching, grouping and autocomplete. 
 
@@ -113,7 +112,6 @@ mk.gui.html.div([match, gallery])
 
 **(4) Declarative (think: Seaborn), but also infinitely customizable and composable.**
 Meerkat visualizations are implemented in Python, so they can be composed and customized.
-TODO: Simple example of the composition and customization. 
 
 
 <!-- Our goal is to make foundation models a more reliable
