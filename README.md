@@ -52,35 +52,6 @@ Check out our [Getting Started page](http://meerkat.wiki/docs/start/quickstart-d
 
 Meerkat is an open-source Python library that helps users visualize, explore, and annotate any dataset. It is especially useful when using machine learning models with unstructured data types (_e.g._ free text, PDFs, images, video). 
 
-### ✨ Use cases where Meerkat shines
-- _Exploratory analysis over unstructured data types._ [Demo](https://www.youtube.com/watch?v=a8FBT33QACQ)
-- _Spot-checking the behavior of large language models (e.g. GPT-3)._  [Demo](https://www.youtube.com/watch?v=3ItA70qoe-o)
-- _Identifying systematic errors made by machine learning models._ [Demo](https://youtu.be/4Kk_LZbNWNs)
-- _Rapid labeling of validation data._
-
-### 🤔 Use cases where Meerkat may not be the right fit
-
-- _Are you only working with structured data (e.g. numerical and categorical variables)?_ Popular data visualization libraries (_e.g._ [Seaborn](https://seaborn.pydata.org/), [Matplotlib](https://matplotlib.org/)) are often sufficient. If you're looking for interactivity, [Plotly](https://plotly.com/) and [Streamlit](https://streamlit.io/) work well with structured data. Meerkat is differentiated in how it visualizes unstructured data types: long-form text, PDFs, HTML, images, video, audio...  
-- _Are you trying to make a straightforward demo of a machine learning model (single input/output, chatbot) and share with the world?_ [Gradio](https://gradio.app/) is likely a better fit! Though, if your demo involves visualizing lots of data, you may find Meerkat useful.
-- _Are you trying to manually label tens of thousands of data points?_  If you are looking for a data labeling tool to use with a labeling team, there are great open source labeling solutions designed for this (_e.g._ [LabelStudio](https://labelstud.io/)). In contrast, Meerkat is great fit for teams/individuals without access to a large labeling workforce who are using pretrained models (_e.g._ GPT-3) and need to label validation data or in-context examples.
-
-<details>
-  <summary>Click me</summary>
-  
-  ### Heading
-  1. Foo
-  2. Bar
-     * Baz
-     * Qux
-
-  ### Some Code
-  ```js
-  function logSomething(something) {
-    console.log('Something', something);
-  }
-  ```
-</details>
-
 ### ✏️ Features and Design Principles
 
 Here are four principles that inform Meerkat's designs.
@@ -91,17 +62,16 @@ Here are four principles that inform Meerkat's designs.
 
 ```python
 import meerkat as mk
-
 df = mk.from_csv("paintings.csv")
 df["img"] = mk.files("img_path")
-df
+df.gui.gallery(main_column="img")
 ```
 
 
 **(2) Diverse data types.** Visualize and annotate almost any data type in Meerkat interfaces: text, images, audio, video, MRI scans, PDFs, HTML, JSON. 
 
 <div align="center">
-	<img src="website/static/dataframe-demo.gif" height=300 alt=""/>
+	<img src="website/static/data-types.gif" height=300 alt=""/>
 </div>
 
 
@@ -126,7 +96,39 @@ mk.gui.html.div([match, gallery])
 </div>
 
 **(4) Declarative (think: Seaborn), but also infinitely customizable and composable.**
-Meerkat visualizations are implemented in Python, so they can be composed and customized.
+Meerkat visualization components can be composed and customized to create new interfaces. 
+
+```python
+plot = mk.gui.plotly.ScatterPlot(df=plot_df, x="umap_1", y="umap_2",)
+
+@mk.gui.reactive
+def filter(selected: list, df: mk.DataFrame):
+    return df[df.primary_key.isin(selected)]
+
+filtered_df = filter(plot.selected, plot_df)
+table = mk.gui.Table(filtered_df, classes="h-full")
+
+mk.gui.html.flex([plot, table], classes="h-[600px]") 
+```
+
+<div align="center">
+	<img src="website/static/compose.gif" height=300 alt="Meerkat logo"/>
+</div>
+
+
+### ✨ Use cases where Meerkat shines
+- _Exploratory analysis over unstructured data types._ [Demo](https://www.youtube.com/watch?v=a8FBT33QACQ)
+- _Spot-checking the behavior of large language models (e.g. GPT-3)._  [Demo](https://www.youtube.com/watch?v=3ItA70qoe-o)
+- _Identifying systematic errors made by machine learning models._ [Demo](https://youtu.be/4Kk_LZbNWNs)
+- _Rapid labeling of validation data._
+
+### 🤔 Use cases where Meerkat may not be the right fit
+
+- _Are you only working with structured data (e.g. numerical and categorical variables)?_ Popular data visualization libraries (_e.g._ [Seaborn](https://seaborn.pydata.org/), [Matplotlib](https://matplotlib.org/)) are often sufficient. If you're looking for interactivity, [Plotly](https://plotly.com/) and [Streamlit](https://streamlit.io/) work well with structured data. Meerkat is differentiated in how it visualizes unstructured data types: long-form text, PDFs, HTML, images, video, audio...  
+- _Are you trying to make a straightforward demo of a machine learning model (single input/output, chatbot) and share with the world?_ [Gradio](https://gradio.app/) is likely a better fit! Though, if your demo involves visualizing lots of data, you may find Meerkat useful.
+- _Are you trying to manually label tens of thousands of data points?_  If you are looking for a data labeling tool to use with a labeling team, there are great open source labeling solutions designed for this (_e.g._ [LabelStudio](https://labelstud.io/)). In contrast, Meerkat is great fit for teams/individuals without access to a large labeling workforce who are using pretrained models (_e.g._ GPT-3) and need to label validation data or in-context examples.
+
+
 
 
 <!-- Our goal is to make foundation models a more reliable
