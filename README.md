@@ -34,28 +34,26 @@ pip install meerkat-ml
 <!-- ```bash
 pip install "meerkat-ml @ git+https://github.com/robustness-gym/meerkat@clever-dev"
 ```  -->
-
-> **_Optional Dependencies_**: some parts of Meerkat rely on optional dependencies e.g. audio processing may rely on utilities from `torchaudio`. We leave it up to you to install necessary dependencies when required. As a convenience, we provide bundles of optional dependencies that you can install e.g. `pip install meerkat-ml[text]` for text dependencies. See `setup.py` for a full list of optional dependencies.
-
+<!-- 
+> **_Optional Dependencies_**: some parts of Meerkat rely on optional dependencies e.g. audio processing may rely on utilities from `torchaudio`. See  -->
+<!-- 
 Then try one of our demos,
 
 ```bash
 mk demo tutorial-image-gallery --copy
 ```
 
-Explore the code for this demo in `tutorial-image-gallery.py`. 
-
-To see a full list of demos, use `mk demo --help`. (If this didn't work for you, we'd appreciate if you could open an issue and let us know.)
+Explore the code for this demo in `tutorial-image-gallery.py`. To see a full list of demos, use `mk demo --help`.  -->
 
 **Next Steps**.
-Check out our [Getting Started page](http://meerkat.wiki/docs/start/quickstart-df.html) and our [documentation](http://meerkat.wiki/docs/index.html) to start building with Meerkat. As we work to make the documentation more comprehensive, please feel free to open an issue or reach out if you have any questions.
+Check out our [Getting Started page](http://meerkat.wiki/docs/start/quickstart-df.html) and our [documentation](http://meerkat.wiki/docs/index.html) to start building with Meerkat.
 
 ## Why Meerkat?
 
-Meerkat is an open-source Python library that helps users visualize, explore, and annotate any dataset. 
+Meerkat is an open-source Python library that helps users visualize, explore, and annotate any dataset. It is especially useful when using machine learning models with unstructured data types (_e.g._ free text, PDFs, images, video). 
 
 ### ✨ Use cases where Meerkat shines
-- _Exploratory analysis over unstructured data._ [Demo](https://www.youtube.com/watch?v=a8FBT33QACQ)
+- _Exploratory analysis over unstructured data types._ [Demo](https://www.youtube.com/watch?v=a8FBT33QACQ)
 - _Spot-checking the behavior of large language models (e.g. GPT-3)._  [Demo](https://www.youtube.com/watch?v=3ItA70qoe-o)
 - _Identifying systematic errors made by machine learning models._ [Demo](https://youtu.be/4Kk_LZbNWNs)
 - _Rapid labeling of validation data._
@@ -66,15 +64,30 @@ Meerkat is an open-source Python library that helps users visualize, explore, an
 - _Are you trying to make a straightforward demo of a machine learning model (single input/output, chatbot) and share with the world?_ [Gradio](https://gradio.app/) is likely a better fit! Though, if your demo involves visualizing lots of data, you may find Meerkat useful.
 - _Are you trying to manually label tens of thousands of data points?_  If you are looking for a data labeling tool to use with a labeling team, there are great open source labeling solutions designed for this (_e.g._ [LabelStudio](https://labelstud.io/)). In contrast, Meerkat is great fit for teams/individuals without access to a large labeling workforce who are using pretrained models (_e.g._ GPT-3) and need to label validation data or in-context examples.
 
+<details>
+  <summary>Click me</summary>
+  
+  ### Heading
+  1. Foo
+  2. Bar
+     * Baz
+     * Qux
+
+  ### Some Code
+  ```js
+  function logSomething(something) {
+    console.log('Something', something);
+  }
+  ```
+</details>
 
 ### ✏️ Features and Design Principles
 
 Here are four principles that inform Meerkat's designs.
 
 **(1) Low overhead.**  With four lines of Python, start interacting with any dataset. 
-	- Zero-copy integrations with your preferred data abstractions: Pandas, Arrow, HF Datasets, Ibis, SQL.
-	- Limits data movement, allowing you to interact with your data where it already lives. No uploads to external databases and no reformatting.
-	- Meets you where you are. Meerkat works in notebooks and in scripts. 
+- Zero-copy integrations with your preferred data abstractions: Pandas, Arrow, HF Datasets, Ibis, SQL.
+- Limited data movement. With Meerkat, you interact with your data where it already lives: no uploads to external databases and no reformatting.
 
 ```python
 import meerkat as mk
@@ -83,12 +96,14 @@ df = mk.from_csv("paintings.csv")
 df["img"] = mk.files("img_path")
 df
 ```
-<div align="center">
 
-<img src="website/static/dataframe-demo.gif" height=300 alt="Meerkat logo"/>
-</div>
 
 **(2) Diverse data types.** Visualize and annotate almost any data type in Meerkat interfaces: text, images, audio, video, MRI scans, PDFs, HTML, JSON. 
+
+<div align="center">
+	<img src="website/static/dataframe-demo.gif" height=300 alt=""/>
+</div>
+
 
 **(3) "Intelligent" user interfaces.** Meerkat makes it easy to embed **machine learning models** (e.g. LLMs) within user interfaces to enable intelligent functionality such as searching, grouping and autocomplete. 
 
