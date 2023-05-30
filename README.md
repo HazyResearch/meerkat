@@ -46,7 +46,7 @@ Check out our [Getting Started page](http://meerkat.wiki/docs/start/quickstart-d
 
 ## Why Meerkat?
 
-Meerkat is an open-source Python library that helps users visualize, explore, and annotate any dataset. It is especially useful when processing machine unstructured data types (_e.g._ free text, PDFs, images, video) with machine learning models. 
+Meerkat is an open-source Python library that helps users visualize, explore, and annotate any dataset. It is especially useful when processing unstructured data types (_e.g._ free text, PDFs, images, video) with machine learning models. 
 
 ### ✏️ Features and Design Principles
 
