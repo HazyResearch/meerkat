@@ -125,11 +125,13 @@ class OpenAIChatCompletion(OpenAIMixin, ChatCompletion):
         prompt: str,
         history: List[Message] = [],
         system_prompt: str = "You are a helpful assistant.",
+        skip_cache: bool = False
     ):
         """Run the engine on a prompt."""
-        cached_run = self.on_run_start(prompt=prompt)
-        if cached_run:
-            return cached_run.output
+        if not skip_cache:
+            cached_run = self.on_run_start(prompt=prompt)
+            if cached_run:
+                return cached_run.output
 
         messages = (
             [
