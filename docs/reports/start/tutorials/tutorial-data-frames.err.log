@@ -25,16 +25,16 @@ valid_df[["label_id", "input", "pred", "probs", "activation"]].head()
 Cell [0;32mIn[20], line 1[0m
 [0;32m----> 1[0m [43mvalid_df[49m[43m[[49m[43m[[49m[38;5;124;43m"[39;49m[38;5;124;43mlabel_id[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43minput[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43mpred[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43mprobs[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43mactivation[39;49m[38;5;124;43m"[39;49m[43m][49m[43m][49m[38;5;241m.[39mhead()
 
-File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204[0m, in [0;36mreactive.<locals>.__reactive.<locals>.wrapper[0;34m(*args, **kwargs)[0m
-[1;32m    202[0m [38;5;66;03m# Call the function on the args and kwargs[39;00m
-[1;32m    203[0m [38;5;28;01mwith[39;00m unmarked():
-[0;32m--> 204[0m     result [38;5;241m=[39m [43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43munpacked_args[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43munpacked_kwargs[49m[43m)[49m
-[1;32m    206[0m [38;5;66;03m# TODO: Check if result is equal to one of the inputs.[39;00m
-[1;32m    207[0m [38;5;66;03m# If it is, we need to copy it.[39;00m
-[1;32m    209[0m [38;5;28;01mif[39;00m _is_unmarked_context [38;5;129;01mor[39;00m _force_no_react [38;5;129;01mor[39;00m [38;5;129;01mnot[39;00m any_inputs_marked:
-[1;32m    210[0m     [38;5;66;03m# If we are in an unmarked context, then we don't need to create[39;00m
-[1;32m    211[0m     [38;5;66;03m# any nodes in the graph.[39;00m
-[1;32m    212[0m     [38;5;66;03m# `fn` should be run as normal.[39;00m
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:211[0m, in [0;36mreactive.<locals>.__reactive.<locals>.wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    209[0m [38;5;66;03m# Call the function on the args and kwargs[39;00m
+[1;32m    210[0m [38;5;28;01mwith[39;00m unmarked():
+[0;32m--> 211[0m     result [38;5;241m=[39m [43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43munpacked_args[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43munpacked_kwargs[49m[43m)[49m
+[1;32m    213[0m [38;5;66;03m# TODO: Check if result is equal to one of the inputs.[39;00m
+[1;32m    214[0m [38;5;66;03m# If it is, we need to copy it.[39;00m
+[1;32m    216[0m [38;5;28;01mif[39;00m _is_unmarked_context [38;5;129;01mor[39;00m _force_no_react [38;5;129;01mor[39;00m [38;5;129;01mnot[39;00m any_inputs_marked:
+[1;32m    217[0m     [38;5;66;03m# If we are in an unmarked context, then we don't need to create[39;00m
+[1;32m    218[0m     [38;5;66;03m# any nodes in the graph.[39;00m
+[1;32m    219[0m     [38;5;66;03m# `fn` should be run as normal.[39;00m
 
 File [0;32m~/work/meerkat/meerkat/meerkat/dataframe.py:537[0m, in [0;36mDataFrame.__getitem__[0;34m(self, posidx)[0m
 [1;32m    535[0m [38;5;129m@reactive[39m()
@@ -47,21 +47,21 @@ File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74[0m, 
 [1;32m     73[0m     [38;5;28;01mwith[39;00m [38;5;28mself[39m[38;5;241m.[39mclone():
 [0;32m---> 74[0m         [38;5;28;01mreturn[39;00m [43mreactive[49m[43m([49m[43mfunc[49m[43m,[49m[43m [49m[43mnested_return[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m)[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
 
-File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204[0m, in [0;36mreactive.<locals>.__reactive.<locals>.wrapper[0;34m(*args, **kwargs)[0m
-[1;32m    202[0m [38;5;66;03m# Call the function on the args and kwargs[39;00m
-[1;32m    203[0m [38;5;28;01mwith[39;00m unmarked():
-[0;32m--> 204[0m     result [38;5;241m=[39m [43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43munpacked_args[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43munpacked_kwargs[49m[43m)[49m
-[1;32m    206[0m [38;5;66;03m# TODO: Check if result is equal to one of the inputs.[39;00m
-[1;32m    207[0m [38;5;66;03m# If it is, we need to copy it.[39;00m
-[1;32m    209[0m [38;5;28;01mif[39;00m _is_unmarked_context [38;5;129;01mor[39;00m _force_no_react [38;5;129;01mor[39;00m [38;5;129;01mnot[39;00m any_inputs_marked:
-[1;32m    210[0m     [38;5;66;03m# If we are in an unmarked context, then we don't need to create[39;00m
-[1;32m    211[0m     [38;5;66;03m# any nodes in the graph.[39;00m
-[1;32m    212[0m     [38;5;66;03m# `fn` should be run as normal.[39;00m
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:211[0m, in [0;36mreactive.<locals>.__reactive.<locals>.wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    209[0m [38;5;66;03m# Call the function on the args and kwargs[39;00m
+[1;32m    210[0m [38;5;28;01mwith[39;00m unmarked():
+[0;32m--> 211[0m     result [38;5;241m=[39m [43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43munpacked_args[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43munpacked_kwargs[49m[43m)[49m
+[1;32m    213[0m [38;5;66;03m# TODO: Check if result is equal to one of the inputs.[39;00m
+[1;32m    214[0m [38;5;66;03m# If it is, we need to copy it.[39;00m
+[1;32m    216[0m [38;5;28;01mif[39;00m _is_unmarked_context [38;5;129;01mor[39;00m _force_no_react [38;5;129;01mor[39;00m [38;5;129;01mnot[39;00m any_inputs_marked:
+[1;32m    217[0m     [38;5;66;03m# If we are in an unmarked context, then we don't need to create[39;00m
+[1;32m    218[0m     [38;5;66;03m# any nodes in the graph.[39;00m
+[1;32m    219[0m     [38;5;66;03m# `fn` should be run as normal.[39;00m
 
-File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137[0m, in [0;36mreactive.<locals>.__reactive.<locals>.wrapper.<locals>._fn_outer_wrapper.<locals>._fn_wrapper[0;34m(*args, **kwargs)[0m
-[1;32m    135[0m [38;5;129m@wraps[39m(_fn)
-[1;32m    136[0m [38;5;28;01mdef[39;00m [38;5;21m_fn_wrapper[39m([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs):
-[0;32m--> 137[0m     [38;5;28;01mreturn[39;00m [43m_fn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:144[0m, in [0;36mreactive.<locals>.__reactive.<locals>.wrapper.<locals>._fn_outer_wrapper.<locals>._fn_wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    142[0m [38;5;129m@wraps[39m(_fn)
+[1;32m    143[0m [38;5;28;01mdef[39;00m [38;5;21m_fn_wrapper[39m([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs):
+[0;32m--> 144[0m     [38;5;28;01mreturn[39;00m [43m_fn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
 
 File [0;32m~/work/meerkat/meerkat/meerkat/dataframe.py:525[0m, in [0;36mDataFrame._get[0;34m(self, posidx, materialize)[0m
 [1;32m    523[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [38;5;28mset[39m(posidx)[38;5;241m.[39missubset([38;5;28mself[39m[38;5;241m.[39mcolumns):

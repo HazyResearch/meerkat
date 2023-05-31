@@ -1916,6 +1916,7 @@ title="Open an issue"
     <span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">nested_return</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">skip_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">backend_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Internal decorator that is used to mark a function as reactive.</span>
 <span class="sd">    This is only meant for internal use, and users should use the</span>
@@ -1965,7 +1966,12 @@ title="Open an issue"
     <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># need to make passing args to the args optional</span>
         <span class="c1"># note: all of the args passed to the decorator MUST be optional</span>
-        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">reactive</span><span class="p">,</span> <span class="n">nested_return</span><span class="o">=</span><span class="n">nested_return</span><span class="p">,</span> <span class="n">skip_fn</span><span class="o">=</span><span class="n">skip_fn</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span>
+            <span class="n">reactive</span><span class="p">,</span>
+            <span class="n">nested_return</span><span class="o">=</span><span class="n">nested_return</span><span class="p">,</span>
+            <span class="n">skip_fn</span><span class="o">=</span><span class="n">skip_fn</span><span class="p">,</span>
+            <span class="n">backend_only</span><span class="o">=</span><span class="n">backend_only</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="c1"># Built-in functions cannot be wrapped in reactive.</span>
     <span class="c1"># They have to be converted to a lambda function first and then run.</span>
@@ -1999,6 +2005,7 @@ title="Open an issue"
             <span class="c1"># Then, Store(list)[0] should also return a Store.</span>
             <span class="c1"># TODO (arjun): These if this assumption holds.</span>
             <span class="k">nonlocal</span> <span class="n">nested_return</span>
+            <span class="k">nonlocal</span> <span class="n">backend_only</span>
             <span class="k">nonlocal</span> <span class="n">fn</span>
 
             <span class="n">_is_unmarked_context</span> <span class="o">=</span> <span class="n">is_unmarked_context</span><span class="p">()</span>
@@ -2098,13 +2105,15 @@ title="Open an issue"
 
             <span class="c1"># Wrap the Result in NodeMixin objects</span>
             <span class="k">if</span> <span class="n">nested_return</span><span class="p">:</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">_nested_apply</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="n">_wrap_outputs</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">_nested_apply</span><span class="p">(</span>
+                    <span class="n">result</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">_wrap_outputs</span><span class="p">,</span> <span class="n">backend_only</span><span class="o">=</span><span class="n">backend_only</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">NodeMixin</span><span class="p">):</span>
                 <span class="n">result</span> <span class="o">=</span> <span class="n">result</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">):</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">_IteratorStore</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">_IteratorStore</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">backend_only</span><span class="o">=</span><span class="n">backend_only</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">Store</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">Store</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">backend_only</span><span class="o">=</span><span class="n">backend_only</span><span class="p">)</span>
 
             <span class="c1"># If the object is a ReactifiableMixin, we should turn</span>
             <span class="c1"># reactivity on.</span>
@@ -2213,14 +2222,14 @@ title="Open an issue"
         <span class="n">nodeable</span><span class="o">.</span><span class="n">inode</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">inode</span><span class="p">,</span> <span class="n">triggers</span><span class="o">=</span><span class="n">triggers</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_wrap_outputs</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_wrap_outputs</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">backend_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">meerkat.interactive.graph.store</span> <span class="kn">import</span> <span class="n">Store</span><span class="p">,</span> <span class="n">_IteratorStore</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">NodeMixin</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">obj</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_IteratorStore</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">Store</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_IteratorStore</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">backend_only</span><span class="o">=</span><span class="n">backend_only</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Store</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">backend_only</span><span class="o">=</span><span class="n">backend_only</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_create_nodes_for_nodeables</span><span class="p">(</span><span class="o">*</span><span class="n">nodeables</span><span class="p">:</span> <span class="n">NodeMixin</span><span class="p">):</span>

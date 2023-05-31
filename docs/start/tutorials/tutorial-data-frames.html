@@ -2315,7 +2315,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "9befe950b53c47d19131c3d50e1ca9ec"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "3e3807ca18124f1a8032e26ab50926b4"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -2522,7 +2522,7 @@ Using the <a class="reference external" href="https://seaborn.pydata.org/install
   warnings.warn(
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7f4f61b2c910&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7f24c9987280&gt;
 </pre></div>
 </div>
 <img alt="../../_images/7e234957b14e939fce17327c18d898143278432b13bb3e39e1316f507cea4bbb.png" src="../../_images/7e234957b14e939fce17327c18d898143278432b13bb3e39e1316f507cea4bbb.png" />
@@ -2561,13 +2561,13 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/44.7M [00:00&lt;?, ?B/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 19%|█▉        | 8.45M/44.7M [00:00&lt;00:00, 88.5MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 14%|█▍        | 6.27M/44.7M [00:00&lt;00:00, 65.8MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 65%|██████▍   | 29.0M/44.7M [00:00&lt;00:00, 163MB/s] 
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 48%|████▊     | 21.4M/44.7M [00:00&lt;00:00, 120MB/s] 
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 44.7M/44.7M [00:00&lt;00:00, 187MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 44.7M/44.7M [00:00&lt;00:00, 165MB/s]
 </pre></div>
 </div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
@@ -2670,16 +2670,16 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <span class="g g-Whitespace">     </span><span class="mi">73</span>     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">():</span>
 <span class="ne">---&gt; </span><span class="mi">74</span>         <span class="k">return</span> <span class="n">reactive</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">nested_return</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">202</span> <span class="c1"># Call the function on the args and kwargs</span>
-<span class="g g-Whitespace">    </span><span class="mi">203</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
-<span class="ne">--&gt; </span><span class="mi">204</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">unpacked_args</span><span class="p">,</span> <span class="o">**</span><span class="n">unpacked_kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">206</span> <span class="c1"># TODO: Check if result is equal to one of the inputs.</span>
-<span class="g g-Whitespace">    </span><span class="mi">207</span> <span class="c1"># If it is, we need to copy it.</span>
-<span class="g g-Whitespace">    </span><span class="mi">209</span> <span class="k">if</span> <span class="n">_is_unmarked_context</span> <span class="ow">or</span> <span class="n">_force_no_react</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">any_inputs_marked</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">210</span>     <span class="c1"># If we are in an unmarked context, then we don&#39;t need to create</span>
-<span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="c1"># any nodes in the graph.</span>
-<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># `fn` should be run as normal.</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:211,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">209</span> <span class="c1"># Call the function on the args and kwargs</span>
+<span class="g g-Whitespace">    </span><span class="mi">210</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
+<span class="ne">--&gt; </span><span class="mi">211</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">unpacked_args</span><span class="p">,</span> <span class="o">**</span><span class="n">unpacked_kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">213</span> <span class="c1"># TODO: Check if result is equal to one of the inputs.</span>
+<span class="g g-Whitespace">    </span><span class="mi">214</span> <span class="c1"># If it is, we need to copy it.</span>
+<span class="g g-Whitespace">    </span><span class="mi">216</span> <span class="k">if</span> <span class="n">_is_unmarked_context</span> <span class="ow">or</span> <span class="n">_force_no_react</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">any_inputs_marked</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">217</span>     <span class="c1"># If we are in an unmarked context, then we don&#39;t need to create</span>
+<span class="g g-Whitespace">    </span><span class="mi">218</span>     <span class="c1"># any nodes in the graph.</span>
+<span class="g g-Whitespace">    </span><span class="mi">219</span>     <span class="c1"># `fn` should be run as normal.</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:193,</span> in <span class="ni">DataFrame._ipython_display_</span><span class="nt">(self)</span>
 <span class="g g-Whitespace">    </span><span class="mi">190</span>     <span class="n">max_rows</span> <span class="o">=</span> <span class="n">meerkat</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span>
@@ -2884,16 +2884,16 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">20</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">valid_df</span><span class="p">[[</span><span class="s2">&quot;label_id&quot;</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;pred&quot;</span><span class="p">,</span> <span class="s2">&quot;probs&quot;</span><span class="p">,</span> <span class="s2">&quot;activation&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">202</span> <span class="c1"># Call the function on the args and kwargs</span>
-<span class="g g-Whitespace">    </span><span class="mi">203</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
-<span class="ne">--&gt; </span><span class="mi">204</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">unpacked_args</span><span class="p">,</span> <span class="o">**</span><span class="n">unpacked_kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">206</span> <span class="c1"># TODO: Check if result is equal to one of the inputs.</span>
-<span class="g g-Whitespace">    </span><span class="mi">207</span> <span class="c1"># If it is, we need to copy it.</span>
-<span class="g g-Whitespace">    </span><span class="mi">209</span> <span class="k">if</span> <span class="n">_is_unmarked_context</span> <span class="ow">or</span> <span class="n">_force_no_react</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">any_inputs_marked</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">210</span>     <span class="c1"># If we are in an unmarked context, then we don&#39;t need to create</span>
-<span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="c1"># any nodes in the graph.</span>
-<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># `fn` should be run as normal.</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:211,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">209</span> <span class="c1"># Call the function on the args and kwargs</span>
+<span class="g g-Whitespace">    </span><span class="mi">210</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
+<span class="ne">--&gt; </span><span class="mi">211</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">unpacked_args</span><span class="p">,</span> <span class="o">**</span><span class="n">unpacked_kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">213</span> <span class="c1"># TODO: Check if result is equal to one of the inputs.</span>
+<span class="g g-Whitespace">    </span><span class="mi">214</span> <span class="c1"># If it is, we need to copy it.</span>
+<span class="g g-Whitespace">    </span><span class="mi">216</span> <span class="k">if</span> <span class="n">_is_unmarked_context</span> <span class="ow">or</span> <span class="n">_force_no_react</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">any_inputs_marked</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">217</span>     <span class="c1"># If we are in an unmarked context, then we don&#39;t need to create</span>
+<span class="g g-Whitespace">    </span><span class="mi">218</span>     <span class="c1"># any nodes in the graph.</span>
+<span class="g g-Whitespace">    </span><span class="mi">219</span>     <span class="c1"># `fn` should be run as normal.</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:537,</span> in <span class="ni">DataFrame.__getitem__</span><span class="nt">(self, posidx)</span>
 <span class="g g-Whitespace">    </span><span class="mi">535</span> <span class="nd">@reactive</span><span class="p">()</span>
@@ -2906,21 +2906,21 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <span class="g g-Whitespace">     </span><span class="mi">73</span>     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">():</span>
 <span class="ne">---&gt; </span><span class="mi">74</span>         <span class="k">return</span> <span class="n">reactive</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">nested_return</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">202</span> <span class="c1"># Call the function on the args and kwargs</span>
-<span class="g g-Whitespace">    </span><span class="mi">203</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
-<span class="ne">--&gt; </span><span class="mi">204</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">unpacked_args</span><span class="p">,</span> <span class="o">**</span><span class="n">unpacked_kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">206</span> <span class="c1"># TODO: Check if result is equal to one of the inputs.</span>
-<span class="g g-Whitespace">    </span><span class="mi">207</span> <span class="c1"># If it is, we need to copy it.</span>
-<span class="g g-Whitespace">    </span><span class="mi">209</span> <span class="k">if</span> <span class="n">_is_unmarked_context</span> <span class="ow">or</span> <span class="n">_force_no_react</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">any_inputs_marked</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">210</span>     <span class="c1"># If we are in an unmarked context, then we don&#39;t need to create</span>
-<span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="c1"># any nodes in the graph.</span>
-<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># `fn` should be run as normal.</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:211,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">209</span> <span class="c1"># Call the function on the args and kwargs</span>
+<span class="g g-Whitespace">    </span><span class="mi">210</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
+<span class="ne">--&gt; </span><span class="mi">211</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">unpacked_args</span><span class="p">,</span> <span class="o">**</span><span class="n">unpacked_kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">213</span> <span class="c1"># TODO: Check if result is equal to one of the inputs.</span>
+<span class="g g-Whitespace">    </span><span class="mi">214</span> <span class="c1"># If it is, we need to copy it.</span>
+<span class="g g-Whitespace">    </span><span class="mi">216</span> <span class="k">if</span> <span class="n">_is_unmarked_context</span> <span class="ow">or</span> <span class="n">_force_no_react</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">any_inputs_marked</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">217</span>     <span class="c1"># If we are in an unmarked context, then we don&#39;t need to create</span>
+<span class="g g-Whitespace">    </span><span class="mi">218</span>     <span class="c1"># any nodes in the graph.</span>
+<span class="g g-Whitespace">    </span><span class="mi">219</span>     <span class="c1"># `fn` should be run as normal.</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper.&lt;locals&gt;._fn_outer_wrapper.&lt;locals&gt;._fn_wrapper</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">135</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">_fn</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:144,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper.&lt;locals&gt;._fn_outer_wrapper.&lt;locals&gt;._fn_wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">142</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">_fn</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">143</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">144</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:525,</span> in <span class="ni">DataFrame._get</span><span class="nt">(self, posidx, materialize)</span>
 <span class="g g-Whitespace">    </span><span class="mi">523</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">posidx</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
