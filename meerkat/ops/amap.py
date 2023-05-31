@@ -46,7 +46,8 @@ async def apply_function(fn: Callable, column: mk.Column):
     """
     assert asyncio.iscoroutinefunction(fn), "Function must be async."
     tasks = []
-    for element in tqdm_asyncio(column, desc=f"Async execution of `{fn.__name__}`"):
+    # for element in tqdm_asyncio(column, desc=f"Async execution of `{fn.__name__}`"):
+    for element in column:
         tasks.append(fn(element))
     results = await asyncio.gather(*tasks)
     return results
@@ -82,12 +83,12 @@ async def amap(
     Returns:
         A column or dataframe with the function applied to each element.
     """
-    # Check if the function is async. If not, make it.
-    if not asyncio.iscoroutinefunction(function):
-        warnings.warn(
-            f"Function {function} is not async. Automatically converting to async."
-            " Consider making it async before calling `amap`."
-        )
+    # # Check if the function is async. If not, make it.
+    # if not asyncio.iscoroutinefunction(function):
+    #     warnings.warn(
+    #         f"Function {function} is not async. Automatically converting to async."
+    #         " Consider making it async before calling `amap`."
+    #     )
 
     if isinstance(data, mk.Column):
         # Run the function asynchronously on the column.

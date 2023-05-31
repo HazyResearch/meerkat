@@ -125,22 +125,7 @@ class SQLAlchemyWatchLogger(WatchLogger):
         Base.metadata.create_all(engine)
 
         self.sessionmaker = sessionmaker(bind=engine)
-        self._session = self.sessionmaker()
         self.thread_id = threading.get_ident()
-
-    @property
-    def session(self):
-        # Need to use a different session if we're in a different thread.
-        # This happens when running an engine asynchronously.
-        if self.thread_id != threading.get_ident():
-            # Do this ephemerally.
-            return self.sessionmaker()
-        else:
-            return self._session
-
-    def close(self) -> None:
-        """Close the client."""
-        self.session.close()
 
     def log_errand(
         self,
@@ -151,18 +136,19 @@ class SQLAlchemyWatchLogger(WatchLogger):
         # Query the `errands` table to see if the errand is already there
         # If not, add it
         session = self.session
-        response = session.query(Errand).filter_by(code=code).first()
-        if response is not None:
-            return response.id
+        with self.sessionmaker():
+            response = session.query(Errand).filter_by(code=code).first()
+            if response is not None:
+                return response.id
 
-        errand = Errand(
-            id=str(uuid.uuid4()),
-            code=code,
-            name=name,
-            module=module,
-        )
-        session.add(errand)
-        session.commit()
+            errand = Errand(
+                id=str(uuid.uuid4()),
+                code=code,
+                name=name,
+                module=module,
+            )
+            session.add(errand)
+            session.commit()
         return errand.id
 
     def log_errand_start(
@@ -182,55 +168,51 @@ class SQLAlchemyWatchLogger(WatchLogger):
             engine=engine,
             time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         )
-        session = self.session
-        session.add(errand_run)
+        with self.sessionmaker() as session:
+            session.add(errand_run)
 
-        # Add the inputs
-        for key, value in inputs.items():
-            obj = Object(id=str(uuid.uuid4()), value=value)
-            session.add(obj)
-            errand_run_input = ErrandRunInput(
-                id=str(uuid.uuid4()),
-                object_id=obj.id,
-                errand_run_id=errand_run.id,
-                key=key,
-            )
-            session.add(errand_run_input)
-        session.commit()
+            # Add the inputs
+            for key, value in inputs.items():
+                obj = Object(id=str(uuid.uuid4()), value=value)
+                session.add(obj)
+                errand_run_input = ErrandRunInput(
+                    id=str(uuid.uuid4()),
+                    object_id=obj.id,
+                    errand_run_id=errand_run.id,
+                    key=key,
+                )
+                session.add(errand_run_input)
+            session.commit()
         return errand_run.id
 
     def _hash_run(self, input: str, engine: str, configuration: Dict[str, Any]):
         from hashlib import sha256
         import json
 
-        return sha256(json.dumps({
-            "input": input,
-            "engine": engine,
-            "configuration": configuration
-        }
-        ).encode('utf-8')).hexdigest()
+        return sha256(
+            json.dumps(
+                {"input": input, "engine": engine, "configuration": configuration}
+            ).encode("utf-8")
+        ).hexdigest()
 
     def retrieve_engine_run(
-        self,
-        input: str,
-        engine: str,
-        configuration: Dict[str, Any]
+        self, input: str, engine: str, configuration: Dict[str, Any]
     ) -> Optional[EngineRun]:
         """Retrieve the most recent engine run for a given input and engine."""
         # Query the `engine_runs` table to see if the engine run is already there
         # If not, return None
         hashed = self._hash_run(input=input, configuration=configuration, engine=engine)
-        session = self.session
-        response = (
-            session.query(EngineRun)
-            .filter_by(hash=hashed)
-            .order_by(EngineRun.created_at.desc())
-            .first()
-        )
-        if response is not None:
-            return response
-        else:
-            return None
+        with self.sessionmaker() as session:
+            response = (
+                session.query(EngineRun)
+                .filter_by(hash=hashed)
+                .order_by(EngineRun.created_at.desc())
+                .first()
+            )
+            if response is not None:
+                return response
+            else:
+                return None
 
     def log_engine_run(
         self,
@@ -242,28 +224,27 @@ class SQLAlchemyWatchLogger(WatchLogger):
         input_tokens: int,
         output_tokens: int,
         configuration: Dict[str, Any],
-
     ) -> None:
         hashed = self._hash_run(input=input, configuration=configuration, engine=engine)
 
         # Log to Tables: engine_runs
-        session = self.session
-        session.add(
-            EngineRun(
-                id=str(uuid.uuid4()),
-                errand_run_id=errand_run_id,
-                input=input,
-                output=output,
-                engine=engine,
-                cost=cost,
-                input_tokens=input_tokens,
-                output_tokens=output_tokens,
-                created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                configuration=configuration,
-                hash=hashed,
+        with self.sessionmaker() as session:
+            session.add(
+                EngineRun(
+                    id=str(uuid.uuid4()),
+                    errand_run_id=errand_run_id,
+                    input=input,
+                    output=output,
+                    engine=engine,
+                    cost=cost,
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
+                    created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    configuration=configuration,
+                    hash=hashed,
+                )
             )
-        )
-        session.commit()
+            session.commit()
 
     def log_errand_end(
         self,
@@ -273,28 +254,20 @@ class SQLAlchemyWatchLogger(WatchLogger):
         # Log to Tables: errand_runs, errand_run_outputs, objects
 
         # Add the outputs
-        session = self.session
-        for key, value in outputs.items():
-            obj = Object(id=str(uuid.uuid4()), value=value)
-            session.add(obj)
+        with self.sessionmaker() as session:
+            for key, value in outputs.items():
+                obj = Object(id=str(uuid.uuid4()), value=value)
+                session.add(obj)
 
-            errand_run_output = ErrandRunOutput(
-                id=str(uuid.uuid4()),
-                object_id=obj.id,
-                errand_run_id=errand_run_id,
-                key=key,
-            )
-            session.add(errand_run_output)
+                errand_run_output = ErrandRunOutput(
+                    id=str(uuid.uuid4()),
+                    object_id=obj.id,
+                    errand_run_id=errand_run_id,
+                    key=key,
+                )
+                session.add(errand_run_output)
 
-        session.commit()
-
-    def commit(self) -> None:
-        """Commit any results."""
-        self.session.commit()
-
-    def rollback(self) -> None:
-        """Rollback any results."""
-        self.session.rollback()
+            session.commit()
 
     @classmethod
     def from_snowflake(cls, user: str, password: str, account_identifier: str):
@@ -313,10 +286,10 @@ class SQLAlchemyWatchLogger(WatchLogger):
     def from_sqlite(cls, path: str):
         engine = create_engine(f"sqlite:///{path}")
         return cls(engine=engine)
-    
+
     @classmethod
     def from_google_cloud_sql(
-        cls, 
+        cls,
         instance_connection_string: str,
         username: str,
         password: str,
@@ -324,11 +297,11 @@ class SQLAlchemyWatchLogger(WatchLogger):
     ):
         """Create a new instance of the class from a Google Cloud SQL connection.
 
-        This method establishes a connection to a Google Cloud SQL database instance 
+        This method establishes a connection to a Google Cloud SQL database instance
         and returns a new instance of the class, configured to use this connection.
 
         Args:
-            instance_connection_string (str): The connection string of the Google Cloud SQL instance. 
+            instance_connection_string (str): The connection string of the Google Cloud SQL instance.
                 This should include the instance's project, region, and name.
             username (str): The username to authenticate with the database instance.
             password (str): The password to authenticate with the database instance.
@@ -338,6 +311,7 @@ class SQLAlchemyWatchLogger(WatchLogger):
             cls: A new instance of the class, configured to use the provided Google Cloud SQL connection.
         """
         from google.cloud.sql.connector import Connector
+
         # initialize Cloud SQL Python Connector object
         connector = Connector()
 
@@ -350,27 +324,26 @@ class SQLAlchemyWatchLogger(WatchLogger):
                 db=database_name,
             )
             return conn
-        
+
         engine = sqlalchemy.create_engine(
             "postgresql+pg8000://",
-            creator=getconn,    
-            pool_size=30,
+            creator=getconn,
+            pool_size=5,
             max_overflow=-1,
         )
         return cls(engine=engine)
-
 
     def get_table(self, model: Union[type, str]):
         if isinstance(model, str):
             model = TABLE_TO_MODEL[model]
 
-        session = self.session
-        result = session.query(model).all()
+        with self.sessionmaker() as session:
+            result = session.query(model).all()
 
-        records = [
-            {c.name: getattr(row, c.name) for c in model.__table__.columns}
-            for row in result
-        ]
-        if len(records) == 0:
-            raise ValueError("No records found.")
-        return DataFrame(records)
+            records = [
+                {c.name: getattr(row, c.name) for c in model.__table__.columns}
+                for row in result
+            ]
+            if len(records) == 0:
+                raise ValueError("No records found.")
+            return DataFrame(records)
