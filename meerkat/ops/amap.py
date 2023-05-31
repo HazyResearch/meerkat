@@ -90,6 +90,8 @@ async def amap(
     #         " Consider making it async before calling `amap`."
     #     )
 
+    fn_name = function.__name__ if hasattr(function, "__name__") else str(function)
+
     if isinstance(data, mk.Column):
         # Run the function asynchronously on the column.
         # Only run `max_concurrent` tasks at a time.
@@ -99,7 +101,8 @@ async def amap(
         ]
         # Synchonously apply the function to each chunk.
         results = []
-        for chunk in tqdm(chunks, desc=f"Chunked execution of `{function.__name__}`"):
+
+        for chunk in tqdm(chunks, desc=f"Chunked execution of `{fn_name}`"):
             results.append(await apply_function(asasync(function), chunk))
         # Flatten the results.
         results = [item for sublist in results for item in sublist]
@@ -123,7 +126,7 @@ async def amap(
         ]
         # Synchonously apply the function to each chunk.
         results = []
-        for chunk in tqdm(chunks, desc=f"Chunked execution of `{function.__name__}`"):
+        for chunk in tqdm(chunks, desc=f"Chunked execution of `{fn_name}`"):
             results.append(
                 await apply_function(asasync(as_single_arg_fn(function)), chunk)
             )
