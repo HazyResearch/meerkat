@@ -328,8 +328,7 @@ class SQLAlchemyWatchLogger(WatchLogger):
         engine = sqlalchemy.create_engine(
             "postgresql+pg8000://",
             creator=getconn,
-            pool_size=5,
-            max_overflow=-1,
+            pool_size=10,
         )
         return cls(engine=engine)
 
