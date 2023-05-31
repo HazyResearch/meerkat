@@ -39,6 +39,7 @@ def reactive(
     fn: Callable = None,
     nested_return: bool = False,
     skip_fn: Callable[..., bool] = None,
+    backend_only: bool = False,
 ) -> Callable:
     """Internal decorator that is used to mark a function as reactive.
     This is only meant for internal use, and users should use the
@@ -88,7 +89,12 @@ def reactive(
     if fn is None:
         # need to make passing args to the args optional
         # note: all of the args passed to the decorator MUST be optional
-        return partial(reactive, nested_return=nested_return, skip_fn=skip_fn)
+        return partial(
+            reactive,
+            nested_return=nested_return,
+            skip_fn=skip_fn,
+            backend_only=backend_only,
+        )
 
     # Built-in functions cannot be wrapped in reactive.
     # They have to be converted to a lambda function first and then run.
@@ -122,6 +128,7 @@ def reactive(
             # Then, Store(list)[0] should also return a Store.
             # TODO (arjun): These if this assumption holds.
             nonlocal nested_return
+            nonlocal backend_only
             nonlocal fn
 
             _is_unmarked_context = is_unmarked_context()
@@ -221,13 +228,15 @@ def reactive(
 
             # Wrap the Result in NodeMixin objects
             if nested_return:
-                result = _nested_apply(result, fn=_wrap_outputs)
+                result = _nested_apply(
+                    result, fn=partial(_wrap_outputs, backend_only=backend_only)
+                )
             elif isinstance(result, NodeMixin):
                 result = result
             elif isinstance(result, Iterator):
-                result = _IteratorStore(result)
+                result = _IteratorStore(result, backend_only=backend_only)
             else:
-                result = Store(result)
+                result = Store(result, backend_only=backend_only)
 
             # If the object is a ReactifiableMixin, we should turn
             # reactivity on.
@@ -336,14 +345,14 @@ def _add_op_as_child(op: Operation, *nodeables: NodeMixin):
         nodeable.inode.add_child(op.inode, triggers=triggers)
 
 
-def _wrap_outputs(obj):
+def _wrap_outputs(obj, backend_only=False):
     from meerkat.interactive.graph.store import Store, _IteratorStore
 
     if isinstance(obj, NodeMixin):
         return obj
     elif isinstance(obj, Iterator):
-        return _IteratorStore(obj)
-    return Store(obj)
+        return _IteratorStore(obj, backend_only=backend_only)
+    return Store(obj, backend_only=backend_only)
 
 
 def _create_nodes_for_nodeables(*nodeables: NodeMixin):
