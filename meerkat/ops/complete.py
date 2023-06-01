@@ -1,3 +1,4 @@
+import os
 import re
 
 import meerkat as mk
@@ -15,6 +16,8 @@ def complete(
     num_blocks: int = 100,
     blocks_per_window: int = 10,
     pbar: bool = False,
+    client_connection: str = None,
+    cache_connection: str = "~/.manifest/cache.sqlite",
 ) -> mk.ScalarColumn:
     """Apply a generative language model to each row in a DataFrame.
 
@@ -29,6 +32,10 @@ def complete(
         ${num_blocks}
         ${blocks_per_window}
         ${pbar}
+        client_connection: The connection string for the client.
+            This is typically the key (e.g. OPENAI).
+            If it is not provided, it will be inferred from the engine.
+        cache_connection: The sqlite connection string for the cache.
 
     Returns:
         Union[Column]: A :class:`DeferredColumn` or a
@@ -37,15 +44,27 @@ def complete(
     """
     from manifest import Manifest
 
+    input_engine = engine
     client_name, engine = engine.split("/")
+    if client_connection is None:
+        if client_name == "openai":
+            client_connection = os.environ["OPENAI_API_KEY"]
+        else:
+            raise ValueError(
+                f"Cannot infer client connection from engine {input_engine}."
+            )
+
+    cache_connection = os.path.abspath(os.path.expanduser(cache_connection))
+    os.makedirs(os.path.dirname(cache_connection), exist_ok=True)
+
     manifest = Manifest(
         client_name=client_name,
-        client_connection=open("/Users/sabrieyuboglu/.meerkat/keys/.openai").read(),
+        client_connection=client_connection,
         engine=engine,
         temperature=0,
         max_tokens=1,
         cache_name="sqlite",
-        cache_connection="/Users/sabrieyuboglu/.manifest/cache.sqlite",
+        cache_connection=cache_connection,
     )
 
     def _run_manifest(rows: mk.DataFrame):
