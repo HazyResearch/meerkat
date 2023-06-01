@@ -1875,7 +1875,8 @@ title="Open an issue"
               <div>
                 
   <h1>Source code for meerkat.ops.complete</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
 
 <span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
 <span class="kn">import</span> <span class="nn">meerkat.tools.docs</span> <span class="k">as</span> <span class="nn">docs</span>
@@ -1892,6 +1893,8 @@ title="Open an issue"
     <span class="n">num_blocks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="n">blocks_per_window</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">pbar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">client_connection</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">cache_connection</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;~/.manifest/cache.sqlite&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mk</span><span class="o">.</span><span class="n">ScalarColumn</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply a generative language model to each row in a DataFrame.</span>
 
@@ -1906,6 +1909,10 @@ title="Open an issue"
 <span class="sd">        ${num_blocks}</span>
 <span class="sd">        ${blocks_per_window}</span>
 <span class="sd">        ${pbar}</span>
+<span class="sd">        client_connection: The connection string for the client.</span>
+<span class="sd">            This is typically the key (e.g. OPENAI).</span>
+<span class="sd">            If it is not provided, it will be inferred from the engine.</span>
+<span class="sd">        cache_connection: The sqlite connection string for the cache.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Union[Column]: A :class:`DeferredColumn` or a</span>
@@ -1914,15 +1921,27 @@ title="Open an issue"
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
 
+    <span class="n">input_engine</span> <span class="o">=</span> <span class="n">engine</span>
     <span class="n">client_name</span><span class="p">,</span> <span class="n">engine</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">client_connection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">client_name</span> <span class="o">==</span> <span class="s2">&quot;openai&quot;</span><span class="p">:</span>
+            <span class="n">client_connection</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Cannot infer client connection from engine </span><span class="si">{</span><span class="n">input_engine</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="n">cache_connection</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">cache_connection</span><span class="p">))</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cache_connection</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
     <span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span>
         <span class="n">client_name</span><span class="o">=</span><span class="n">client_name</span><span class="p">,</span>
-        <span class="n">client_connection</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/Users/sabrieyuboglu/.meerkat/keys/.openai&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span>
+        <span class="n">client_connection</span><span class="o">=</span><span class="n">client_connection</span><span class="p">,</span>
         <span class="n">engine</span><span class="o">=</span><span class="n">engine</span><span class="p">,</span>
         <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">max_tokens</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">cache_name</span><span class="o">=</span><span class="s2">&quot;sqlite&quot;</span><span class="p">,</span>
-        <span class="n">cache_connection</span><span class="o">=</span><span class="s2">&quot;/Users/sabrieyuboglu/.manifest/cache.sqlite&quot;</span><span class="p">,</span>
+        <span class="n">cache_connection</span><span class="o">=</span><span class="n">cache_connection</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_run_manifest</span><span class="p">(</span><span class="n">rows</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
