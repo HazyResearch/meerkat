@@ -16,6 +16,7 @@ from .image_annotator import ImageAnnotator
 from .json import Json
 from .markdown import Caption, Header, Markdown, Subheader, Title
 from .match import Match
+from .medimage import MedicalImage
 from .multiselect import MultiSelect
 from .number import Number
 from .numberinput import NumberInput
@@ -56,6 +57,7 @@ __all__ = [
     "Json",
     "Markdown",
     "Match",
+    "MedicalImage",
     "MultiSelect",
     "PDF",
     "Put",
