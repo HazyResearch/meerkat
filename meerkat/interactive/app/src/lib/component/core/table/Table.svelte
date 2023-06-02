@@ -66,10 +66,10 @@
 	}).then((newSchema) => {
 		console.log('Fetching schema');
 		schema.set(newSchema);
-		if (columnWidths.length === 0) {
-			columnWidths = Array(newSchema.columns.length).fill(100);
-			columnWidths[0] = 200;
-		}
+		// if (columnWidths.length === 0) {
+		// 	columnWidths = Array(newSchema.columns.length).fill(100);
+		// 	columnWidths[0] = 200;
+		// }
 	});
 
 	$: fetchChunk({
@@ -80,15 +80,15 @@
 	}).then((newChunk) => {
 		console.log('Fetching chunk');
 		chunk.set(newChunk);
-		if (rowHeights.length === 0) {
-			rowHeights = Array(newChunk.keyidxs.length).fill(24); // same as text-sm + 4
-			rowHeights[0] = 32;
-		}
+		// if (rowHeights.length === 0) {
+		// 	rowHeights = Array(newChunk.keyidxs.length).fill(24); // same as text-sm + 4
+		// 	rowHeights[0] = 32;
+		// }
 	});
 
-	let columnWidths: Array<number> = [];
+	let columnWidths: Array<number> = Array(17).fill(100); //[];
 	let columnUnit: string = 'px';
-	let rowHeights: Array<number> = [];
+	let rowHeights: Array<number> = Array(50).fill(24); //[];
 	let rowUnit: string = 'px';
 
 	let resizeProps = {
@@ -216,6 +216,7 @@
 			if (editMode) {
 				if (onEdit && onEdit.endpointId) {
 					const { column, keyidx, posidx } = primarySelectedCell;
+					primarySelectedCell.value = editValue;
 					dispatch(onEdit.endpointId, {
 						detail: {
 							column,
@@ -609,6 +610,8 @@
 	function startEdit() {
 		editMode = true;
 		editValue = primarySelectedCell.value;
+		console.log('startEdit, primarySelectedCell:', primarySelectedCell);
+		console.log('startEdit, editValue:', editValue);
 	}
 
 	/**
@@ -617,8 +620,10 @@
 	 * @param callOnEdit Whether or not to call the onEdit endpoint.
 	 */
 	function endEdit(callOnEdit: boolean = true) {
+		console.log('endEdit, editValue:', editValue);
 		if (callOnEdit && onEdit && onEdit.endpointId) {
 			const { column, keyidx, posidx } = primarySelectedCell;
+			primarySelectedCell.value = editValue;
 			dispatch(onEdit.endpointId, {
 				detail: {
 					column,
@@ -627,6 +632,8 @@
 					value: editValue
 				}
 			});
+			// TODO: after this runs, we need to update primarySelectedCell with the edited value. Otherwise it holds state from the previous edit
+			console.log('endEdit, primarySelectedCell:', primarySelectedCell);
 		}
 		editMode = false;
 		if (!callOnEdit) console.log('primarySelectedCell:', primarySelectedCell);
@@ -962,7 +969,10 @@
 							keyidx === primarySelectedCell.keyidx}
 						minWidth={columnWidths[col_index]}
 						minHeight={rowHeights[posidx]}
-						on:edit={(e) => (editValue = e.detail.value)}
+						on:edit={(e) => {
+							console.log('e.detail.value:', e.detail.value);
+							editValue = e.detail.value;
+						}}
 					/>
 				</div>
 			{/each}
