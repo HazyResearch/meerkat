@@ -76,11 +76,13 @@ class ImageFormatter(BaseFormatter):
         return {
             "max_size": self.max_size,
             "classes": self.classes,
+            "mode": self.mode,
         }
 
     def _set_state(self, state: Dict[str, Any]):
         self.max_size = state["max_size"]
         self.classes = state["classes"]
+        self.mode = state["mode"]
 
 
 class ImageFormatterGroup(FormatterGroup):
