@@ -572,7 +572,7 @@ class Component(BaseComponent):
         # Inheriting an existing Component and modifying it on the Python side
         # should not change the name of the component used on the frontend
         if cls.__bases__[0] != Component and issubclass(cls.__bases__[0], Component):
-            return cls.__bases__[0].__name__
+            return cls.__bases__[0].component_name
 
         return cls.__name__
 
