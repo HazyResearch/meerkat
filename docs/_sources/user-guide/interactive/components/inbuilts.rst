@@ -31,6 +31,7 @@ core
    meerkat.interactive.app.src.lib.component.core.Json
    meerkat.interactive.app.src.lib.component.core.Markdown
    meerkat.interactive.app.src.lib.component.core.Match
+   meerkat.interactive.app.src.lib.component.core.MedicalImage
    meerkat.interactive.app.src.lib.component.core.Number
    meerkat.interactive.app.src.lib.component.core.NumberInput
    meerkat.interactive.app.src.lib.component.core.PDF
