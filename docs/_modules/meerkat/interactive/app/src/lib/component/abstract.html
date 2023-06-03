@@ -2449,7 +2449,7 @@ title="Open an issue"
         <span class="c1"># Inheriting an existing Component and modifying it on the Python side</span>
         <span class="c1"># should not change the name of the component used on the frontend</span>
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">Component</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Component</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">component_name</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
 
