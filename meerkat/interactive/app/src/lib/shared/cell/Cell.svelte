@@ -11,23 +11,11 @@
 	export let cellProps: object = {};
 	export let cellDataProp: string = 'data';
 	export let editable: boolean = false;
-	export let minWidth: number = 0;
-	export let minHeight: number = 0;
 
 	const dispatch = createEventDispatcher();
 	setContext('cellEdit', (data: any) => {
 		dispatch('edit', { value: data });
 	});
-
-	let cellInfoObj = {
-		...cellInfo,
-		style: { minWidth: writable(minWidth), minHeight: writable(minHeight) }
-	};
-	$: {
-		cellInfoObj.style.minWidth.set(minWidth);
-		cellInfoObj.style.minHeight.set(minHeight);
-	}
-	setContext('cellInfo', cellInfoObj);
 
 	// need to actually create a new object, since we don't want to modify the
 	// cell_props that were passed in
@@ -47,12 +35,7 @@
 			}
 		}
 	}
+
 </script>
 
-<DynamicComponent
-	name={cellComponent}
-	props={{
-		...cellProps,
-		editable: writable(editable)
-	}}
-/>
+<DynamicComponent name={cellComponent} props={{ ...cellProps, editable: writable(editable) }} />

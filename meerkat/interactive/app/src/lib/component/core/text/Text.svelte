@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { get } from 'svelte/store';
-	import { getContext, onDestroy } from 'svelte/internal';
-	import type { CellInfo } from '$lib/utils/dataframe';
+	import { getContext } from 'svelte/internal';
 
 	export let data: any;
 	export let editable: boolean = false;
@@ -9,28 +7,6 @@
 	export let classes: string = '';
 
 	const cellEdit: CallableFunction = getContext('cellEdit');
-
-	const cellInfo: CellInfo = getContext('cellInfo');
-	// Build up style if it exists in the context
-	let style: string = '';
-	if (cellInfo) {
-		if (cellInfo.style) {
-			if (cellInfo.style.minWidth) {
-				const unsubscribe = cellInfo.style.minWidth.subscribe((value: number) => {
-					style = style.replace(/min-width: \d+px;/, '');
-					style += `min-width: ${value}px;`;
-				});
-				onDestroy(unsubscribe);
-			}
-			if (cellInfo.style.minHeight) {
-				const unsubscribe = cellInfo.style.minHeight.subscribe((value: number) => {
-					style = style.replace(/min-height: \d+px;/, '');
-					style += `min-height: ${value}px;`;
-				});
-				onDestroy(unsubscribe);
-			}
-		}
-	}
 
 	let editableCell: HTMLDivElement;
 
@@ -64,16 +40,17 @@
 	}
 </script>
 
-<!-- TODO: binding innerHTML to data doesn't seem to work when trying to input a newline -->
-<div
-	class={classes +
-		' px-1 outline-none whitespace-nowrap ' +
-		(editable
-			? 'whitespace-pre bg-white border-double border-2 border-violet-600 outline-2 outline-offset-0 outline-violet-300 w-fit'
-			: '')}
-	{style}
-	contenteditable="true"
-	bind:innerHTML={data}
-	bind:this={editableCell}
-	on:input={() => cellEdit(data)}
-/>
+{#if editable}
+	<!-- TODO: binding innerHTML to data doesn't seem to work when trying to input a newline -->
+	<div
+		class={classes + ' px-1 outline-none whitespace-nowrap'}
+		contenteditable="true"
+		bind:innerHTML={data}
+		bind:this={editableCell}
+		on:input={() => cellEdit(data)}
+	/>
+{:else}
+	<div class={classes}>
+		{data}
+	</div>
+{/if}

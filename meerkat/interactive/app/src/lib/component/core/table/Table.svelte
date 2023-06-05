@@ -69,28 +69,20 @@
 	fetchSchema({
 		df: df,
 		formatter: 'icon'
-	}).then((newSchema) => {
-		schema.set(newSchema);
-		columnWidths = Array(newSchema.columns.length).fill(100);
-		columnWidths[0] = 200;
-	});
+	}).then((newSchema) => (columnWidths = Array(newSchema.columns.length).fill(100)));
 
 	$: fetchSchema({
 		df: df,
 		formatter: 'icon'
 	}).then((newSchema) => schema.set(newSchema));
 
-	// Run this once to set rowHeights
+	// Run this once to set rowHeights (24 is same as text-sm + 4)
 	fetchChunk({
 		df: df,
 		start: page * perPage,
 		end: (page + 1) * perPage,
 		formatter: 'tiny'
-	}).then((newChunk) => {
-		chunk.set(newChunk);
-		rowHeights = Array(newChunk.keyidxs.length).fill(24); // same as text-sm + 4
-		rowHeights[0] = 32;
-	});
+	}).then((newChunk) => (rowHeights = Array(newChunk.keyidxs.length).fill(22)));
 
 	$: fetchChunk({
 		df: df,
@@ -1002,20 +994,18 @@
 					{keyidx}
 				>
 					<div
-						class={'relative' +
+						class={'relative ' +
 							(editMode &&
 							col.name === primarySelectedCell.column &&
 							keyidx === primarySelectedCell.keyidx
-								? ' z-10'
+								? 'z-10 whitespace-pre bg-white border-double border-2 border-violet-600 outline-2 outline-offset-0 outline-violet-300 w-fit'
 								: '')}
+						style={`min-width: ${columnWidths[col_index] + 2}px;` +
+							`min-height: ${rowHeights[posidx] + 2}px;`}
 					>
 						<Cell
 							{...$chunk.getCell(rowi, col.name)}
-							editable={editMode &&
-								col.name === primarySelectedCell.column &&
-								keyidx === primarySelectedCell.keyidx}
-							minWidth={columnWidths[col_index]}
-							minHeight={rowHeights[posidx]}
+							editable
 							on:edit={(e) => {
 								console.log('e.detail.value:', e.detail.value);
 								editValue = e.detail.value;
