@@ -580,17 +580,18 @@
 		// Determine borders
 		if (primarySelectedCell.column === column && primarySelectedCell.keyidx === keyidx) {
 			if (editMode) classes += 'overflow-visible -ml-px -mt-px ';
-			else classes += 'border-2 border-violet-600 -ml-px -mt-px ';
+			else classes += 'border-t-2 border-l-2 border-violet-600 ';
 		} else {
 			// border width of 1px, default color slate
 			classes += 'border-t border-l border-slate-300 ';
 
 			if (posidx > 0) {
-				// TODO: Don't add border if the cell above is primarySelectedCell
-				// if (!areEqual(getCell(column, parseInt($chunk.keyidxs[posidx - 1])), primarySelectedCell)) {
-				const bitmapAbove = getSelectedBitmap(column, parseInt($chunk.keyidxs[posidx - 1]));
-				if (bitmap !== bitmapAbove) classes += 'border-t-violet-600 ';
-				// }
+				if (areEqual(getCell(column, posidx - 1), primarySelectedCell)) {
+					classes += 'border-t-2 border-t-violet-600 -mt-px ';
+				} else {
+					const bitmapAbove = getSelectedBitmap(column, parseInt($chunk.keyidxs[posidx - 1]));
+					if (bitmap !== bitmapAbove) classes += 'border-t-violet-600 ';
+				}
 			} else if (bitmap > 0 && posidx === 0) {
 				classes += 'border-t-violet-600 ';
 			}
@@ -600,11 +601,12 @@
 
 			const colidx = col2idx(column);
 			if (colidx > 0) {
-				// TODO: Don't add border if the cell on the left is primarySelectedCell
-				// if (!areEqual(getCell($chunk.columns[colidx - 1], keyidx), primarySelectedCell)) {
-				const bitmapLeft = getSelectedBitmap($chunk.columns[colidx - 1], keyidx);
-				if (bitmap !== bitmapLeft) classes += 'border-l-violet-600 ';
-				// }
+				if (areEqual(getCell($chunk.columns[colidx - 1], posidx), primarySelectedCell)) {
+					classes += 'border-l-2 border-l-violet-600 -ml-px ';
+				} else {
+					const bitmapLeft = getSelectedBitmap($chunk.columns[colidx - 1], keyidx);
+					if (bitmap !== bitmapLeft) classes += 'border-l-violet-600 ';
+				}
 			} else if (bitmap > 0 && colidx === 0) {
 				classes += 'border-l-violet-600 ';
 			}
@@ -612,11 +614,6 @@
 			if (bitmap > 0 && colidx === $schema.columns.length - 1)
 				classes += 'border-r border-r-violet-600 ';
 		}
-
-		// Determine text color
-		// if (secondarySelectedCell.column === column && secondarySelectedCell.keyidx === keyidx) {
-		// 	classes += 'text-red-600 ';
-		// }
 
 		return classes;
 	}
@@ -994,10 +991,10 @@
 				>
 					<div
 						class={'relative ' +
-							(editMode &&
-							col.name === primarySelectedCell.column &&
-							keyidx === primarySelectedCell.keyidx
-								? 'z-10 whitespace-pre bg-white border-double border-2 border-violet-600 outline-2 outline-offset-0 outline-violet-300 w-fit'
+							(col.name === primarySelectedCell.column && keyidx === primarySelectedCell.keyidx
+								? editMode
+									? 'z-10 whitespace-pre bg-white border-double border-2 border-violet-600 outline-2 outline-offset-0 outline-violet-300 w-fit '
+									: '-mt-px -ml-px '
 								: '')}
 						style={`min-width: ${columnWidths[col_index] + 2}px;` +
 							`min-height: ${rowHeights[posidx] + 2}px;`}
