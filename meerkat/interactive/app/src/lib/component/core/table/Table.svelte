@@ -885,7 +885,7 @@
 			>
 				<!-- Column icon and name -->
 				<button
-					class="flex items-center gap-1 px-0.5 overflow-hidden"
+					class="flex w-full justify-center items-center gap-1 px-0.5 overflow-hidden"
 					on:click={(e) => onClickCol(e, column.name)}
 				>
 					<div class="w-5 mr-0.5">
@@ -929,7 +929,7 @@
 				style={`grid-column: 1 / 2`}
 			>
 				<button
-					class={'w-7 text-center ' +
+					class={'w-7 h-full text-center ' +
 						getRowSelectClasses(
 							keyidx,
 							primarySelectedCell,
