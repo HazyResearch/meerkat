@@ -99,6 +99,18 @@
 		offset: 0
 	};
 
+	/**
+	 * Helper function to find the first ancestor of an element with a given
+	 * class.
+	 *
+	 * @param el - The element to start searching from
+	 * @param cls - The class to search for
+	 */
+	const findAncestor = (el: HTMLElement | null, cls: string) => {
+		while (el && (el = el.parentElement) && !el.classList.contains(cls));
+		return el;
+	};
+
 	const resizeMethods = {
 		mousedown(direction: string, idx: number) {
 			return (e: MouseEvent) => {
@@ -106,6 +118,12 @@
 				resizeProps.direction = direction;
 				resizeProps.idxBeingResized = idx;
 				resizeProps.mouseStart = direction === 'x' ? e.x : e.y;
+
+				const el = findAncestor(e.target as HTMLElement, 'header-cell');
+				if (el) {
+					if (direction === 'x') columnWidths[idx] = el.offsetWidth;
+					else rowHeights[idx] = el.offsetHeight;
+				}
 				resizeProps.sizeStart = direction === 'x' ? columnWidths[idx] : rowHeights[idx];
 
 				// Attach listeners for events
@@ -835,8 +853,12 @@
 	<!-- Table (max-height subtracts 32px for height of footer)-->
 	<div
 		class={`grid overflow-x-scroll overflow-y-scroll text-sm border border-slate-300`}
-		style={`grid-template-rows: 1fr ${rowHeights.join(rowUnit + ' ')}${rowUnit}; ` +
-			`grid-template-columns: min-content ${columnWidths.join(columnUnit + ' ')}${columnUnit};` +
+		style={`grid-template-rows: min-content ${rowHeights
+			.map((h) => (h === -1 ? 'min-content' : `${h}${rowUnit}`))
+			.join(' ')};` +
+			`grid-template-columns: min-content ${columnWidths
+				.map((w) => (w === -1 ? 'min-content' : `${w}${columnUnit}`))
+				.join(' ')};` +
 			'max-height:calc(100vh - 32px)'}
 	>
 		<!-- Header row -->
@@ -889,9 +911,7 @@
 				<div
 					class="absolute flex items-center opacity-0 hover:opacity-100 h-full w-1 right-0 cursor-col-resize"
 					on:mousedown|preventDefault={resizeMethods.mousedown('x', col_index)}
-					on:dblclick|preventDefault={() => {
-						columnWidths[col_index] = 100;
-					}}
+					on:dblclick|preventDefault={() => (columnWidths[col_index] = -1)}
 				>
 					<div class="flex justify-between h-5 w-full">
 						<div class="bg-slate-700 rounded-md" style="width: 3px;" />
@@ -927,9 +947,7 @@
 				<div
 					class="absolute flex justify-center opacity-0 hover:opacity-100 h-1 w-full bottom-0 cursor-row-resize"
 					on:mousedown|preventDefault={resizeMethods.mousedown('y', posidx)}
-					on:dblclick|preventDefault={() => {
-						rowHeights[posidx] = 20;
-					}}
+					on:dblclick|preventDefault={() => (rowHeights[posidx] = -1)}
 				>
 					<div class="flex flex-col justify-between w-5 h-full">
 						<div class="bg-slate-700 rounded-md" style="height: 3px;" />
@@ -962,18 +980,27 @@
 					column={col.name}
 					{keyidx}
 				>
-					<Cell
-						{...$chunk.getCell(rowi, col.name)}
-						editable={editMode &&
+					<div
+						class={'relative' +
+							(editMode &&
 							col.name === primarySelectedCell.column &&
-							keyidx === primarySelectedCell.keyidx}
-						minWidth={columnWidths[col_index]}
-						minHeight={rowHeights[posidx]}
-						on:edit={(e) => {
-							console.log('e.detail.value:', e.detail.value);
-							editValue = e.detail.value;
-						}}
-					/>
+							keyidx === primarySelectedCell.keyidx
+								? ' z-10'
+								: '')}
+					>
+						<Cell
+							{...$chunk.getCell(rowi, col.name)}
+							editable={editMode &&
+								col.name === primarySelectedCell.column &&
+								keyidx === primarySelectedCell.keyidx}
+							minWidth={columnWidths[col_index]}
+							minHeight={rowHeights[posidx]}
+							on:edit={(e) => {
+								console.log('e.detail.value:', e.detail.value);
+								editValue = e.detail.value;
+							}}
+						/>
+					</div>
 				</div>
 			{/each}
 		{/each}
@@ -1000,9 +1027,9 @@
 			{/if}
 		</div>
 
-		<!-- <div class="px-2 flex space-x-1 items-center">
+		<div class="px-2 flex space-x-1 items-center">
 			#TODO Wrap: {wrap}
-		</div> -->
+		</div>
 
 		<Pagination bind:page bind:perPage totalItems={$schema.nrows} dropdownPlacement={'top'} />
 	</div>

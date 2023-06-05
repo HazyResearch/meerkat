@@ -65,17 +65,15 @@
 </script>
 
 <!-- TODO: binding innerHTML to data doesn't seem to work when trying to input a newline -->
-<div class={'relative' + (editable ? ' z-10' : '')}>
-	<div
-		class={classes +
-			' px-1 outline-none whitespace-nowrap ' +
-			(editable
-				? 'whitespace-pre bg-white border-double border-2 border-violet-600 outline-2 outline-offset-0 outline-violet-300 w-fit'
-				: '')}
-		{style}
-		contenteditable="true"
-		bind:innerHTML={data}
-		bind:this={editableCell}
-		on:input={() => cellEdit(data)}
-	/>
-</div>
+<div
+	class={classes +
+		' px-1 outline-none whitespace-nowrap ' +
+		(editable
+			? 'whitespace-pre bg-white border-double border-2 border-violet-600 outline-2 outline-offset-0 outline-violet-300 w-fit'
+			: '')}
+	{style}
+	contenteditable="true"
+	bind:innerHTML={data}
+	bind:this={editableCell}
+	on:input={() => cellEdit(data)}
+/>
