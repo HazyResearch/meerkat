@@ -37,7 +37,7 @@
 	export let onSelectRows: Endpoint;
 
 	export let classes: string = 'h-fit';
-	let wrap: string = 'clip'; // 'wrap' | 'clip' (add 'overflow' later)
+	let wrapping: string = 'overflow';
 
 	let cutoutWidth: number = 0;
 	let cutoutHeight: number = 0;
@@ -51,6 +51,11 @@
 		});
 	};
 
+	let columnWidths: Array<number> = [];
+	let columnUnit: string = 'px';
+	let rowHeights: Array<number> = [];
+	let rowUnit: string = 'px';
+
 	// Create placeholder variables for table data.
 	let schema: Writable<DataFrameSchema> = writable({
 		columns: [],
@@ -60,16 +65,31 @@
 	});
 	let chunk: Writable<DataFrameChunk> = writable(new DataFrameChunk([], [], [], 0, 'pkey'));
 
-	$: fetchSchema({
+	// Run this once to set columnWidths
+	fetchSchema({
 		df: df,
 		formatter: 'icon'
 	}).then((newSchema) => {
-		console.log('Fetching schema');
 		schema.set(newSchema);
-		// if (columnWidths.length === 0) {
-		// 	columnWidths = Array(newSchema.columns.length).fill(100);
-		// 	columnWidths[0] = 200;
-		// }
+		columnWidths = Array(newSchema.columns.length).fill(100);
+		columnWidths[0] = 200;
+	});
+
+	$: fetchSchema({
+		df: df,
+		formatter: 'icon'
+	}).then((newSchema) => schema.set(newSchema));
+
+	// Run this once to set rowHeights
+	fetchChunk({
+		df: df,
+		start: page * perPage,
+		end: (page + 1) * perPage,
+		formatter: 'tiny'
+	}).then((newChunk) => {
+		chunk.set(newChunk);
+		rowHeights = Array(newChunk.keyidxs.length).fill(24); // same as text-sm + 4
+		rowHeights[0] = 32;
 	});
 
 	$: fetchChunk({
@@ -77,19 +97,7 @@
 		start: page * perPage,
 		end: (page + 1) * perPage,
 		formatter: 'tiny'
-	}).then((newChunk) => {
-		console.log('Fetching chunk');
-		chunk.set(newChunk);
-		// if (rowHeights.length === 0) {
-		// 	rowHeights = Array(newChunk.keyidxs.length).fill(24); // same as text-sm + 4
-		// 	rowHeights[0] = 32;
-		// }
-	});
-
-	let columnWidths: Array<number> = Array(17).fill(100); //[];
-	let columnUnit: string = 'px';
-	let rowHeights: Array<number> = Array(50).fill(24); //[];
-	let rowUnit: string = 'px';
+	}).then((newChunk) => chunk.set(newChunk));
 
 	let resizeProps = {
 		direction: 'x',
@@ -911,7 +919,14 @@
 				<div
 					class="absolute flex items-center opacity-0 hover:opacity-100 h-full w-1 right-0 cursor-col-resize"
 					on:mousedown|preventDefault={resizeMethods.mousedown('x', col_index)}
-					on:dblclick|preventDefault={() => (columnWidths[col_index] = -1)}
+					on:dblclick|preventDefault={(e) => {
+						columnWidths[col_index] = -1; // let it auto-size to min-content
+						setTimeout(() => {
+							const el = findAncestor(e.target, 'header-cell');
+							console.log('el:', el.offsetWidth);
+							if (el) columnWidths[col_index] = el.offsetWidth;
+						});
+					}}
 				>
 					<div class="flex justify-between h-5 w-full">
 						<div class="bg-slate-700 rounded-md" style="width: 3px;" />
@@ -947,7 +962,13 @@
 				<div
 					class="absolute flex justify-center opacity-0 hover:opacity-100 h-1 w-full bottom-0 cursor-row-resize"
 					on:mousedown|preventDefault={resizeMethods.mousedown('y', posidx)}
-					on:dblclick|preventDefault={() => (rowHeights[posidx] = -1)}
+					on:dblclick|preventDefault={(e) => {
+						rowHeights[posidx] = -1; // let it auto-size to min-content
+						setTimeout(() => {
+							const el = findAncestor(e.target, 'header-cell');
+							if (el) rowHeights[posidx] = el.offsetHeight;
+						});
+					}}
 				>
 					<div class="flex flex-col justify-between w-5 h-full">
 						<div class="bg-slate-700 rounded-md" style="height: 3px;" />
@@ -1020,15 +1041,28 @@
 			{#if selectedRows.length > 0}
 				{#if selectedRows.length === 1}
 					<Check class="text-violet-600" />
+					<div class="text-violet-600 font-mono text-sm ">1 row selected</div>
 				{:else}
 					<CheckAll class="text-violet-600" />
+					<div class="text-violet-600 font-mono text-sm ">{selectedRows.length} rows selected</div>
 				{/if}
-				<div class="text-violet-600 font-mono text-sm ">{selectedRows.length} rows selected</div>
 			{/if}
 		</div>
 
-		<div class="px-2 flex space-x-1 items-center">
-			#TODO Wrap: {wrap}
+		<div class="px-2 flex space-x-2 items-center">
+			<div>Wrapping:</div>
+			<label>
+				<input type="radio" bind:group={wrapping} name="wrapping" value={'overflow'} />
+				Overflow
+			</label>
+			<label>
+				<input type="radio" bind:group={wrapping} name="wrapping" value={'wrap'} />
+				Wrap
+			</label>
+			<label>
+				<input type="radio" bind:group={wrapping} name="wrapping" value={'clip'} />
+				Clip
+			</label>
 		</div>
 
 		<Pagination bind:page bind:perPage totalItems={$schema.nrows} dropdownPlacement={'top'} />
