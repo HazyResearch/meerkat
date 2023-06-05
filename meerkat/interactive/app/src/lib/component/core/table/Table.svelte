@@ -579,7 +579,6 @@
 
 		// Determine borders
 		if (primarySelectedCell.column === column && primarySelectedCell.keyidx === keyidx) {
-			// TODO: styles are awkwardly split between here and Text.svelte
 			if (editMode) classes += 'overflow-visible -ml-px -mt-px ';
 			else classes += 'border-2 border-violet-600 -ml-px -mt-px ';
 		} else {
@@ -1006,6 +1005,9 @@
 						<Cell
 							{...$chunk.getCell(rowi, col.name)}
 							editable
+							focused={editMode &&
+								col.name === primarySelectedCell.column &&
+								keyidx === primarySelectedCell.keyidx}
 							on:edit={(e) => {
 								console.log('e.detail.value:', e.detail.value);
 								editValue = e.detail.value;

@@ -3,25 +3,21 @@
 
 	export let data: any;
 	export let editable: boolean = false;
-	let editablePrev = editable;
+	export let focused: boolean = false;
 	export let classes: string = '';
 
 	const cellEdit: CallableFunction = getContext('cellEdit');
 
 	let editableCell: HTMLDivElement;
 
-	$: setFocus(editable);
+	$: setFocus(focused);
 
 	function setFocus(focus: boolean) {
-		if (editablePrev === focus) return;
-		editablePrev = focus;
+		if (!editableCell) return;
 
-		if (editableCell) {
-			if (!focus) {
-				editableCell.blur();
-				return;
-			}
-
+		if (!focus) {
+			editableCell.blur();
+		} else {
 			editableCell.focus();
 
 			// Set the cursor to the end of the div. From

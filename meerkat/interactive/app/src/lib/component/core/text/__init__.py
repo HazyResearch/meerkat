@@ -5,6 +5,7 @@ class Text(Component):
     data: str
     classes: str = ""
     editable: bool = False
+    focused: bool = False
 
     def __init__(
         self,
@@ -12,16 +13,19 @@ class Text(Component):
         *,
         classes: str = "",
         editable: bool = False,
+        focused: bool = False,
     ):
         """Display text.
 
         Args:
             data: The text to display.
             editable: Whether the text is editable.
+            focused: Whether the text is focused.
         """
         # "whitespace-nowrap text-ellipsis overflow-hidden text-right "
         super().__init__(
             classes=classes,
             data=data,
             editable=editable,
+            focused=focused,
         )

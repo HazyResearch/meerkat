@@ -11,6 +11,7 @@
 	export let cellProps: object = {};
 	export let cellDataProp: string = 'data';
 	export let editable: boolean = false;
+	export let focused: boolean = false;
 
 	const dispatch = createEventDispatcher();
 	setContext('cellEdit', (data: any) => {
@@ -35,7 +36,9 @@
 			}
 		}
 	}
-
 </script>
 
-<DynamicComponent name={cellComponent} props={{ ...cellProps, editable: writable(editable) }} />
+<DynamicComponent
+	name={cellComponent}
+	props={{ ...cellProps, editable: writable(editable), focused: writable(focused) }}
+/>
