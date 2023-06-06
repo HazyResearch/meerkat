@@ -995,9 +995,10 @@
 						class={'relative ' +
 							(col.name === primarySelectedCell.column && keyidx === primarySelectedCell.keyidx
 								? editMode
-									? 'z-10 whitespace-pre bg-white border-double border-2 border-violet-600 outline-2 outline-offset-0 outline-violet-300 w-fit '
+									? 'z-10 bg-white border-double border-2 border-violet-600 outline-2 outline-offset-0 outline-violet-300 w-fit '
 									: '-mt-px -ml-px '
-								: '')}
+								: '') +
+							(wrapping === 'wrap' ? 'whitespace-pre-wrap ' : 'whitespace-nowrap')}
 						style={`min-width: ${columnWidths[col_index] + 2}px;` +
 							`min-height: ${rowHeights[posidx] + 2}px;`}
 					>
