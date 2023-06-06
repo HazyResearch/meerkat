@@ -37,7 +37,7 @@
 	export let onSelectRows: Endpoint;
 
 	export let classes: string = 'h-fit';
-	let wrapping: string = 'overflow';
+	let wrapping: string = 'clip';
 
 	let cutoutWidth: number = 0;
 	let cutoutHeight: number = 0;
@@ -572,7 +572,7 @@
 		let classes = '';
 		const bitmap = getSelectedBitmap(column, keyidx);
 
-		// Determine overflow
+		// TODO: Determine overflow
 		// if (wrapping !== 'overflow') classes += 'overflow-hidden ';
 
 		// Determine background color
@@ -969,7 +969,7 @@
 			<!-- Data columns -->
 			{#each $chunk.columnInfos as col, col_index}
 				<div
-					class={'cell ' +
+					class={'cell overflow-hidden ' +
 						getCellSelectClasses(
 							col.name,
 							keyidx,
@@ -1040,10 +1040,10 @@
 
 		<div class="px-2 flex space-x-2 items-center">
 			<div>Wrapping:</div>
-			<label>
+			<!-- <label>
 				<input type="radio" bind:group={wrapping} name="wrapping" value={'overflow'} />
 				Overflow
-			</label>
+			</label> -->
 			<label>
 				<input type="radio" bind:group={wrapping} name="wrapping" value={'wrap'} />
 				Wrap
