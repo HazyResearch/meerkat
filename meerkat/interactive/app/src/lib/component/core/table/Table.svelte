@@ -103,10 +103,11 @@
 	 * Helper function to find the first ancestor of an element with a given
 	 * class.
 	 *
-	 * @param el - The element to start searching from
+	 * @param et - The event target
 	 * @param cls - The class to search for
 	 */
-	const findAncestor = (el: HTMLElement | null, cls: string) => {
+	const findAncestor = (et: EventTarget | null, cls: string) => {
+		let el: HTMLElement | null = et as HTMLElement;
 		while (el && (el = el.parentElement) && !el.classList.contains(cls));
 		return el;
 	};
@@ -119,7 +120,7 @@
 				resizeProps.idxBeingResized = idx;
 				resizeProps.mouseStart = direction === 'x' ? e.x : e.y;
 
-				const el = findAncestor(e.target as HTMLElement, 'header-cell');
+				const el = findAncestor(e.target, 'header-cell');
 				if (el) {
 					if (direction === 'x') columnWidths[idx] = el.offsetWidth;
 					else rowHeights[idx] = el.offsetHeight;
@@ -624,8 +625,6 @@
 	function startEdit() {
 		editMode = true;
 		editValue = primarySelectedCell.value;
-		console.log('startEdit, primarySelectedCell:', primarySelectedCell);
-		console.log('startEdit, editValue:', editValue);
 	}
 
 	/**
@@ -634,7 +633,6 @@
 	 * @param callOnEdit Whether or not to call the onEdit endpoint.
 	 */
 	function endEdit(callOnEdit: boolean = true) {
-		console.log('endEdit, editValue:', editValue);
 		if (callOnEdit && onEdit && onEdit.endpointId) {
 			const { column, keyidx, posidx } = primarySelectedCell;
 			primarySelectedCell.value = editValue;
@@ -646,11 +644,8 @@
 					value: editValue
 				}
 			});
-			// TODO: after this runs, we need to update primarySelectedCell with the edited value. Otherwise it holds state from the previous edit
-			console.log('endEdit, primarySelectedCell:', primarySelectedCell);
 		}
 		editMode = false;
-		if (!callOnEdit) console.log('primarySelectedCell:', primarySelectedCell);
 	}
 
 	// Define keyboard shortcuts
@@ -911,7 +906,6 @@
 						columnWidths[col_index] = -1; // let it auto-size to min-content
 						setTimeout(() => {
 							const el = findAncestor(e.target, 'header-cell');
-							console.log('el:', el.offsetWidth);
 							if (el) columnWidths[col_index] = el.offsetWidth;
 						});
 					}}
@@ -1005,10 +999,7 @@
 							focused={editMode &&
 								col.name === primarySelectedCell.column &&
 								keyidx === primarySelectedCell.keyidx}
-							on:edit={(e) => {
-								console.log('e.detail.value:', e.detail.value);
-								editValue = e.detail.value;
-							}}
+							on:edit={(e) => (editValue = e.detail.value)}
 						/>
 					</div>
 				</div>
