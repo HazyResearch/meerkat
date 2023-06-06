@@ -69,7 +69,7 @@
 	fetchSchema({
 		df: df,
 		formatter: 'icon'
-	}).then((newSchema) => (columnWidths = Array(newSchema.columns.length).fill(100)));
+	}).then((newSchema) => (columnWidths = Array(newSchema.columns.length).fill(-1)));
 
 	$: fetchSchema({
 		df: df,
@@ -82,7 +82,7 @@
 		start: page * perPage,
 		end: (page + 1) * perPage,
 		formatter: 'tiny'
-	}).then((newChunk) => (rowHeights = Array(newChunk.keyidxs.length).fill(22)));
+	}).then((newChunk) => (rowHeights = Array(newChunk.keyidxs.length).fill(-1)));
 
 	$: fetchChunk({
 		df: df,
@@ -572,6 +572,9 @@
 		let classes = '';
 		const bitmap = getSelectedBitmap(column, keyidx);
 
+		// Determine overflow
+		// if (wrapping !== 'overflow') classes += 'overflow-hidden ';
+
 		// Determine background color
 		if (bitmap > 0) {
 			// the max tailwind color is 900, so we cap the count at 9
@@ -650,6 +653,11 @@
 
 	// Define keyboard shortcuts
 	window.addEventListener('keydown', (e) => {
+		if (primarySelectedCell.column === '') {
+			console.log('setting to first cell', $schema.columns[0].name);
+			primarySelectedCell = secondarySelectedCell = getCell($schema.columns[0].name, 0);
+		}
+
 		const colidx = col2idx(primarySelectedCell.column);
 		const posidx = primarySelectedCell.posidx;
 
@@ -961,7 +969,7 @@
 			<!-- Data columns -->
 			{#each $chunk.columnInfos as col, col_index}
 				<div
-					class={'cell overflow-hidden ' +
+					class={'cell ' +
 						getCellSelectClasses(
 							col.name,
 							keyidx,
