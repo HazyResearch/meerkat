@@ -1052,7 +1052,7 @@
 		class="flex justify-between h-8 z-10 bg-slate-100 px-5 rounded-b-sm border-t border-t-slate-300"
 	>
 		<div class="px-2 flex space-x-1 items-center">
-			{#if selectedRows.length > 0}
+			{#if selectedRows.length > 0 && selectedCols.length === 0 && selectedCells.length === 0}
 				{#if selectedRows.length === 1}
 					<Check class="text-violet-600" />
 					<div class="text-violet-600 font-mono text-sm ">1 row selected</div>
@@ -1060,6 +1060,24 @@
 					<CheckAll class="text-violet-600" />
 					<div class="text-violet-600 font-mono text-sm ">{selectedRows.length} rows selected</div>
 				{/if}
+			{:else if selectedRows.length === 0 && selectedCols.length > 0 && selectedCells.length === 0}
+				{#if selectedCols.length === 1}
+					<Check class="text-violet-600" />
+					<div class="text-violet-600 font-mono text-sm ">1 column selected</div>
+				{:else}
+					<CheckAll class="text-violet-600" />
+					<div class="text-violet-600 font-mono text-sm ">
+						{selectedCols.length} columns selected
+					</div>
+				{/if}
+			{:else if selectedRows.length === 0 && selectedCols.length === 0 && selectedCells.length > 0}
+				<CheckAll class="text-violet-600" />
+				<div class="text-violet-600 font-mono text-sm ">
+					{selectedCells.length} cells selected
+				</div>
+			{:else if selectedRows.length === 0 && selectedCols.length === 0 && selectedCells.length === 0 && primarySelectedCell.column !== ''}
+				<Check class="text-violet-600" />
+				<div class="text-violet-600 font-mono text-sm ">1 cell selected</div>
 			{/if}
 		</div>
 
