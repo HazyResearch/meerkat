@@ -84,7 +84,17 @@
 	$: fetchSchema({
 		df: df,
 		formatter: 'icon'
-	}).then((newSchema) => schema.set(newSchema));
+	}).then((newSchema) => {
+		schema.set(newSchema);
+		// After giving 2 seconds for the table to load, set the row heights
+		setTimeout(() => {
+			const headerCells = document.getElementsByClassName('header-cell');
+			// Use i + 1 because the first header-cell is the top-left cutout
+			rowHeights = rowHeights.map(
+				(_, i) => (headerCells[i + 1 + columnWidths.length] as HTMLElement).offsetHeight
+			);
+		}, 2000);
+	});
 
 	// Run this once to set rowHeights (24 is same as text-sm + 4)
 	fetchChunk({
@@ -605,7 +615,7 @@
 
 			if (posidx > 0) {
 				if (areEqual(getCell(column, posidx - 1), primarySelectedCell)) {
-					classes += 'border-t-2 border-t-violet-600 -mt-px ';
+					if (!editMode) classes += 'border-t-2 border-t-violet-600 -mt-px ';
 				} else {
 					const bitmapAbove = getSelectedBitmap(column, parseInt($chunk.keyidxs[posidx - 1]));
 					if (bitmap !== bitmapAbove) classes += 'border-t-violet-600 ';
@@ -620,7 +630,7 @@
 			const colidx = col2idx(column);
 			if (colidx > 0) {
 				if (areEqual(getCell($chunk.columns[colidx - 1], posidx), primarySelectedCell)) {
-					classes += 'border-l-2 border-l-violet-600 -ml-px ';
+					if (!editMode) classes += 'border-l-2 border-l-violet-600 -ml-px ';
 				} else {
 					const bitmapLeft = getSelectedBitmap($chunk.columns[colidx - 1], keyidx);
 					if (bitmap !== bitmapLeft) classes += 'border-l-violet-600 ';
