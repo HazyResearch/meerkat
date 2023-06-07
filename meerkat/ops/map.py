@@ -498,21 +498,17 @@ def _materialize(
     num_blocks: int,
     blocks_per_window: int,
 ):
-    import logging
-
-    import numpy as np
-    import pandas as pd
-    import pyarrow as pa
-    import torch
-    from tqdm import tqdm
-
-    import meerkat as mk
-    from meerkat.columns.abstract import column
-
-    from .concat import concat
-
     if use_ray:
+        import logging
+
+        import numpy as np
+        import pandas as pd
+        import pyarrow as pa
         import ray
+        import torch
+
+        import meerkat as mk
+        from meerkat.columns.abstract import column
 
         ray.init(ignore_reinit_error=True, logging_level=logging.ERROR)
         ray.data.set_progress_bars(enabled=pbar)
@@ -612,6 +608,10 @@ def _materialize(
             )
 
     else:
+        from tqdm import tqdm
+
+        from .concat import concat
+
         result = []
         for batch_start in tqdm(range(0, len(data), batch_size), disable=not pbar):
             result.append(
