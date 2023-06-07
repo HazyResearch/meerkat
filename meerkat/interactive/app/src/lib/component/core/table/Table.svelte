@@ -476,6 +476,7 @@
 	function getColumnSelectClasses(
 		column: string,
 		primarySelectedCell: Cell,
+		activeCells: Array<Cell>,
 		selectedCells: Array<Cell>,
 		selectedCols: Array<string>,
 		selectedRows: Array<number>
@@ -483,6 +484,7 @@
 		if (selectedCols.includes(column)) return 'bg-violet-700 text-white font-bold ';
 		if (
 			primarySelectedCell.column === column ||
+			activeCells.some((c) => c.column === column) ||
 			selectedCells.some((c) => c.column === column) ||
 			selectedRows.length > 0
 		)
@@ -493,6 +495,7 @@
 	function getRowSelectClasses(
 		keyidx: number,
 		primarySelectedCell: Cell,
+		activeCells: Array<Cell>,
 		selectedCells: Array<Cell>,
 		selectedCols: Array<string>,
 		selectedRows: Array<number>
@@ -500,6 +503,7 @@
 		if (selectedRows.includes(keyidx)) return 'bg-violet-700 text-white font-bold ';
 		if (
 			primarySelectedCell.keyidx === keyidx ||
+			activeCells.some((c) => c.keyidx === keyidx) ||
 			selectedCells.some((c) => c.keyidx === keyidx) ||
 			selectedCols.length > 0
 		)
@@ -886,6 +890,7 @@
 					getColumnSelectClasses(
 						column.name,
 						primarySelectedCell,
+						activeCells,
 						selectedCells,
 						selectedCols,
 						selectedRows
@@ -948,6 +953,7 @@
 						getRowSelectClasses(
 							keyidx,
 							primarySelectedCell,
+							activeCells,
 							selectedCells,
 							selectedCols,
 							selectedRows
