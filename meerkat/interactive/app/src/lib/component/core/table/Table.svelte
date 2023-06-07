@@ -69,7 +69,17 @@
 	fetchSchema({
 		df: df,
 		formatter: 'icon'
-	}).then((newSchema) => (columnWidths = Array(newSchema.columns.length).fill(-1)));
+	}).then((newSchema) => {
+		columnWidths = Array(newSchema.columns.length).fill(-1);
+		// After giving 2 seconds for the table to load, clamp the column widths
+		setTimeout(() => {
+			const headerCells = document.getElementsByClassName('header-cell');
+			// Use i + 1 because the first header-cell is the top-left cutout
+			columnWidths = columnWidths.map((_, i) =>
+				Math.min((headerCells[i + 1] as HTMLElement).offsetWidth, 300)
+			);
+		}, 2000);
+	});
 
 	$: fetchSchema({
 		df: df,
@@ -981,12 +991,19 @@
 							selectedRows,
 							editMode
 						)}
-					on:mousedown|preventDefault={selectCellMethods.mousedown({
-						column: col.name,
-						keyidx: keyidx,
-						posidx: posidx,
-						value: $chunk.getCell(rowi, col.name).data
-					})}
+					on:mousedown={editMode &&
+					col.name === primarySelectedCell.column &&
+					keyidx === primarySelectedCell.keyidx
+						? null
+						: (e) => {
+								e.preventDefault();
+								selectCellMethods.mousedown({
+									column: col.name,
+									keyidx: keyidx,
+									posidx: posidx,
+									value: $chunk.getCell(rowi, col.name).data
+								})(e);
+						  }}
 					on:dblclick={startEdit}
 					column={col.name}
 					{keyidx}
