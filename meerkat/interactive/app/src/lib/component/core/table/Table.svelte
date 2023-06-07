@@ -1031,7 +1031,7 @@
 					{keyidx}
 				>
 					<div
-						class={'relative ' +
+						class={'relative px-1 ' +
 							(col.name === primarySelectedCell.column && keyidx === primarySelectedCell.keyidx
 								? editMode
 									? 'z-10 bg-white border-double border-2 border-violet-600 outline-2 outline-offset-0 outline-violet-300 w-fit '

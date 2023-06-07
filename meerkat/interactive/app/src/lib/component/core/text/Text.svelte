@@ -39,7 +39,7 @@
 {#if editable}
 	<!-- TODO: binding innerHTML to data doesn't seem to work when trying to input a newline -->
 	<div
-		class={classes + ' px-1 outline-none'}
+		class={classes + ' outline-none'}
 		contenteditable="true"
 		bind:innerHTML={data}
 		bind:this={editableCell}
