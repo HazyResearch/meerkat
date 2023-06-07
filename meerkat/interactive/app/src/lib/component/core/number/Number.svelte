@@ -39,7 +39,7 @@
 	}
 
 	let invalid = false;
-	let showInvalid = false;
+	let invalidCount = 0;
 
 	if (dtype === 'auto') {
 		// The + operator converts a string or number to a number if possible
@@ -69,15 +69,15 @@
 {#if editable}
 	<div
 		class={classes + (invalid ? ' outline-red-500' : ' outline-none')}
-		class:invalid={showInvalid}
+		class:invalid={invalidCount > 0}
 		contenteditable="true"
 		bind:innerHTML={data}
 		bind:this={editableCell}
 		on:input={() => {
 			invalid = data !== '' && data !== 'NaN' && isNaN(data);
 			if (invalid) {
-				showInvalid = true;
-				setTimeout(() => (showInvalid = false), 1000);
+				invalidCount++;
+				setTimeout(() => invalidCount--, 400);
 			} else {
 				cellEdit(data === '' ? 0 : dtype === 'string' ? data : +data);
 			}
@@ -106,6 +106,6 @@
 	}
 
 	.invalid {
-		animation: shake 0.2s ease-in-out 0s 2;
+		animation: shake 0.2s ease-in-out 0s infinite;
 	}
 </style>
