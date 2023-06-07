@@ -56,6 +56,24 @@
 	let rowHeights: Array<number> = [];
 	let rowUnit: string = 'px';
 
+	function setColumnWidths(clamp: number | null = null) {
+		const headerCells = document.getElementsByClassName('header-cell');
+		// Use i + 1 because the first header-cell is the top-left cutout
+		columnWidths = columnWidths.map((_, i) =>
+			clamp
+				? Math.min((headerCells[i + 1] as HTMLElement).offsetWidth, clamp)
+				: (headerCells[i + 1] as HTMLElement).offsetWidth
+		);
+	}
+
+	function setRowHeights() {
+		const headerCells = document.getElementsByClassName('header-cell');
+		// Use i + 1 because the first header-cell is the top-left cutout
+		rowHeights = rowHeights.map(
+			(_, i) => (headerCells[i + 1 + columnWidths.length] as HTMLElement).offsetHeight
+		);
+	}
+
 	// Create placeholder variables for table data.
 	let schema: Writable<DataFrameSchema> = writable({
 		columns: [],
@@ -72,13 +90,7 @@
 	}).then((newSchema) => {
 		columnWidths = Array(newSchema.columns.length).fill(-1);
 		// After giving 2 seconds for the table to load, clamp the column widths
-		setTimeout(() => {
-			const headerCells = document.getElementsByClassName('header-cell');
-			// Use i + 1 because the first header-cell is the top-left cutout
-			columnWidths = columnWidths.map((_, i) =>
-				Math.min((headerCells[i + 1] as HTMLElement).offsetWidth, 300)
-			);
-		}, 2000);
+		setTimeout(() => setColumnWidths(300), 2000);
 	});
 
 	$: fetchSchema({
@@ -87,13 +99,7 @@
 	}).then((newSchema) => {
 		schema.set(newSchema);
 		// After giving 2 seconds for the table to load, set the row heights
-		setTimeout(() => {
-			const headerCells = document.getElementsByClassName('header-cell');
-			// Use i + 1 because the first header-cell is the top-left cutout
-			rowHeights = rowHeights.map(
-				(_, i) => (headerCells[i + 1 + columnWidths.length] as HTMLElement).offsetHeight
-			);
-		}, 2000);
+		setTimeout(setRowHeights, 2000);
 	});
 
 	// Run this once to set rowHeights (24 is same as text-sm + 4)
@@ -896,7 +902,7 @@
 
 		{#each $schema.columns as column, col_index}
 			<div
-				class={'header-cell border border-slate-300 font-mono bg-slate-100 text-slate-800 sticky top-0 z-10 flex ' +
+				class={'header-cell border border-slate-300 font-mono bg-slate-100 text-slate-800 sticky top-0 z-20 flex ' +
 					getColumnSelectClasses(
 						column.name,
 						primarySelectedCell,
@@ -955,7 +961,7 @@
 		{#each zip($chunk.keyidxs, $chunk.posidxs) as [keyidx, posidx], rowi}
 			<!-- First column shows the posidx (row number) -->
 			<div
-				class="header-cell border border-slate-300 font-mono bg-slate-100 text-slate-800 sticky left-0 z-10"
+				class="header-cell border border-slate-300 font-mono bg-slate-100 text-slate-800 sticky left-0 z-20"
 				style={`grid-column: 1 / 2`}
 			>
 				<button
@@ -1078,7 +1084,17 @@
 				Overflow
 			</label> -->
 			<label>
-				<input type="radio" bind:group={wrapping} name="wrapping" value={'wrap'} />
+				<input
+					type="radio"
+					bind:group={wrapping}
+					name="wrapping"
+					value={'wrap'}
+					on:input={() =>
+						setTimeout(() => {
+							setColumnWidths();
+							setRowHeights();
+						}, 100)}
+				/>
 				Wrap
 			</label>
 			<label>
