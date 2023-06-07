@@ -62,5 +62,6 @@
       ~Number.precision
       ~Number.percentage
       ~Number.classes
+      ~Number.editable
    
    

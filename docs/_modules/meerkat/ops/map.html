@@ -2380,21 +2380,17 @@ title="Open an issue"
     <span class="n">num_blocks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">blocks_per_window</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">logging</span>
-
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
-    <span class="kn">import</span> <span class="nn">torch</span>
-    <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
-
-    <span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
-    <span class="kn">from</span> <span class="nn">meerkat.columns.abstract</span> <span class="kn">import</span> <span class="n">column</span>
-
-    <span class="kn">from</span> <span class="nn">.concat</span> <span class="kn">import</span> <span class="n">concat</span>
-
     <span class="k">if</span> <span class="n">use_ray</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">logging</span>
+
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+        <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
         <span class="kn">import</span> <span class="nn">ray</span>
+        <span class="kn">import</span> <span class="nn">torch</span>
+
+        <span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
+        <span class="kn">from</span> <span class="nn">meerkat.columns.abstract</span> <span class="kn">import</span> <span class="n">column</span>
 
         <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ignore_reinit_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logging_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
         <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">set_progress_bars</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="n">pbar</span><span class="p">)</span>
@@ -2494,6 +2490,10 @@ title="Open an issue"
             <span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+        <span class="kn">from</span> <span class="nn">.concat</span> <span class="kn">import</span> <span class="n">concat</span>
+
         <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">batch_start</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">),</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">pbar</span><span class="p">):</span>
             <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
