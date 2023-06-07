@@ -258,21 +258,7 @@
 
 	const selectCellMethods = {
 		mousedown(cell: Cell) {
-			if (editMode) {
-				if (onEdit && onEdit.endpointId) {
-					const { column, keyidx, posidx } = primarySelectedCell;
-					primarySelectedCell.value = editValue;
-					dispatch(onEdit.endpointId, {
-						detail: {
-							column,
-							keyidx,
-							posidx,
-							value: editValue
-						}
-					});
-				}
-				editMode = false;
-			}
+			if (editMode) endEdit();
 			return (e: MouseEvent) => {
 				if (e.shiftKey) {
 					secondarySelectedCell = cell;
