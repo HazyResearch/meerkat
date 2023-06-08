@@ -99,7 +99,7 @@ mk.gui.html.div([match, gallery])
 Meerkat visualization components can be composed and customized to create new interfaces. 
 
 ```python
-plot = mk.gui.plotly.ScatterPlot(df=plot_df, x="umap_1", y="umap_2",)
+plot = mk.gui.plotly.Scatter(df=plot_df, x="umap_1", y="umap_2",)
 
 @mk.gui.reactive
 def filter(selected: list, df: mk.DataFrame):
