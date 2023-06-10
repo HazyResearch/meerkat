@@ -10,3 +10,4 @@ class Number(Component):
     percentage: bool = False
     classes: str = ""
     editable: bool = False
+    focused: bool = False

@@ -7,8 +7,6 @@
 	export let props: any;
 	export let slots: any = [];
 
-	console.log("props", props)
-
 	let component: ComponentType;
 	onMount(async () => {
 		// If the library is Meerkat, then we can load the component
@@ -18,18 +16,16 @@
 			return;
 		}
 	});
-	$:{
+	$: {
 		component = components[name];
 	}
-
 </script>
-
 
 {#if component}
 	<!-- Pass the props to the component being rendered -->
 	<svelte:component this={component} {...props} on:edit>
 		{#each slots as slot}
-			<svelte:self {...slot}/>
+			<svelte:self {...slot} />
 		{/each}
 	</svelte:component>
 {/if}
