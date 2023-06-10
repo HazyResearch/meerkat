@@ -383,6 +383,7 @@
 	};
 
 	function onClickCol(e: MouseEvent, column: string) {
+		if (editMode) endEdit();
 		if (e.shiftKey) {
 			selectedCols = [];
 			// loop through all cols between primarySelectedCol and this col
@@ -428,6 +429,7 @@
 	}
 
 	function onClickRow(e: MouseEvent, keyidx: number) {
+		if (editMode) endEdit();
 		const posidx = keyidx2idx(keyidx);
 		if (e.shiftKey) {
 			selectedRows = [];
