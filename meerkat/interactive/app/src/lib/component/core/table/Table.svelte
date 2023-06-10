@@ -208,7 +208,7 @@
 			column,
 			keyidx: parseInt($chunk.keyidxs[posidx]),
 			posidx,
-			value: $chunk.getCell(posidx, column).data
+			value: $chunk.getCell(posidx % perPage, column).data
 		};
 	}
 
@@ -590,9 +590,6 @@
 		let classes = '';
 		const bitmap = getSelectedBitmap(column, keyidx);
 
-		// TODO: Determine overflow
-		// if (wrapping !== 'overflow') classes += 'overflow-hidden ';
-
 		// Determine background color
 		if (bitmap > 0) {
 			// the max tailwind color is 900, so we cap the count at 9
@@ -672,7 +669,6 @@
 	// Define keyboard shortcuts
 	window.addEventListener('keydown', (e) => {
 		if (primarySelectedCell.column === '') {
-			console.log('setting to first cell', $schema.columns[0].name);
 			primarySelectedCell = secondarySelectedCell = getCell($schema.columns[0].name, 0);
 		}
 
@@ -855,7 +851,6 @@
 				startEdit();
 			}
 		} else if (e.key === 'Escape') {
-			// TODO: make the cell revert immediately instead of on refresh
 			e.preventDefault();
 			if (editMode) endEdit(false);
 		}
@@ -913,11 +908,10 @@
 								class={selectedCols.includes(column.name) ? 'text-violet-300' : 'text-violet-600'}
 							/>
 						{:else}
-							<!-- TODO: make white when selected -->
 							<Cell
 								data={''}
 								cellComponent={column.cellComponent}
-								cellProps={column.cellProps}
+								cellProps={{...column.cellProps, fill: 'currentColor'}}
 								cellDataProp={column.cellDataProp}
 							/>
 						{/if}
