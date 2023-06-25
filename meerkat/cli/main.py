@@ -258,7 +258,8 @@ def build(
         "npm", show_choices=True, help="Package manager to use"
     )
 ):
-    """Build app folder for both the internal meerkat folder and custom project."""
+    """Build app folder for both the internal meerkat folder and custom
+    project."""
     from meerkat.interactive.svelte import SvelteWriter
 
     writer = SvelteWriter()

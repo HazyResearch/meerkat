@@ -33,9 +33,8 @@ class Violin(Component):
         on_select: Endpoint = None,
         **kwargs,
     ):
-        """See
-        https://plotly.com/python-api-reference/generated/plotly.express.violin.html
-        for more details."""
+        """See https://plotly.com/python-api-
+        reference/generated/plotly.express.violin.html for more details."""
 
         if not env.is_package_installed("plotly"):
             raise ValueError(

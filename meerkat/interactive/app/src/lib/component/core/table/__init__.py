@@ -28,9 +28,11 @@ class OnEditInterface(EventInterface):
 class OnSelectTable(EventInterface):
     selected: List[Any]
 
+
 @endpoint
 def edit(df: DataFrame, column: str, keyidx: Union[int, str], posidx: int, value: Any):
     df.loc[keyidx, column] = value
+
 
 class Table(Component):
     df: DataFrame

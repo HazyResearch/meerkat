@@ -1,41 +1,18 @@
 from functools import lru_cache
-import ibis
 
-from meerkat.tools.lazy_loader import LazyLoader
-
-import cytoolz as tz
-import dill
 import numpy as np
 import pandas as pd
-import pyarrow as pa
-from pandas._libs import lib
 
-import meerkat
-from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
 from meerkat.columns.scalar.abstract import ScalarColumn
-from meerkat.columns.scalar.arrow import ArrowScalarColumn
-from meerkat.errors import ConversionError
-from meerkat.interactive.graph.marking import is_unmarked_context, unmarked
-from meerkat.interactive.graph.reactivity import reactive
-from meerkat.interactive.graph.store import Store
-from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
-from meerkat.mixins.cloneable import CloneableMixin
-from meerkat.mixins.deferable import DeferrableMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
-from meerkat.mixins.indexing import IndexerMixin, MaterializationMixin
-from meerkat.mixins.inspect_fn import FunctionInspectorMixin
-from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin
-from meerkat.row import Row
 from meerkat.tools.lazy_loader import LazyLoader
-from meerkat.tools.utils import convert_to_batch_fn, dump_yaml, load_yaml
-
 
 from .dataframe import DataFrame
 
-
+ibis = LazyLoader("ibis")
 torch = LazyLoader("torch")
 
 
@@ -67,7 +44,7 @@ class IbisDataFrame(DataFrame):
     def ncols(self):
         """Number of rows in the DataFrame."""
         return len(self.data.columns)
-    
+
     def _get_loc(self, keyidx, materialize: bool = False):
         if self.primary_key_name is None:
             raise ValueError(
@@ -91,7 +68,7 @@ class IbisDataFrame(DataFrame):
         if isinstance(posidx, str):
             # str index => column selection (AbstractColumn)
             if posidx in self.columns:
-    
+
                 return IbisColumn(self.expr[[posidx]])
             raise KeyError(f"Column `{posidx}` does not exist.")
 
@@ -112,9 +89,7 @@ class IbisDataFrame(DataFrame):
             stop = posidx.stop if posidx.stop is not None else len(self)
 
             return DataFrame.from_arrow(
-                self.expr.limit(
-                    n=max(0, stop - start), offset=start
-                ).to_pyarrow()
+                self.expr.limit(n=max(0, stop - start), offset=start).to_pyarrow()
             )
 
         elif (isinstance(posidx, tuple) or isinstance(posidx, list)) and len(posidx):
@@ -123,10 +98,9 @@ class IbisDataFrame(DataFrame):
                 index_type = "column"
             else:
                 index_type = "row"
-                return DataFrame([
-                    self._get(i, materialize=materialize)
-                    for i in posidx
-                ])
+                return DataFrame(
+                    [self._get(i, materialize=materialize) for i in posidx]
+                )
 
         elif isinstance(posidx, np.ndarray):
             if len(posidx.shape) != 1:
@@ -162,7 +136,7 @@ class IbisDataFrame(DataFrame):
             return df
         elif index_type == "row":  # pragma: no cover
             raise NotImplementedError("TODO: implement row selection")
-    
+
     def _clone(self, data: object = None, **kwargs):
         state = self._get_state(clone=True)
         state.update(kwargs)
@@ -190,23 +164,21 @@ class IbisDataFrame(DataFrame):
                 obj.set_primary_key(None, inplace=True)
         obj.expr = data
         return obj
-    
+
     def _set_data(self, value: ibis.expr = None):
         self.expr = value
         self._data = value
-
 
 
 class IbisColumn(Column):
-
     def __init__(self, expr: ibis.Expr):
         self.expr = expr
         super().__init__(data=expr)
-    
+
     def _set_data(self, value: ibis.expr = None):
         self.expr = value
         self._data = value
-    
+
     @lru_cache(maxsize=1)
     def full_length(self):
         return self.expr.count().execute()
@@ -229,9 +201,9 @@ class IbisColumn(Column):
             return NumberFormatterGroup(dtype="int")
         elif isinstance(dtype, ibis.expr.datatypes.Floating):
             return NumberFormatterGroup(dtype="float")
-        
-        return super()._get_default_formatters() 
-    
+
+        return super()._get_default_formatters()
+
     def _get(self, index, materialize: bool = True):
         if self._is_batch_index(index):
             # only create a numpy array column

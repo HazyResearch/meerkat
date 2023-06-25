@@ -105,7 +105,6 @@ class Column(
             formatters if formatters is not None else self._get_default_formatters()
         )
 
-
     @unmarked()
     def __repr__(self):
         return (

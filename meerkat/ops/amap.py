@@ -1,18 +1,15 @@
 import asyncio
 import concurrent
 import functools
-import warnings
 from typing import Any, Callable, Union
 
-from tqdm.asyncio import tqdm_asyncio
 from tqdm.auto import tqdm
 
 import meerkat as mk
 
 
 async def callasync(fn: Callable, element: Any):
-    """
-    Call a function asynchronously.
+    """Call a function asynchronously.
 
     Uses the `asyncio` library to call a function asynchronously.
     """
@@ -23,9 +20,7 @@ async def callasync(fn: Callable, element: Any):
 
 
 def asasync(fn: Callable):
-    """
-    Decorator to make a function asynchronous.
-    """
+    """Decorator to make a function asynchronous."""
 
     @functools.wraps(fn)
     async def wrapper(element):
@@ -35,10 +30,8 @@ def asasync(fn: Callable):
 
 
 async def apply_function(fn: Callable, column: mk.Column):
-    """
-    Asynchronously apply a function to each element in a column.
-    Run the return value of this function through `asyncio.run()` to
-    get the results.
+    """Asynchronously apply a function to each element in a column. Run the
+    return value of this function through `asyncio.run()` to get the results.
 
     Args:
         fn: The async function to apply to each element.
@@ -54,10 +47,8 @@ async def apply_function(fn: Callable, column: mk.Column):
 
 
 def as_single_arg_fn(fn: Callable) -> Callable:
-    """
-    Convert a function that takes multiple arguments to a function that takes
-    a single argument.
-    """
+    """Convert a function that takes multiple arguments to a function that
+    takes a single argument."""
 
     @functools.wraps(fn)
     def wrapper(kwargs):

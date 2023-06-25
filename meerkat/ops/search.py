@@ -35,7 +35,7 @@ def search(
 
     Return:
         DataFrame: A sorted view of DataFrame.
-    
+
     Examples
     ---------
     df.search("asdjfkdfl", "")
