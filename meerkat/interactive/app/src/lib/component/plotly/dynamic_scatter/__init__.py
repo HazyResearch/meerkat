@@ -1,8 +1,6 @@
 import json
 from typing import List
 
-import ibis
-
 from meerkat import env
 from meerkat.dataframe import DataFrame
 from meerkat.ibis import IbisDataFrame
@@ -15,7 +13,7 @@ from meerkat.tools.utils import classproperty, requires
 from ...abstract import Component
 
 px = LazyLoader("plotly.express")
-
+ibis = LazyLoader("ibis")
 
 class OnRelayoutInterface(EventInterface):
     """Defines the interface for an event.
