@@ -19,7 +19,7 @@ torch = LazyLoader("torch")
 class IbisDataFrame(DataFrame):
     def __init__(
         self,
-        expr: ibis.Expr,
+        expr: "ibis.Expr",
     ):
         self.expr = expr
 
@@ -165,17 +165,17 @@ class IbisDataFrame(DataFrame):
         obj.expr = data
         return obj
 
-    def _set_data(self, value: ibis.expr = None):
+    def _set_data(self, value: "ibis.expr" = None):
         self.expr = value
         self._data = value
 
 
 class IbisColumn(Column):
-    def __init__(self, expr: ibis.Expr):
+    def __init__(self, expr: "ibis.Expr"):
         self.expr = expr
         super().__init__(data=expr)
 
-    def _set_data(self, value: ibis.expr = None):
+    def _set_data(self, value: "ibis.expr" = None):
         self.expr = value
         self._data = value
 
