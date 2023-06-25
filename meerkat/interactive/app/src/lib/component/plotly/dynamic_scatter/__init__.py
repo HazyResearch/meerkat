@@ -15,6 +15,7 @@ from ...abstract import Component
 px = LazyLoader("plotly.express")
 ibis = LazyLoader("ibis")
 
+
 class OnRelayoutInterface(EventInterface):
     """Defines the interface for an event.
 
