@@ -21,14 +21,13 @@
 </script>
 
 {#if editable}
-	<div
-		class={classes + " whitespace-pre-line"}
-		contenteditable="true"
-		on:keydown={handleKeydown}
-		
-	>
-		{data}
-	</div>
+	<input
+		class="input w-full"
+		on:change={() => {
+			cellEdit(data);
+		}}
+		bind:value={data}
+	/>
 {:else}
 	<div class={classes}>
 		{data}

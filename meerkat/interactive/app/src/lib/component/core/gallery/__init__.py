@@ -24,6 +24,7 @@ class Gallery(Component):
         allow_selection: bool = False,
         cell_size: int = 24,
         per_page: int = 20,
+        page: int = 0,
     ):
         """Gallery view of a DataFrame.
 
@@ -51,6 +52,7 @@ class Gallery(Component):
             allow_selection=allow_selection,
             cell_size=cell_size,
             per_page=per_page,
+            page=page,
         )
 
     def _get_ipython_height(self):
