@@ -40,7 +40,6 @@ from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.datasets import get
-from meerkat.engines import BaseEngine, ChatCompletion, TextCompletion
 from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.complete import complete
 from meerkat.ops.concat import concat
@@ -209,10 +208,6 @@ __all__ = [
     "from_arrow",
     "from_huggingface",
     "read",
-    # <<<< Engines >>>>
-    "BaseEngine",
-    "ChatCompletion",
-    "TextCompletion",
     # <<<< Formatters >>>>
     "BaseFormatter",
     "FormatterGroup",
