@@ -23,7 +23,9 @@
 <div class={classes}>
 	<Checkbox
 		on:change={(e) => {
-			cellEdit(checked);
+			if (cellEdit) {
+				cellEdit(checked);
+			}
 			dispatch('change');
 		}}
 		bind:checked

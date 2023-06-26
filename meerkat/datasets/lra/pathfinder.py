@@ -107,9 +107,10 @@ class pathfinder(DatasetBuilder):
 
     @staticmethod
     def _get_dataset_dir(name: str, version: str) -> str:
-        """
-        self.dataset_dir will be: <root_dir>/lra_release/lra_release/pathfinder<res>
-        e.g. /home/user/.meerkat/datasets/lra_release/lra_release/pathfinder32
+        """self.dataset_dir will be:
+
+        <root_dir>/lra_release/lra_release/pathfinder<res> e.g.
+        /home/user/.meerkat/datasets/lra_release/lra_release/pathfinder32.
         """
         res = _get_resolution(version)
         return os.path.join(

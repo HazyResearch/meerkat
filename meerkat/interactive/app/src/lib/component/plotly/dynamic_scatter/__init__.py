@@ -3,6 +3,7 @@ from typing import List
 
 from meerkat import env
 from meerkat.dataframe import DataFrame
+from meerkat.ibis import IbisDataFrame
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store, reactive
@@ -12,6 +13,7 @@ from meerkat.tools.utils import classproperty, requires
 from ...abstract import Component
 
 px = LazyLoader("plotly.express")
+ibis = LazyLoader("ibis")
 
 
 class OnRelayoutInterface(EventInterface):
@@ -57,9 +59,8 @@ class DynamicScatter(Component):
         on_select: Endpoint = None,
         **kwargs,
     ):
-        """See
-        https://plotly.com/python-api-reference/generated/plotly.express.scatter.html
-        for more details."""
+        """See https://plotly.com/python-api-
+        reference/generated/plotly.express.scatter.html for more details."""
 
         if not env.is_package_installed("plotly"):
             raise ValueError(
@@ -69,11 +70,19 @@ class DynamicScatter(Component):
         if df.primary_key_name is None:
             raise ValueError("Dataframe must have a primary key")
 
-        fig_df = df if len(df) <= max_points else df.sample(max_points)  # noqa: F841
+        full_size = len(df)  # noqa: F841
 
         @reactive()
         def get_layout(df: DataFrame, x: str, y: str, color: str):
-            fig = px.scatter(df.to_pandas(), x=x, y=y, color=color, **kwargs)
+            if isinstance(df, IbisDataFrame):
+                fig_df = DataFrame.from_pandas(
+                    df.expr.order_by(ibis.random())
+                    .limit(max_points)[x, y, color]
+                    .execute()
+                )
+            else:
+                fig_df = df if len(df) <= max_points else df.sample(max_points)
+            fig = px.scatter(fig_df.to_pandas(), x=x, y=y, color=color, **kwargs)
             return json.dumps(json.loads(fig.to_json())["layout"])
 
         layout = get_layout(df, x=x, y=y, color=color)
@@ -88,22 +97,37 @@ class DynamicScatter(Component):
 
         @reactive()
         def filter_df(df: DataFrame, axis_range: dict, x: str, y: str):
-            df = df.view()
+            is_ibis = isinstance(df, IbisDataFrame)
+            if is_ibis:
+                df = df.expr
+            else:
+                df = df.view()
+
             if axis_range["x0"] is not None:
-                df = df[(axis_range["x0"] < df[x])]
+                df = df[axis_range["x0"] < df[x]]
             if axis_range["x1"] is not None:
                 df = df[df[x] < axis_range["x1"]]
             if axis_range["y0"] is not None:
-                df = df[(axis_range["y0"] < df[y])]
+                df = df[axis_range["y0"] < df[y]]
             if axis_range["y1"] is not None:
                 df = df[df[y] < axis_range["y1"]]
+            if is_ibis:
+                df = IbisDataFrame(df)
             return df
 
         @reactive()
         def sample_df(df: DataFrame):
-            df = df.view()
-            if len(df) > max_points:
-                df = df.sample(max_points)
+            is_ibis = isinstance(df, IbisDataFrame)
+            if is_ibis:
+                df = DataFrame.from_pandas(
+                    df.expr.order_by(ibis.random())
+                    .limit(max_points)[x, y, color, df.primary_key_name]
+                    .execute()
+                )
+            else:
+                df = df.view()
+                if len(df) > max_points:
+                    df = df.sample(max_points)
             return df
 
         @reactive()

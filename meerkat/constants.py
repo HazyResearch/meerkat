@@ -240,6 +240,11 @@ class PathHelper(metaclass=Singleton):
         if is_notebook():
             # If we are running inside a notebook, and the notebook is next to
             # an app/ directory, then use that as the app directory.
+            if MEERKAT_APP_DIR is not None:
+                self._appdir = MEERKAT_APP_DIR
+                self._appdir = os.path.abspath(self._appdir)
+                return self._appdir
+
             candidate_path = os.path.join(os.getcwd(), "app")
             if os.path.exists(candidate_path):
                 # The notebook is next to an app/ directory. Point to this directory.
@@ -264,6 +269,14 @@ class PathHelper(metaclass=Singleton):
         self._appdir = os.path.abspath(self._appdir)
 
         return self._appdir
+
+    @appdir.setter
+    def appdir(self, value):
+        self._appdir = os.path.abspath(value)
+
+    def use_internal_appdir(self):
+        """Set the path to the internal app directory."""
+        self.appdir = MEERKAT_INTERNAL_APP_DIR
 
     @property
     def is_user_app(self) -> bool:

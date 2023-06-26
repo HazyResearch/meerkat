@@ -35,6 +35,10 @@ def search(
 
     Return:
         DataFrame: A sorted view of DataFrame.
+
+    Examples
+    ---------
+    df.search("asdjfkdfl", "")
     """
     if len(data) <= 1:
         raise ValueError("Dataframe must have at least 2 rows.")

@@ -173,7 +173,8 @@ class MedicalImageFormatter(ImageFormatter):
         return total_zoom_extent
 
     def _resize(self, mv: MedicalVolume, slice_dim: int) -> MedicalVolume:
-        """Resizes a medical volume so that in-plane is the same resolution (in mm).
+        """Resizes a medical volume so that in-plane is the same resolution (in
+        mm).
 
         Args:
             mv: The medical volume to resize.

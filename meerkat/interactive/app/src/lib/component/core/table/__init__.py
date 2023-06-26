@@ -1,8 +1,8 @@
-from typing import Any, List
+from typing import Any, List, Union
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.endpoint import EndpointProperty
+from meerkat.interactive.endpoint import EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
 from meerkat.interactive.formatter.base import register_placeholder
 
@@ -20,13 +20,18 @@ class OnEditInterface(EventInterface):
     """
 
     column: str
-    keyidx: int
+    keyidx: Union[int, str]
     posidx: int
     value: Any
 
 
 class OnSelectTable(EventInterface):
     selected: List[Any]
+
+
+@endpoint
+def edit(df: DataFrame, column: str, keyidx: Union[int, str], posidx: int, value: Any):
+    df.loc[keyidx, column] = value
 
 
 class Table(Component):
@@ -58,6 +63,10 @@ class Table(Component):
                 rows. Defaults to False.
             single_select: Whether to allow the user to select only one row.
         """
+
+        if on_edit is None:
+            on_edit = edit.partial(df=df)
+
         super().__init__(
             df=df,
             selected=selected,
@@ -73,6 +82,6 @@ class Table(Component):
 
 register_placeholder(
     name="table",
-    fallbacks=["thumbnail"],
+    fallbacks=["tiny"],
     description="Formatter to be used in a gallery view.",
 )
