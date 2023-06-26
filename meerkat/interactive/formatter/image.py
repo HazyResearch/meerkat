@@ -1,7 +1,7 @@
 import base64
 import os
 from io import BytesIO
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Union
 
 import numpy as np
 from PIL import Image as PILImage
@@ -22,12 +22,19 @@ class ImageFormatter(BaseFormatter):
     data_prop: str = "data"
 
     def __init__(
-        self, max_size: Tuple[int] = None, classes: str = "", mode: Optional[str] = None
+        self,
+        max_size: Tuple[int] = None,
+        classes: str = "",
+        mode: Optional[str] = None,
+        enable_zoom: Union[bool, float] = False,
+        enable_pan: bool = False,
     ):
         super().__init__()
         self.max_size = max_size
         self.classes = classes
         self.mode = mode
+        self.enable_zoom = enable_zoom
+        self.enable_pan = enable_pan
 
     def encode(self, cell: PILImage, skip_copy: bool = False, mode: str = None) -> str:
         """Encodes an image as a base64 string.
@@ -66,7 +73,11 @@ class ImageFormatter(BaseFormatter):
 
     @property
     def props(self) -> Dict[str, Any]:
-        return {"classes": self.classes}
+        return {
+            "classes": self.classes,
+            "enable_zoom": self.enable_zoom,
+            "enable_pan": self.enable_pan,
+        }
 
     def html(self, cell: Image) -> str:
         encoded = self.encode(cell)
@@ -77,12 +88,18 @@ class ImageFormatter(BaseFormatter):
             "max_size": self.max_size,
             "classes": self.classes,
             "mode": self.mode,
+            "enable_zoom": self.enable_zoom,
+            "enable_pan": self.enable_pan,
         }
 
     def _set_state(self, state: Dict[str, Any]):
         self.max_size = state["max_size"]
         self.classes = state["classes"]
         self.mode = state["mode"]
+        if "enable_zoom" in state:
+            self.enable_zoom = state["enable_zoom"]
+        if "enable_pan" in state:
+            self.enable_pan = state["enable_pan"]
 
 
 class ImageFormatterGroup(FormatterGroup):
@@ -91,7 +108,9 @@ class ImageFormatterGroup(FormatterGroup):
     def __init__(self, classes: str = "", mode: Optional[str] = None):
         super().__init__(
             icon=IconFormatter(name="Image"),
-            base=self.formatter_class(classes=classes, mode=mode),
+            base=self.formatter_class(
+                classes=classes, mode=mode, enable_zoom=True, enable_pan=True
+            ),
             tiny=self.formatter_class(max_size=[32, 32], classes=classes, mode=mode),
             small=self.formatter_class(max_size=[64, 64], classes=classes, mode=mode),
             thumbnail=self.formatter_class(

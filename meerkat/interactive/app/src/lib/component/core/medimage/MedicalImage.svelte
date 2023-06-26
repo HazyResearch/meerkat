@@ -1,17 +1,21 @@
 <script lang="ts">
 	import type { CellInfo } from '$lib/utils/dataframe';
 	import type { Endpoint } from '$lib/utils/types';
+	import { onMount } from 'svelte';
+
 	import {
 		Fullscreen,
 		FullscreenExit,
 		PlayFill,
 		PauseFill,
 		Compass,
-		Palette
+		Palette,
+		ZoomIn
 	} from 'svelte-bootstrap-icons';
 	import { dispatch } from '$lib/utils/api';
 	import { BarLoader } from 'svelte-loading-spinners';
 	import Toolbar from '$lib/shared/common/Toolbar.svelte';
+	import Image from '../image/Image.svelte';
 
 	export let data: Array<string>;
 	export let classes: string = '';
@@ -34,10 +38,16 @@
 	let segmentation: Array<string> = null;
 	const segmentationCache: any = {};
 
+	// Transform properties.
+	let zoom: number = 1;
+	let offset: Array<number> = [0, 0];
+
 	// Whether the image is fullscreen.
 	let isFullscreen: boolean = false;
 	// Whether the video is playing.
 	let isPlaying: boolean = false;
+	// Whether the zoom is active.
+	let isZoomActive: boolean = false;
 	// Whether the toolbar information should be shown.
 	let isToolbarActive: boolean = false;
 	// Whether we should pin the toolbar.
@@ -48,6 +58,9 @@
 	// TODO: this should be reactive.
 	$: numSlices = data.length;
 	$: sliceNumber = Math.floor(numSlices / 2);
+
+	// Cursor style
+	$: cursorStyle = isZoomActive ? 'zoom-in' : 'default';
 
 	function fetchData() {
 		if (dim in dataCache) {
@@ -96,11 +109,22 @@
 		});
 	}
 
+	function handleZoom(event: MouseEvent) {
+		if (event.button == 2) {
+			event.preventDefault();
+			zoom -= 0.05;
+		} else {
+			zoom += 0.05;
+		}
+		zoom = Math.max(zoom, 1);
+	}
+
 	function clampSliceNumber(sliceNumber: number) {
 		return Math.min(Math.max(0, sliceNumber), numSlices - 1);
 	}
 
 	function handleScroll(event: WheelEvent) {
+		event.preventDefault();
 		if (numSlices === 1) {
 			return;
 		}
@@ -112,13 +136,24 @@
 	}
 
 	function handleKeyPressFullscreen(event: KeyboardEvent) {
-		console.log(event);
 		if (event.key === 'Escape') {
 			isFullscreen = false;
 		} else if (event.key === 'ArrowUp') {
 			sliceNumber = clampSliceNumber(sliceNumber - 1);
 		} else if (event.key === 'ArrowDown') {
 			sliceNumber = clampSliceNumber(sliceNumber + 1);
+		} else {
+			handleKeyPress(event);
+		}
+	}
+
+	function handleKeyPress(event: KeyboardEvent) {
+		if (event.key === '=' && event.ctrlKey) {
+			zoom += 0.05;
+			zoom = Math.max(zoom, 1);
+		} else if (event.key === '-' && event.ctrlKey) {
+			zoom -= 0.05;
+			zoom = Math.max(zoom, 1);
 		}
 	}
 
@@ -126,8 +161,10 @@
 		isFullscreen = !isFullscreen;
 		if (isFullscreen) {
 			window.addEventListener('keydown', handleKeyPressFullscreen);
+			window.removeEventListener('keydown', handleKeyPress);
 		} else {
 			window.removeEventListener('keydown', handleKeyPressFullscreen);
+			window.addEventListener('keydown', handleKeyPress);
 		}
 	}
 
@@ -145,6 +182,10 @@
 			setTimeout(nextImage, 1000 / fps); // change @ 30 fps
 		}
 	}
+
+	onMount(() => {
+		window.addEventListener('keydown', handleKeyPress);
+	});
 </script>
 
 {#if showToolbar}
@@ -161,21 +202,34 @@
 			<div class="flex justify-center items-center h-full">Error</div>
 		{:else}
 			<div class="image-container w-full h-full">
-				<div class="w-full h-full" style="position: relative;">
-					<img
-						src={data[sliceNumber]}
-						class={classes + 'z-index-0'}
-						on:wheel|preventDefault={handleScroll}
-						alt="A medical image."
+				<div
+					class="w-full h-full overflow-hidden"
+					style="position: relative;"
+					on:wheel|preventDefault={handleScroll}
+					on:mousedown={(e) => {
+						isZoomActive && handleZoom(e);
+					}}
+					on:keypress={handleKeyPress}
+				>
+					<Image
+						data={data[sliceNumber]}
+						classes={classes + 'z-index-0'}
 						style="position:absolute; : 0; left: 0; width: 100%; height: 100%; object-fit: contain;"
+						alt="A medical image."
+						bind:zoom
+						bind:offset
+						enablePan={!isZoomActive}
+						cursor={cursorStyle}
 					/>
 					{#if isSegmentationActive}
-						<img
-							src={segmentation[sliceNumber]}
-							class={classes + 'z-index-2'}
-							on:wheel|preventDefault={handleScroll}
-							alt="A segmentation."
+						<Image
+							data={segmentation[sliceNumber]}
+							classes={classes + 'z-index-2'}
 							style="opacity: 0.7; position:absolute; : 0; left: 0; width: 100%; height: 100%; object-fit: contain;"
+							bind:zoom
+							bind:offset
+							enablePan={!isZoomActive}
+							cursor={cursorStyle}
 						/>
 					{/if}
 				</div>
@@ -186,7 +240,7 @@
 						Slice {sliceNumber + 1}/{numSlices}
 					</span>
 
-					<div class={'grid gap-x-3 grid-cols-' +  + (1 + (segmentationColumn !== ""))}>
+					<div class={'grid gap-x-3 grid-cols-' + (2 + (segmentationColumn !== ''))}>
 						<!-- Reformat button -->
 						<button
 							on:click={() => {
@@ -205,9 +259,17 @@
 									fetchSegmentation();
 								}}
 							>
-								<Palette width={24} height={24} fill={isSegmentationActive ? 'yellow' : 'white'}/>
+								<Palette width={24} height={24} fill={isSegmentationActive ? 'yellow' : 'white'} />
 							</button>
 						{/if}
+
+						<button
+							on:click={() => {
+								isZoomActive = !isZoomActive;
+							}}
+						>
+							<ZoomIn width={24} height={24} fill={isZoomActive ? 'yellow' : 'white'} />
+						</button>
 					</div>
 				</Toolbar>
 
