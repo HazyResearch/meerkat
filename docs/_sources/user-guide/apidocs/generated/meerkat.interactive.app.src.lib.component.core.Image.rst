@@ -59,5 +59,7 @@
       ~Image.wrapper_import_style
       ~Image.data
       ~Image.classes
+      ~Image.enable_zoom
+      ~Image.enable_pan
    
    
