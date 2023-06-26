@@ -15,12 +15,15 @@
 	// Cursor style.
 	export let cursor: string = 'default';
 
-	console.log("Image.svelte: enableZoom = ", zoom);
-
 	const handleWheel = (event: WheelEvent) => {
+		if (!event.ctrlKey) {
+			return;
+		}
+
+		// Zoom in/out
 		const { deltaY } = event;
 		event.preventDefault();
-		zoom += deltaY * 0.01;
+		zoom += -deltaY * 0.01;
 		zoom = Math.max(zoom, 1);
 	};
 
