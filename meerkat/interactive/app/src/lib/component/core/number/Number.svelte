@@ -8,6 +8,29 @@
 	export let editable: boolean = false;
 	export let classes: string = '';
 
+    if(dtype === "auto"){
+        if(typeof data === "number") {
+            
+            if(Number.isInteger(data)) {
+                dtype = "int";
+            } else {
+                dtype = "float";
+            }
+        } else {
+            dtype = "string"
+        }
+    }
+    
+    
+    if (dtype === "float" && data !== "NaN") {
+        if (percentage) {
+            data = (data * 100).toPrecision(precision) + "%";
+        } else if (!isNaN(data)) {
+            data = data.toPrecision(precision);
+        } else {
+            data = "NaN";
+        }
+    }
 	const cellEdit: CallableFunction = getContext('cellEdit');
 
 	let invalid = false;

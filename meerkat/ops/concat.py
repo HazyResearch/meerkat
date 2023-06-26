@@ -81,7 +81,7 @@ Try running `<objs>.filter(lambda x: len(x) > 0)` before calling mk.concat."""
 
             if shared and not overwrite:
                 if suffixes is None:
-                    raise ConcatError("Must ")
+                    raise ConcatError("Must pass `suffixes` if columns are shared.")
                 data = tz.merge(
                     {k + suffixes[idx] if k in shared else k: v for k, v in df.items()}
                     for idx, df in enumerate(objs)

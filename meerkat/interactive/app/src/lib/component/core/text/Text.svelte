@@ -6,6 +6,18 @@
 	export let classes: string = '';
 
 	const cellEdit: CallableFunction = getContext('cellEdit');
+
+	function handleKeydown(event) {
+		// Check if Shift-Enter (Mac)
+		const isCmdOrCtrl = event.shiftKey;
+		if (event.key === 'Enter' && !isCmdOrCtrl) {
+			// Prevent the default behavior (e.g., line break)
+			event.preventDefault();
+			data = event.target.textContent;
+			cellEdit(data);
+			event.target.blur();
+		}
+	}
 </script>
 
 {#if editable}

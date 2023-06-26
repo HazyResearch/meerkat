@@ -41,6 +41,9 @@ class NumberFormatter(BaseFormatter):
         if isinstance(cell, float) and math.isnan(cell):
             return "NaN"
 
+        if isinstance(cell, (str, int, float)):
+            return cell
+
         if isinstance(cell, np.generic):
             if pd.isna(cell):
                 return "NaN"

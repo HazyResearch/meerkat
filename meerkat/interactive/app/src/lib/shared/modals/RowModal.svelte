@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { fetchChunk, fetchSchema } from '$lib/utils/api';
+	import { fetchChunk, fetchSchema, dispatch } from '$lib/utils/api';
 	import type { DataFrameRef } from '$lib/utils/dataframe';
 	import ArrowLeft from 'svelte-bootstrap-icons/lib/ArrowLeft.svelte';
 	import ChevronLeft from 'svelte-bootstrap-icons/lib/ChevronLeft.svelte';
 	import ChevronRight from 'svelte-bootstrap-icons/lib/ChevronRight.svelte';
+	import type { Endpoint } from '$lib/utils/types';
 	import { closeModal } from 'svelte-modals';
 	import Cell from '../cell/Cell.svelte';
 
@@ -11,6 +12,7 @@
 	export let df: DataFrameRef;
 	export let posidx: number;
 	export let mainColumn: string = '';
+	export let onEdit: Endpoint;
 
 	// Give the card the `flex-grow` Tailwind class to horizontally
 	// fill out space in the (containing) flex container.
@@ -44,21 +46,28 @@
 		}
 	};
 
+	// if the click is outside of the model, close it
+	const onClick = (e) => {
+		if (e.target === e.currentTarget) {
+			closeModal();
+		}
+	};
+
 	const onKeyPress = async (e) => {
 		// q / esc / enter
-		if (e.charCode === 113 || e.charCode === 13 || e.charCode === 27) {
+		if ( e.charCode === 27) {
 			closeModal();
 			// a / left arrow
-		} else if (e.charCode === 97 || e.charCode === 37) {
+		} else if (e.charCode === 37) {
 			decrement();
 			// d / right arrow
-		} else if (e.charCode === 100 || e.charCode === 39) {
+		} else if (e.charCode === 39) {
 			increment();
 		}
 	};
 </script>
 
-<svelte:window on:keypress={onKeyPress} />
+<svelte:window on:keypress={onKeyPress}  on:click={onClick} />
 
 {#if isOpen}
 	<div
@@ -155,16 +164,29 @@
 						class="flex p-10 items-center h-full w-full justify-center justify-self-center overflow-y-scroll"
 					>
 						{#await mainChunkPromise then chunk}
-							<Cell {...chunk.getCell(0, mainColumn)} />
+							<Cell 
+								{...chunk.getCell(0, mainColumn)} 
+								editable={true}
+								on:edit={(e) => {
+									dispatch(onEdit.endpointId, {
+										detail: {
+											column: mainColumn,
+											keyidx: chunk.keyidxs[0],
+											posidx: posidx,
+											value: e.detail.value
+										}
+									});
+								}}
+							/>
 						{/await}
 					</div>
 				</div>
 			</div>
 		</div>
-		<div
+		<!-- <div
 			class="h-fit bg-slate-100 mt-1 w-[90%] rounded-lg text-center text-sm text-gray-600 font-mono"
 		>
 			a : previous row | d : next row | q : close
-		</div>
+		</div> -->
 	</div>
 {/if}
