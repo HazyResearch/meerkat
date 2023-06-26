@@ -1880,11 +1880,11 @@ title="Open an issue"
               <div>
                 
   <h1>Source code for meerkat.interactive.app.src.lib.component.core.table</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">meerkat.dataframe</span> <span class="kn">import</span> <span class="n">DataFrame</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.app.src.lib.component.abstract</span> <span class="kn">import</span> <span class="n">Component</span>
-<span class="kn">from</span> <span class="nn">meerkat.interactive.endpoint</span> <span class="kn">import</span> <span class="n">EndpointProperty</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.endpoint</span> <span class="kn">import</span> <span class="n">EndpointProperty</span><span class="p">,</span> <span class="n">endpoint</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.event</span> <span class="kn">import</span> <span class="n">EventInterface</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.base</span> <span class="kn">import</span> <span class="n">register_placeholder</span>
 
@@ -1902,13 +1902,18 @@ title="Open an issue"
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">keyidx</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">keyidx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
     <span class="n">posidx</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">value</span><span class="p">:</span> <span class="n">Any</span>
 
 
 <span class="k">class</span> <span class="nc">OnSelectTable</span><span class="p">(</span><span class="n">EventInterface</span><span class="p">):</span>
     <span class="n">selected</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+
+
+<span class="nd">@endpoint</span>
+<span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">keyidx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">posidx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">keyidx</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
 
 <div class="viewcode-block" id="Table"><a class="viewcode-back" href="../../../../../../../../user-guide/apidocs/generated/meerkat.interactive.app.src.lib.component.core.Table.html#meerkat.interactive.app.src.lib.component.core.Table">[docs]</a><span class="k">class</span> <span class="nc">Table</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
@@ -1940,6 +1945,10 @@ title="Open an issue"
 <span class="sd">                rows. Defaults to False.</span>
 <span class="sd">            single_select: Whether to allow the user to select only one row.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">on_edit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">on_edit</span> <span class="o">=</span> <span class="n">edit</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
             <span class="n">selected</span><span class="o">=</span><span class="n">selected</span><span class="p">,</span>
@@ -1955,7 +1964,7 @@ title="Open an issue"
 
 <span class="n">register_placeholder</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;table&quot;</span><span class="p">,</span>
-    <span class="n">fallbacks</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;thumbnail&quot;</span><span class="p">],</span>
+    <span class="n">fallbacks</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;tiny&quot;</span><span class="p">],</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Formatter to be used in a gallery view.&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
