@@ -124,6 +124,13 @@
 	}
 
 	function handleScroll(event: WheelEvent) {
+		// Pinch-to-zoom action on MacOS.
+		// https://dev.to/danburzo/pinch-me-i-m-zooming-gestures-in-the-dom-a0e
+		if (event.ctrlKey) {
+			zoom += -event.deltaY * 0.01;
+			zoom = Math.max(zoom, 1);
+			return;
+		}
 		event.preventDefault();
 		if (numSlices === 1) {
 			return;
