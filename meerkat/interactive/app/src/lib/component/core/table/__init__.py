@@ -38,10 +38,13 @@ class Table(Component):
     df: DataFrame
     selected: List[str] = []
     single_select: bool = False
+
     classes: str = "h-fit"
 
     on_edit: EndpointProperty[OnEditInterface] = None
     on_select: EndpointProperty[OnSelectTable] = None
+
+    row_views: List[EndpointProperty] = None
 
     def __init__(
         self,
@@ -51,7 +54,8 @@ class Table(Component):
         single_select: bool = False,
         classes: str = "h-fit",
         on_edit: EndpointProperty = None,
-        on_select: EndpointProperty = None
+        on_select: EndpointProperty = None,
+        row_views: List[EndpointProperty] = None
     ):
         """Table view of a DataFrame.
 
@@ -66,6 +70,9 @@ class Table(Component):
 
         if on_edit is None:
             on_edit = edit.partial(df=df)
+        
+        if row_views is None:
+            row_views = []
 
         super().__init__(
             df=df,
@@ -74,6 +81,7 @@ class Table(Component):
             classes=classes,
             on_edit=on_edit,
             on_select=on_select,
+            row_views=row_views
         )
 
     def _get_ipython_height(self):

@@ -7,6 +7,7 @@
 
 	const cellEdit: CallableFunction = getContext('cellEdit');
 
+
 	function handleKeydown(event) {
 		// Check if Shift-Enter (Mac)
 		const isCmdOrCtrl = event.shiftKey;

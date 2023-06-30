@@ -7,12 +7,16 @@
 	import type { Endpoint } from '$lib/utils/types';
 	import { closeModal } from 'svelte-modals';
 	import Cell from '../cell/Cell.svelte';
+	import DynamicComponent from '../DynamicComponent.svelte';
+	import Row from './Row.svelte';
+	import { createStoresFromComponent } from '$lib/utils/stores';
 
 	export let isOpen: boolean;
 	export let df: DataFrameRef;
 	export let posidx: number;
 	export let mainColumn: string = '';
 	export let onEdit: Endpoint;
+	export let rowViews: Array<Endpoint>;
 
 	// Give the card the `flex-grow` Tailwind class to horizontally
 	// fill out space in the (containing) flex container.
@@ -32,6 +36,10 @@
 			formatter: 'full'
 		});
 	});
+	console.log(rowViews)
+	$: rowViewComponentPromise = dispatch(rowViews[0].endpointId, {
+		detail: {df: df, posidx: posidx}
+	}).then(createStoresFromComponent);
 
 	const increment = async () => {
 		let chunk = await chunkPromise;
@@ -163,7 +171,7 @@
 					<div
 						class="flex p-10 items-center h-full w-full justify-center justify-self-center overflow-y-scroll"
 					>
-						{#await mainChunkPromise then chunk}
+						<!-- {#await mainChunkPromise then chunk}
 							<Cell 
 								{...chunk.getCell(0, mainColumn)} 
 								editable={true}
@@ -178,6 +186,9 @@
 									});
 								}}
 							/>
+						{/await} -->
+						{#await rowViewComponentPromise then component}
+							<Row {...component}/>
 						{/await}
 					</div>
 				</div>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getContext, onMount, type ComponentType } from 'svelte';
+	import { writable } from 'svelte/store';
 
 	const components: { [key: string]: ComponentType } = getContext('Components');
 
@@ -7,7 +8,6 @@
 	export let props: any;
 	export let slots: any = [];
 
-	console.log("props", props)
 
 	let component: ComponentType;
 	onMount(async () => {

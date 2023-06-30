@@ -21,6 +21,8 @@
 	export let singleSelect: boolean = false;
 	export let onEdit: Endpoint;
 	export let onSelect: Endpoint;
+	
+	export let rowViews: Array<any> = [];
 
 	export let classes: string = 'h-fit';
 
@@ -30,7 +32,8 @@
 			df: df,
 			posidx: posidx,
 			mainColumn: undefined,
-			onEdit: onEdit
+			onEdit: onEdit,
+			rowViews: rowViews
 		});
 	};
 
