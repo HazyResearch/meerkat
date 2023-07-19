@@ -80,6 +80,7 @@ class OpenAIChatCompletion(OpenAIMixin, ChatCompletion):
 
     COST_PER_TOKEN = {
         "gpt-3.5-turbo": 0.002 / 1000,
+        "gpt-4":    0.03/ 1000
     }
 
     def __init__(
