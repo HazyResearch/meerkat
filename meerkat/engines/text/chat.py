@@ -78,10 +78,7 @@ class Message(BaseModel):
 
 class OpenAIChatCompletion(OpenAIMixin, ChatCompletion):
 
-    COST_PER_TOKEN = {
-        "gpt-3.5-turbo": 0.002 / 1000,
-        "gpt-4":    0.03/ 1000
-    }
+    COST_PER_TOKEN = {"gpt-3.5-turbo": 0.002 / 1000, "gpt-4": 0.03 / 1000}
 
     def __init__(
         self,
@@ -126,7 +123,7 @@ class OpenAIChatCompletion(OpenAIMixin, ChatCompletion):
         prompt: str,
         history: List[Message] = [],
         system_prompt: str = "You are a helpful assistant.",
-        skip_cache: bool = False
+        skip_cache: bool = False,
     ):
         """Run the engine on a prompt."""
         if not skip_cache:
@@ -171,7 +168,7 @@ class OpenAIChatCompletion(OpenAIMixin, ChatCompletion):
             cost=self.COST_PER_TOKEN[self._model] * response["usage"]["total_tokens"],
             input_tokens=response["usage"]["prompt_tokens"],
             output_tokens=response["usage"]["completion_tokens"],
-            configuration=self.configuration
+            configuration=self.configuration,
         )
 
     def key(self, key: str):

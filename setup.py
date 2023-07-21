@@ -74,6 +74,7 @@ REQUIRED = [
     "sse-starlette",
     "tabulate",
     "pyparsing",
+    "pydantic<2.0.0",
 ]
 
 # Read in docs/requirements.txt
