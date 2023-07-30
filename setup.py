@@ -63,6 +63,7 @@ REQUIRED = [
     "ipywidgets>=7.0.0",
     ipython_requirement,
     "fastapi",
+    "pydantic<2.0.0",  # TODO: Remove this once we figure out how to support pydantic 2.0
     "uvicorn",
     "rich",
     "cryptography",
