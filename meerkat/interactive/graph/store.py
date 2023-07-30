@@ -4,7 +4,8 @@ from typing import Any, Generic, Iterator, List, Tuple, TypeVar, Union
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ValidationError
-from pydantic.fields import ModelField
+from pydantic.fields import Field
+
 from wrapt import ObjectProxy
 
 from meerkat.interactive.graph.magic import _magic, is_magic_context
@@ -134,7 +135,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
         yield cls.validate
 
     @classmethod
-    def validate(cls, v, field: ModelField):
+    def validate(cls, v, field: Field):
         if not isinstance(v, cls):
             if not field.sub_fields:
                 # Generic parameters were not provided so we don't try to validate

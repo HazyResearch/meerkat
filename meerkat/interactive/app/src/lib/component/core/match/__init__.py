@@ -185,6 +185,13 @@ class Match(Component):
     on_unclickplus: Endpoint = None
     on_reset: Endpoint = None
 
+    on_reset_selection: Endpoint = None
+    on_set_negative_selection: Endpoint = None
+    on_unset_negative_selection: Endpoint = None
+    on_set_positive_selection: Endpoint = None
+    on_unset_positive_selection: Endpoint = None
+    on_external_selection_change: Endpoint = None
+
     def __init__(
         self,
         df: DataFrame = None,

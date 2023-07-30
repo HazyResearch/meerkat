@@ -257,6 +257,7 @@ class SvelteWriter(metaclass=Singleton):
         prop_names_camel_case = [
             snake_case_to_camel_case(prop_name) for prop_name in component.prop_names
         ]
+        breakpoint()
 
         return template.render(
             import_style=component.wrapper_import_style,
