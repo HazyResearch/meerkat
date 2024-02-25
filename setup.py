@@ -35,7 +35,7 @@ DESCRIPTION = (
     "Meerkat is building new data abstractions to make " "machine learning easier."
 )
 URL = "https://github.com/robustness-gym/meerkat"
-EMAIL = "kgoel@cs.stanford.edu"
+EMAIL = "eyuboglu@stanford.edu"
 AUTHOR = "The Meerkat Team"
 REQUIRES_PYTHON = ">=3.7.0"
 VERSION = main_ns["__version__"]
@@ -53,6 +53,7 @@ REQUIRED = [
     "tqdm>=4.49.0",
     "datasets>=1.4.1",
     "pyarrow>=11.0.0",
+    "pydantic<2.0",
     "PyYAML>=5.4.1",
     "omegaconf>=2.0.5",
     "semver>=2.13.0",
