@@ -43,7 +43,7 @@ def concat(
     if len(objs) == 0:
         return DataFrame()
 
-    if not all([type(objs[0]) == type(obj) for obj in objs[1:]]):
+    if not all([type(objs[0]) is type(obj) for obj in objs[1:]]):
         _any_object_empty = any([len(obj) == 0 for obj in objs])
         if _any_object_empty:
             raise ConcatError(
@@ -57,7 +57,7 @@ Try running `<objs>.filter(lambda x: len(x) > 0)` before calling mk.concat."""
         if axis == 0 or axis == "rows":
             # append new rows
             columns = objs[0].columns
-            if not all([set(df.columns) == set(columns) for df in objs]):
+            if not all([set(df.columns) is set(columns) for df in objs]):
                 raise ConcatError(
                     "Can only concatenate DataFrames along axis 0 (rows) if they have "
                     " the same set of columns names."

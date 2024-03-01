@@ -76,7 +76,7 @@ def test_getitem(column_testbed, index_type: type):
             result = result()
         column_testbed.assert_data_equal(data, result.data)
 
-        if type(result) == type(col):
+        if type(result) is type(col):
             # if the getitem returns a column of the same type, enforce that all the
             # attributes were cloned over appropriately. We don't want to check this
             # for columns that return columns of different type from getitem
